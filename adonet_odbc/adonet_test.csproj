@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net461</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <RootNamespace>adonet_test</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="ConnectODBC.cs">
+      <Link>adonet_test\ConnectODBC.cs</Link>
+    </Compile>
+    <Compile Include="Program.cs">
+      <Link>adonet_test\Program.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Data.Common" Version="4.3.0" />
+    <PackageReference Include="System.Data.Odbc" Version="4.7.0" />
+  </ItemGroup>
+</Project>

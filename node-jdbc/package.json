@@ -1,0 +1,42 @@
+{
+  "name": "node-jdbc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "mocha test/**/*.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^4.3.7",
+    "jdbc": "^0.7.5",
+    "mocha": "^11.1.0",
+    "winston": "^3.11.0",
+    "java": "^0.12.1"
+  },
+  "java": {
+    "dependencies": [
+      {
+        "groupId": "cubrid",
+        "artifactId": "cubrid-jdbc",
+        "version": "11.3.0.0047",
+        "jar": "./lib/cubrid-jdbc-11.3.0.0047.jar"
+      }
+    ],
+    "repositories": [
+      {
+        "id": "cubrid",
+        "url": "http://maven.cubrid.org"
+      }
+    ],
+    "options": [
+      "-Xmx512m",
+      "-Djava.awt.headless=true"
+    ]
+  }
+}
+
+
