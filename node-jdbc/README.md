@@ -6,5 +6,5 @@
 테스트 방법
 - node.js 및 npm 설치
 - lib 폴더에 jdbc 복사 (파일명 변경시 package.json, test/cubrid-jdbc.test.js내 파일명 변경 필요).
-- npm install
+- npm install (최초 실행)
 - 'run_test.bat' 배치 파일 실행

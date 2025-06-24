@@ -47,6 +47,13 @@ class ODBC:
         sql = f'select count(*) from {self.table_name}'
         self.cur.execute(sql)
         print("Data count after insert: {}".format(self.cur.fetchone()[0]))
+        
+    def select_all(self):
+        sql = f'select * from {self.table_name}'
+        self.cur.execute(sql)
+        print("Data all selected. rowCount: {}".format(self.cur.rowcount))
+        # for row in self.cur:
+        #     print(row)
 
     def select(self):
         sql = f'select * from {self.table_name} where id = ?'
@@ -63,6 +70,7 @@ class ODBC:
     def test(self):
         self.insert()
         self.select_count()
+        self.select_all()
         self.select()
 
 if __name__ == "__main__":

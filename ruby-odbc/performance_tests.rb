@@ -53,6 +53,16 @@ def test_data_selection_dbi_odbc(dbi_dsn, user, password)
   stmt.finish if stmt.respond_to?(:finish)
   puts "SelectedRow count: #{row[0]}"
 
+  stmt = dbh.prepare("SELECT * FROM test_table")
+  stmt.execute
+  rows = stmt.fetch_all
+  stmt.finish if stmt.respond_to?(:finish)
+  puts "Data all selected. rowCount: #{rows.size}"
+  for i in 0..rows.size-1
+    row = rows[i]
+    # puts "Row1 #{i}: ID=#{row[0]}, Name=#{row[1]}"
+  end
+
   start_time = Time.now
   sel_stmt = dbh.prepare("SELECT * FROM test_table WHERE id = ?")
   iterations.times do |i|
@@ -98,6 +108,7 @@ def test_table_insertion_odbc(dsn, user, password)
 end
 
 def test_data_selection_odbc(dsn, user, password)
+  puts "##################################\n# Test (ODBC): Data Selection Test\n##################################\n"
   iterations = ITERATIONS
   dbh = ODBC::Database.new
   dbh.connect(dsn, user, password)
@@ -108,6 +119,16 @@ def test_data_selection_odbc(dsn, user, password)
   row = stmt.fetch
   stmt.finish if stmt.respond_to?(:finish)
   puts "SelectedRow count: #{row[0]}"
+
+  stmt = dbh.prepare("SELECT * FROM test_table")
+  stmt.execute
+  rows = stmt.fetch_all
+  stmt.finish if stmt.respond_to?(:finish)
+  puts "Data all selected. rowCount: #{rows.size}"
+  for i in 0..rows.size-1
+    row = rows[i]
+    # puts "Row1 #{i}: ID=#{row[0]}, Name=#{row[1]}"
+  end
 
   start_time = Time.now
   sel_stmt = dbh.prepare("SELECT * FROM test_table WHERE id = ?")

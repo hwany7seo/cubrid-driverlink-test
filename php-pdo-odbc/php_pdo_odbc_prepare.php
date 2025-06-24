@@ -2,10 +2,10 @@
 $dsn = 'odbc:Driver={CUBRID Driver};db_name=demodb;server=192.168.2.32;port=33000';
 $username = 'dba';
 $password = '';
+$insert_count = 100;
 
 try {
     $options = getopt("c:");
-    $insert_count = 3;
     if (isset($options['c'])) {
         $insert_count = $options['c'];
     }
@@ -27,7 +27,7 @@ try {
 
     for ($i = 1; $i <= $insert_count; $i++) {
         $id = $i;
-        $name = 'preodb' . $i;
+        $name = 'pdoodbc' . $i;
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->bindParam(':name', $name, PDO::PARAM_STR);
         $stmt->execute();
@@ -38,47 +38,40 @@ try {
     $elapsed_time = $endTime - $startTime;
     error_log ("data inserted (elapsed time: " . $elapsed_time . "s)");
 
-    // $countSQL = "SELECT COUNT(*) as total FROM test_table";
-    // $stmt = $pdo->prepare($countSQL);
-    // $stmt->execute();
-    // $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    // $rowCount = $row['total'];
-    // error_log("Data count after insert: " . $rowCount); 
+    $countSQL = "SELECT COUNT(*) as total FROM test_table";
+    $stmt = $pdo->prepare($countSQL);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $rowCount = $row['total'];
+    error_log("Data count after insert: " . $rowCount); 
 
-    $startTime = microtime(true);
     $selectSQL = "SELECT * FROM test_table";
     $stmt = $pdo->query($selectSQL);
-    error_log("execute query");
     $rowCount = $stmt->rowCount();
     error_log("rowCount: " . $rowCount);
+
+    $rows = array();
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $rows[] = $row;
+        $rowCount++;
+        //error_log("Row: " . $row['id'] . " - " . $row['name']);
+    }
+
+    $startTime = microtime(true);
+    $selectSQL = "SELECT * FROM test_table where id = ?";
+    $stmt = $pdo->prepare($selectSQL);
+
+
+    $rowCount = 0;
+    for ($i = 1; $i <= $insert_count; $i++) { 
+        $stmt->execute([$i]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $rowCount++;
+    }
+
     $endTime = microtime(true);
     $elapsed_time = $endTime - $startTime;
     error_log("data selected. rowCount : " . $rowCount . " elapsed_time: " . $elapsed_time . "s)");
-
-    $rows = array();
-    while ($row = odbc_fetch_array($result)) {
-        $rows[] = $row;
-        $rowCount++;
-        if ($rowCount <= 5) {
-            echo "Row " . $rowCount . ": id=" . $row['id'] . ", name=" . $row['name'] . "\n";
-        }
-    }
-
-    // $startTime = microtime(true);
-    // $selectSQL = "SELECT * FROM test_table where id = ?";
-    // $stmt = $pdo->prepare($selectSQL);
-
-
-    // $rowCount = 0;
-    // for ($i = 1; $i <= $insert_count; $i++) { 
-    //     $stmt->execute([$i]);
-    //     $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    //     $rowCount++;
-    // }
-
-    // $endTime = microtime(true);
-    // $elapsed_time = $endTime - $startTime;
-    // error_log("data selected. rowCount : " . $rowCount . " elapsed_time: " . $elapsed_time . "s)");
 
 } catch (PDOException $e) {
     error_log("Connection failed: " . $e->getMessage());

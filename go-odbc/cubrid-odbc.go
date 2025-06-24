@@ -39,31 +39,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// insert_stmt, err := tx.Prepare("INSERT INTO test_table (id, name) VALUES (?, ?)")
-	// if err != nil {
-	// 	tx.Rollback()
-	// 	log.Fatal(err)
-	// }
-
-	// for i := 0; i < insert_count; i++ {
-	// 	name := fmt.Sprintf("godata%d", i)
-	// 	//fmt.Printf("insert %d, name: %s\n", i, name)
-
-	// 	_, err := insert_stmt.Exec(i, name)
-	// 	if err != nil {
-	// 		tx.Rollback()
-	// 		log.Fatal(err)
-	// 	}
-
-	// }
+	insert_stmt, err := tx.Prepare("INSERT INTO test_table (id, name) VALUES (?, ?)")
+	if err != nil {
+		tx.Rollback()
+		log.Fatal(err)
+	}
 
 	for i := 0; i < insert_count; i++ {
-		sql := fmt.Sprintf("INSERT INTO test_table (id, name) VALUES (%d, 'godata%d')", i, i)
-		_, err := tx.Exec(sql)
+		name := fmt.Sprintf("godata%d", i)
+		//fmt.Printf("insert %d, name: %s\n", i, name)
+
+		_, err := insert_stmt.Exec(i, name)
 		if err != nil {
 			tx.Rollback()
 			log.Fatal(err)
 		}
+
 	}
 
 	tx.Commit()

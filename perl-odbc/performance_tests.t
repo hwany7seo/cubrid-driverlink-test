@@ -19,7 +19,6 @@ sub connect_odbc {
     diag("##################################\n# Connecting to ODBC\n##################################");
     my $dbh = DBI->connect($dsn, $user, $password, { 'RaiseError' => 1, 'PrintError' => 1, 'AutoCommit' => 0 });
     $dbh->{odbc_disable_bind_by_name} = 1;
-    $dbh->trace(2, 'odbc_trace.log');
 
     if (!$dbh) {
         die "Failed to connect to ODBC: $DBI::errstr";
@@ -41,7 +40,7 @@ sub test_table_insertion_odbc {
     for my $i (1 .. $test_count) {
         $sth->bind_param(1, $i) or die "Bind failed for ID: " . $sth->errstr;
         $sth->bind_param(2, "perldt$i") or die "Bind failed for Name: " . $sth->errstr;
-        print "Binding ID=$i, Name=perldt$i\n";
+        # print "Binding ID=$i, Name=perldt$i\n";
         $sth->execute() or die "Execute failed: " . $sth->errstr;
     }
 

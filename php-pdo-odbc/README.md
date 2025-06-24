@@ -15,7 +15,8 @@ PHP의 내부 Module은 ODBC, PDO는 PDO-ODBC를 사용합니다.
 테스트 방법
 - odbc 관리자 설정
 - connectODBC의 설정에 맞게 connection url 변경 필요.
-- 'run_tests.bat' 실행
+- PHP 설치 폴더에 맞게 'run_tests.bat' 안에 PHP_PATH 변수 수정.
+- 'run_tests.bat' 실행 
 
 파일 정보
 - php_pdo_odbc_prepare.php (php_pdo_odbc.dll 사용 예제)

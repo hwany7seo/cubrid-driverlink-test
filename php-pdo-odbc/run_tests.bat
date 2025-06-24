@@ -14,13 +14,10 @@ echo ------------------------------------------------------------
 echo ------------------------------------------------------------
 echo ------------------------------------------------------------
 
-@REM REM Run PDO ODBC tests
-@REM echo Running PDO ODBC tests...
-@REM call %PHP_PATH% .\php_pdo_odbc_prepare.php
+REM Run PDO ODBC tests
+echo Running PDO ODBC tests...
+call %PHP_PATH% .\php_pdo_odbc_prepare.php
 
-@REM REM Run mysql PHP tests
-@REM echo Running mysql PHP tests...
-@REM call %PHP_PATH% php_odbc_test_prepare_mysql.php
 
 echo All tests completed.
 endlocal
