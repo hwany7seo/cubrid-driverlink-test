@@ -9,10 +9,14 @@ import (
 	_ "github.com/alexbrainman/odbc"
 )
 
-const insert_count = 100
+const insert_count = 10
+const cubrid_dns = "DSN=CUBRID Driver;UID=dba;PWD=;"
+const cubrid_unicode_dns = "DSN=CUBRID Driver Unicode;UID=dba;PWD=;"
+const mysql_dns = "DSN=MYSQL Driver;UID=hwanyseo;PWD=Cubrid123!@#;"
+const cubrid_driver = "Driver={CUBRID Driver Unicode};server=localhost;port=33000;uid=dba;pwd=;db_name=demodb;charset=utf-8;autocommit=0;"
 
 func main() {
-	db, err := sql.Open("odbc", "Driver={CUBRID Driver};server=192.168.2.32;port=33000;uid=dba;pwd=;db_name=demodb;charset=utf-8;autocommit=0;")
+	db, err := sql.Open("odbc", cubrid_unicode_dns)
 	if err != nil {
 		log.Fatal(err)
 	} else {
@@ -47,7 +51,7 @@ func main() {
 
 	for i := 0; i < insert_count; i++ {
 		name := fmt.Sprintf("godata%d", i)
-		//fmt.Printf("insert %d, name: %s\n", i, name)
+		fmt.Printf("insert %d, name: %s\n", i, name)
 
 		_, err := insert_stmt.Exec(i, name)
 		if err != nil {
@@ -96,7 +100,7 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			//fmt.Printf("ID: %d, Name: %s\n", id, name)
+			fmt.Printf("ID: %d, Name: %s\n", id, name)
 			select_count++
 		}
 

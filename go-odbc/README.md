@@ -10,6 +10,3 @@
 - 'go mod tidy' command 실행
 - 'run_test.bat' 배치 파일 실행
 
-
-Known Issue
-- prepare 후 execute시에 bind 값이 최초값으로 지속됨.
