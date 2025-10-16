@@ -3,35 +3,30 @@ import time
 
 class ODBC:
 
-    insert_count = 5
-    # mysql_dsn = "MYSQL Driver"
-    # mysql_uid = "hwanyseo"
-    # mysql_pwd = "Cubrid123!@#"
+    insert_count = 10
     dsn = "CUBRID Driver"
-    driver = "CUBRID Driver Unicode"
-    server = "192.168.2.32"
-    port = 33000
     uid = "dba"
     pwd = ""
-    db_name = "demodb"
-    
+    # dsn = "MYSQL Driver"
+    # uid = "hwanyseo"
+    # pwd = "Cubrid123!@#"
+
     def __init__(self):
+        print(pyodbc.__file__)
         self.report_sampling = {}
         self.table_name = "test_table"
         self.report = {}
         self.test_insert_count = self.insert_count
         print("Connecting to database...", flush=True)
-        # self.conn = pyodbc.connect(f"driver={self.driver};server={self.server};port={self.port};uid={self.uid};pwd={self.pwd};db_name={self.db_name};")
         self.conn = pyodbc.connect(
             DSN=self.dsn, 
             UID=self.uid, 
-            PWD=self.pwd,
-            charset="utf-8"
+            PWD=self.pwd
+            # charset="utf-8"
         )
         self.conn.autocommit = False
         print("Database connected successfully", flush=True)
         self.cur = self.conn.cursor()
-        #self.cur.execute("SET NAMES utf8;")
         self.initialize()
         self.test()   
 
@@ -49,7 +44,7 @@ class ODBC:
         cursor = self.conn.cursor()
         for i in range(self.test_insert_count):
             if i % 10 == 0:
-                cursor.executemany(sql, [(i, f"한글테스트{i}")])
+                cursor.executemany(sql, [(i, f"aaaa{i}")])
             else:
                 cursor.executemany(sql, [(i, f"pyodbc{i}")])
         self.conn.commit()
@@ -65,9 +60,11 @@ class ODBC:
         sql = f'select * from {self.table_name}'
         self.cur.execute(sql)
         print("Data all selected. rowCount: {}".format(self.cur.rowcount))
-        # for row in self.cur:
-        #     print(row)
-
+        print("Sample data (including Korean):")
+        for i, row in enumerate(self.cur):
+            print(f"  Row {i+1}: {row}")
+            
+ 
     def select(self):
         sql = f'select * from {self.table_name} where id = ?'
         start = time.time()
@@ -75,24 +72,26 @@ class ODBC:
         for i in range(self.test_insert_count):
             self.cur.execute(sql, i)
             row = self.cur.fetchone()
-            print(row)
-            if row:
-                print(f"row[0]: {row[0]}")
-                print(f"row[1]: {row[1]}")
-                unicode_str = row[1].encode('utf-16')
-                print(f"row[1]: {unicode_str}")
-            else:
-                print("row is None")
             row_count += 1
         end = time.time()
         print("data selected. rowCount: {} (elapsed time: {:.2f}s)".format(
             row_count, end - start))
+
+    def select_korean(self):
+        print("Testing Korean data search...", flush=True)
+        sql = f"select * from {self.table_name} where name like '%한글%'"
+        self.cur.execute(sql)
+        korean_rows = self.cur.fetchall()
+        print(f"Korean data found: {len(korean_rows)} rows")
+        for row in korean_rows:
+            print(f"  Korean row: {row}")
 
     def test(self):
         self.insert()
         self.select_count()
         self.select_all()
         self.select()
+        self.select_korean()
 
 if __name__ == "__main__":
     odbc = ODBC()
