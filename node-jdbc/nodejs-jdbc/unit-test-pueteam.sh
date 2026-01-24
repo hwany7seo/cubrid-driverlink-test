@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Ensure python 3.8+ for node-gyp
+export PYTHON=/bin/python3.8
+
 echo "=========================================="
 echo "CUBRID nodejs-jdbc (Async/Await) Wrapper Test"
 echo "=========================================="

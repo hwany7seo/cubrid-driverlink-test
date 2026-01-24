@@ -73,41 +73,97 @@ class CUBRIDAsyncWrapper {
         try {
             return await stmt.executeUpdate(sql);
         } finally {
-            await stmt.close();
+            if (stmt.close) await stmt.close();
         }
     }
 
-    async query(sql, params) {
+    async query(sql, params, callback) {
+        if (typeof params === 'function') {
+            callback = params;
+            params = undefined;
+        }
+
         if (!this.conn) throw new Error('Not connected');
         
-        // If params provided, use PreparedStatement
-        if (params && Array.isArray(params)) {
-            const ps = await this.conn.prepareStatement(sql);
-            try {
-                for (let i = 0; i < params.length; i++) {
-                    const val = params[i];
-                    if (typeof val === 'number') await ps.setInt(i + 1, val);
-                    else await ps.setString(i + 1, String(val));
+        // Simple heuristic to decide executeQuery vs executeUpdate
+        const trimmedSql = sql.trim().toUpperCase();
+        const isSelect = trimmedSql.startsWith('SELECT') || trimmedSql.startsWith('SHOW') || trimmedSql.startsWith('CALL');
+
+        try {
+            let result;
+            // If params provided, use PreparedStatement
+            if (params && Array.isArray(params)) {
+                const ps = await this.conn.prepareStatement(sql);
+                try {
+                    for (let i = 0; i < params.length; i++) {
+                        const val = params[i];
+                        if (val instanceof Date) {
+                             // Format as 'YYYY-MM-DD HH:mm:ss.SSS' for CUBRID
+                             const pad = (n) => n < 10 ? '0' + n : n;
+                             const pad3 = (n) => n < 10 ? '00' + n : (n < 100 ? '0' + n : n);
+                             const str = `${val.getFullYear()}-${pad(val.getMonth()+1)}-${pad(val.getDate())} ${pad(val.getHours())}:${pad(val.getMinutes())}:${pad(val.getSeconds())}.${pad3(val.getMilliseconds())}`;
+                             await ps.setString(i + 1, str);
+                        } else if (typeof val === 'number') {
+                             if (Number.isInteger(val)) await ps.setInt(i + 1, val);
+                             else await ps.setDouble(i + 1, val);
+                        } else {
+                             await ps.setString(i + 1, String(val));
+                        }
+                    }
+                    
+                    if (isSelect) {
+                        const rs = await ps.executeQuery();
+                        result = await this._processResultSet(rs);
+                    } else {
+                        const count = await ps.executeUpdate();
+                        result = {
+                            result: { RowsCount: count, ColumnValues: [], rows: [] },
+                            queryHandle: Math.floor(Math.random() * 10000)
+                        };
+                    }
+                } finally {
+                    if (ps && typeof ps.close === 'function') await ps.close();
                 }
-                const rs = await ps.executeQuery();
-                return await this._processResultSet(rs);
-            } finally {
-                await ps.close();
+            } else {
+                // Simple Statement
+                const stmt = await this.conn.createStatement();
+                try {
+                    if (isSelect) {
+                        const rs = await stmt.executeQuery(sql);
+                        result = await this._processResultSet(rs);
+                    } else {
+                        const count = await stmt.executeUpdate(sql);
+                        result = {
+                            result: { RowsCount: count, ColumnValues: [], rows: [] },
+                            queryHandle: Math.floor(Math.random() * 10000)
+                        };
+                    }
+                } finally {
+                    // check_toObjArray verified stmt has close(), and safe check is good
+                    if (stmt.close) await stmt.close();
+                }
             }
-        } else {
-            // Simple Statement
-            const stmt = await this.conn.createStatement();
-            try {
-                const rs = await stmt.executeQuery(sql);
-                return await this._processResultSet(rs);
-            } finally {
-                await stmt.close();
+
+            if (callback) {
+                callback(null, result.result, result.queryHandle);
             }
+            return result;
+        } catch (e) {
+            if (callback) {
+                callback(e);
+                return;
+            }
+            throw e;
         }
     }
     
-    async queryAll(sql, params) {
-        return this.query(sql, params);
+    async closeQuery(handle, callback) {
+        // Mock implementation as query() already closes resources
+        if (callback) callback(null);
+    }
+
+    async queryAll(sql, params, callback) {
+        return this.query(sql, params, callback);
     }
 
     async _processResultSet(rs) {
@@ -224,6 +280,7 @@ class CUBRIDAsyncWrapper {
         return {
             setInt: async (idx, val) => ps.setInt(idx, val),
             setString: async (idx, val) => ps.setString(idx, val),
+            setDouble: async (idx, val) => ps.setDouble(idx, val),
             executeUpdate: async () => ps.executeUpdate(),
             executeQuery: async () => {
                 const rs = await ps.executeQuery();
