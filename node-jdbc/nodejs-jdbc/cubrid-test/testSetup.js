@@ -1,6 +1,22 @@
 import { JDBC, isJvmCreated, addOption, setupClasspath } from 'nodejs-jdbc';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+// Try to require java from nodejs-jdbc dependency or relative path
+// Since nodejs-jdbc depends on java, it should be in node_modules
+let java;
+try {
+    java = require('java');
+} catch (e) {
+    // If not found directly, try to find it in nodejs-jdbc's node_modules
+    try {
+        java = require('nodejs-jdbc/node_modules/java');
+    } catch (e2) {
+        console.warn("Failed to load java module, LOB write might fail");
+    }
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -125,6 +141,20 @@ class CUBRIDAsyncWrapper {
                              const pad3 = (n) => n < 10 ? '00' + n : (n < 100 ? '0' + n : n);
                              const str = `${val.getFullYear()}-${pad(val.getMonth()+1)}-${pad(val.getDate())} ${pad(val.getHours())}:${pad(val.getMinutes())}:${pad(val.getSeconds())}.${pad3(val.getMilliseconds())}`;
                              await ps.setString(i + 1, str);
+                        } else if (Buffer.isBuffer(val)) {
+                             // Create Java byte array using java module
+                             if (java) {
+                                 // Convert unsigned bytes (0-255) to signed bytes (-128-127) for Java
+                                 const signedBytes = [];
+                                 for (const b of val) {
+                                     signedBytes.push(b > 127 ? b - 256 : b);
+                                 }
+                                 const byteArray = java.newArray('byte', signedBytes);
+                                 await ps.setBytes(i + 1, byteArray);
+                             } else {
+                                 // Fallback: try array (might fail as seen before)
+                                 await ps.setBytes(i + 1, Array.from(val));
+                             }
                         } else if (typeof val === 'number') {
                              if (Number.isInteger(val)) await ps.setInt(i + 1, val);
                              else await ps.setDouble(i + 1, val);
@@ -307,6 +337,7 @@ class CUBRIDAsyncWrapper {
             setInt: async (idx, val) => ps.setInt(idx, val),
             setString: async (idx, val) => ps.setString(idx, val),
             setDouble: async (idx, val) => ps.setDouble(idx, val),
+            setBytes: async (idx, val) => ps.setBytes(idx, val),
             executeUpdate: async () => ps.executeUpdate(),
             executeQuery: async () => {
                 const rs = await ps.executeQuery();
