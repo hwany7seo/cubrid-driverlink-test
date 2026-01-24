@@ -23,7 +23,11 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             expect(result).to.have.property('ColumnNames').to.be.an('array');
             expect(result).to.have.property('ColumnValues').to.be.an('array');
             
+            expect(client._queryResultSets).to.have.all.keys(['' + response.queryHandle]);
+            
             await client.closeQuery(response.queryHandle);
+            expect(client._queryResultSets).to.be.empty;
+            
             await client.close();
         });
 
@@ -40,7 +44,6 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             )`);
 
             const now = new Date();
-            // JDBC might lose millisecond precision depending on driver/DB config
             now.setMilliseconds(0); 
             
             const params = [1, 'test_user', now, 99.5, 1];
@@ -51,10 +54,15 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
 
             expect(row.ID).to.equal(1);
             expect(row.NAME).to.equal('test_user');
-            // Date comparison
-            // JDBC returns java.sql.Timestamp which node-jdbc converts to string or object
-            // Adjust expectation based on actual return type
-            // expect(new Date(row.CREATED_AT).getTime()).to.be.closeTo(now.getTime(), 1000);
+            // CUBRID JDBC might return different string format for DATETIME or Timestamp object
+            // Check if it's a string or object and convert for comparison if needed
+            // For now assuming the wrapper returns something comparable or string
+            if (row.CREATED_AT instanceof Date) {
+                 expect(row.CREATED_AT.getTime()).to.equal(now.getTime());
+            } else {
+                 // If string, simple check
+                 expect(row.CREATED_AT).to.exist;
+            }
             expect(Number(row.SCORE)).to.equal(99.5);
             expect(row.IS_ACTIVE).to.equal(1);
 
@@ -62,13 +70,12 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
         });
 
         it('should handle large result sets', async function() {
-            this.timeout(60000); // Increase timeout for large data
+            this.timeout(60000); 
             const client = testSetup.createDefaultCUBRIDDemodbConnection();
             await client.connect();
 
             await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT)`);
             
-            // Batch insert 1000 rows
             const batchSize = 1000;
             const insertSql = `INSERT INTO ${TABLE_NAME} VALUES(?)`;
             const stmt = await client.getRawConnection().prepareStatement(insertSql);
@@ -87,6 +94,12 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             const response = await client.query(`SELECT * FROM ${TABLE_NAME}`);
             expect(response.result.RowsCount).to.equal(batchSize);
             expect(response.result.rows.length).to.equal(batchSize);
+            
+            // Check first and last
+            // Order is not guaranteed without ORDER BY
+            const ids = response.result.rows.map(r => r.ID);
+            expect(ids).to.include(0);
+            expect(ids).to.include(batchSize - 1);
 
             await client.close();
         });
@@ -102,7 +115,7 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             const row = response.result.rows[0];
             
             expect(row.ID).to.equal(1);
-            expect(row.VAL).to.be.null; // or undefined
+            expect(row.VAL).to.be.null;
 
             await client.close();
         });
@@ -112,11 +125,10 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             await client.connect();
 
             try {
-                await client.query('SELECT * FROM'); // Syntax error
+                await client.query('SELECT * FROM'); 
                 throw new Error('Should have failed');
             } catch (err) {
                 expect(err).to.exist;
-                // Check for syntax error message
             }
 
             await client.close();
@@ -131,7 +143,6 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
                 throw new Error('Should have failed');
             } catch (err) {
                 expect(err).to.exist;
-                // Check for table not found error
             }
 
             await client.close();
@@ -145,8 +156,6 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             await client.execute(`INSERT INTO ${TABLE_NAME}(val) VALUES('a')`);
             
             const res = await client.query('SELECT LAST_INSERT_ID()');
-            // Check if we get a valid ID back
-            // The column name might vary, so check first value
             const id = Object.values(res.result.rows[0])[0];
             expect(Number(id)).to.be.above(0);
             

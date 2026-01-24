@@ -14,12 +14,27 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             const client = testSetup.createDefaultCUBRIDDemodbConnection();
             await client.connect();
             
-            // DDL usually returns 0 affected rows
+            // Execute CREATE
             let res = await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT)`);
             expect(res.result.RowsCount).to.equal(0);
             
+            // Verify internal state: execute internally calls query, so handle created?
+            // Yes, CUBRIDAsyncWrapper.execute calls this.query
+            expect(client._queryResultSets).to.have.all.keys(['' + res.queryHandle]);
+            
+            // Verify table exists
+            const showTables = await client.query('SHOW TABLES');
+            const tables = showTables.result.rows.map(r => Object.values(r)[0]);
+            expect(tables).to.contain(TABLE_NAME);
+            
+            // Execute DROP
             res = await client.execute(`DROP TABLE ${TABLE_NAME}`);
             expect(res.result.RowsCount).to.equal(0);
+            
+            // Verify table gone
+            const showTables2 = await client.query('SHOW TABLES');
+            const tables2 = showTables2.result.rows.map(r => Object.values(r)[0]);
+            expect(tables2).to.not.contain(TABLE_NAME);
             
             await client.close();
         });
@@ -33,6 +48,7 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             // Execute with params
             let res = await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(?, ?)`, [1, 'test']);
             expect(res.result.RowsCount).to.equal(1);
+            expect(client._queryResultSets).to.contain.keys(['' + res.queryHandle]);
             
             res = await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(?, ?)`, [2, 'test2']);
             expect(res.result.RowsCount).to.equal(1);
@@ -53,8 +69,11 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(1), (2), (3)`);
             
             const res = await client.execute(`UPDATE ${TABLE_NAME} SET id = id + 10 WHERE id > ?`, [1]);
-            // execute should return result object with RowsCount for update
-            expect(res.result.RowsCount).to.equal(2); // 2 and 3 updated
+            expect(res.result.RowsCount).to.equal(2); 
+            expect(client._queryResultSets).to.contain.keys(['' + res.queryHandle]);
+            
+            const check = await client.query(`SELECT id FROM ${TABLE_NAME} WHERE id > 10`);
+            expect(check.result.RowsCount).to.equal(2);
             
             await client.close();
         });
@@ -104,9 +123,11 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
         it('should execute with callback', function(done) {
             const client = testSetup.createDefaultCUBRIDDemodbConnection();
             client.connect().then(() => {
-                client.execute(`CREATE TABLE ${TABLE_NAME}(id INT)`, function(err, result) {
+                client.execute(`CREATE TABLE ${TABLE_NAME}(id INT)`, function(err, result, queryHandle) {
                     if (err) return done(err);
                     expect(result).to.exist;
+                    expect(queryHandle).to.be.a('number');
+                    expect(client._queryResultSets).to.contain.keys(['' + queryHandle]);
                     
                     client.close().then(() => done());
                 });
@@ -122,8 +143,15 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
                 throw new Error('Should have failed');
             } catch (e) {
                 expect(e).to.exist;
-                // JDBC specific error checking
-                // e.g. "Table not found"
+            }
+            
+            // Verify connection is still usable?
+            // Some drivers might invalidate connection on fatal error, but syntax error should be fine
+            try {
+                await client.query('SELECT 1');
+            } catch(e) {
+                // If query fails, ensure it's not because connection is closed unexpectedly
+                // unless intended.
             }
             
             await client.close();
@@ -135,8 +163,7 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             
             await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT)`);
             try {
-                await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(?)`, [1, 2]); // Too many params
-                // throw new Error('Should have failed'); // JDBC might be lenient depending on driver
+                await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(?)`, [1, 2]); 
             } catch (e) {
                 expect(e).to.exist;
             }

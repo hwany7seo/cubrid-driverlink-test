@@ -22,18 +22,39 @@ describe('CUBRIDConnection', function() {
 
             const res = await client.batchExecuteNoQuery(queries);
             
-            // Check intermediate result if possible, or just verify final state
-            // JDBC batch execution result is an array of update counts
-            // But our wrapper aggregates it.
-            // 0 (CREATE) + 3 (INSERT) + 0 (DROP) = 3 affected rows total? 
-            // Or JDBC returns specific values. Let's check structure.
+            expect(res).to.be.an('object')
+                .to.have.property('queryHandle')
+                .to.be.a('number')
+                .to.be.above(0);
             
-            expect(res).to.be.an('object');
-            expect(res.queryHandle).to.be.a('number');
-            expect(res.result).to.be.an('object');
+            expect(res)
+                .to.have.property('result')
+                .to.be.an('object');
             
-            // Verify no open result sets leak (wrapper logic)
-            expect(client._queryResultSets).to.be.empty; // batchExecuteNoQuery doesn't open result set
+            // In node-cubrid, total rows count is verified. 
+            // In JDBC, it might be sum of update counts.
+            // CREATE(0) + INSERT(3) + DROP(0) = 3
+            // But original test expects 10? Why? 
+            // Ah, original test runs `SHOW TABLES` AFTER batch execution and verifies THAT response.
+            // Let's follow original flow exactly.
+            
+            const showTablesRes = await client.query('SHOW TABLES');
+            expect(showTablesRes)
+                .to.be.an('object')
+                .to.have.property('queryHandle')
+                .to.be.a('number')
+                .to.be.above(0);
+                
+            expect(showTablesRes.result)
+                .to.be.an('object')
+                .to.have.property('RowsCount')
+                .to.be.a('number');
+                
+            expect(client)
+                .to.be.an('object')
+                .to.have.property('_queryResultSets')
+                .to.be.an('object')
+                .to.have.all.keys(['' + showTablesRes.queryHandle]);
 
             await client.close();
         });
@@ -49,8 +70,19 @@ describe('CUBRIDConnection', function() {
 
                 client.batchExecuteNoQuery(queries, function(err, result) {
                     if (err) return done(err);
-                    expect(result).to.exist;
-                    client.close().then(() => done());
+                    
+                    client.query('SHOW TABLES').then(response => {
+                        expect(response)
+                            .to.be.an('object')
+                            .to.have.property('queryHandle')
+                            .to.be.a('number');
+                            
+                        expect(client)
+                            .to.have.property('_queryResultSets')
+                            .to.have.all.keys(['' + response.queryHandle]);
+                            
+                        client.close().then(() => done());
+                    }).catch(done);
                 });
             });
         });
@@ -62,6 +94,12 @@ describe('CUBRIDConnection', function() {
             const queries = [];
             const res = await client.batchExecuteNoQuery(queries);
             
+            expect(client)
+                .to.be.an('object')
+                .to.have.property('_queryResultSets')
+                .to.be.an('object')
+                .to.be.empty;
+                
             expect(res.result.RowsCount).to.equal(0);
             await client.close();
         });
@@ -78,18 +116,49 @@ describe('CUBRIDConnection', function() {
                 `INSERT INTO ${TABLE_NAME} (id) VALUES (1), (2), (3)`,
             ];
 
-            await client.batchExecuteNoQuery(queries);
+            const batchRes = await client.batchExecuteNoQuery(queries);
+            
+            // Step 1: Check SHOW TABLES
+            let res = await client2.query('SHOW TABLES');
+            expect(res).to.be.an('object').to.have.property('queryHandle');
+            
+            expect(client2)
+                .to.have.property('_queryResultSets')
+                .to.have.all.keys(['' + res.queryHandle]);
+                
+            let tables = res.result.ColumnValues.map(row => row[0]); // Adjust based on JDBC wrapper return structure
+            // JDBC wrapper result.ColumnValues is array of arrays? Yes from testSetup.js
+            // But wait, testSetup.js: ColumnValues: normalized.map(r => Object.values(r))
+            // So it's [[val1, val2], [val1, val2]]
+            // If SHOW TABLES returns one column per row...
+            // Check if TABLE_NAME is in the list
+            // Flatten if needed or map first element
+            const tableNames = res.result.rows.map(r => Object.values(r)[0]);
+            expect(tableNames).to.contain(TABLE_NAME);
 
-            // Check with client2
-            const res = await client2.query(`SELECT * FROM ${TABLE_NAME}`);
+            // Step 2: Select Data
+            res = await client2.query(`SELECT * FROM ${TABLE_NAME}`);
+            expect(res).to.be.an('object').to.have.property('queryHandle');
             expect(res.result.RowsCount).to.equal(3);
             
-            const ids = res.result.rows.map(r => r.ID); // Assuming uppercase from wrapper
+            expect(client2._queryResultSets).to.contain.keys(['' + res.queryHandle]);
+            // Should have 2 keys now (SHOW TABLES handle + SELECT handle) if not closed?
+            // Original test says "expect(Object.keys(client2._queryResultSets)).to.have.length(2);"
+            // Yes, because we didn't close query1
+            
+            const ids = res.result.rows.map(r => r.ID); 
             expect(ids).to.include(1);
             expect(ids).to.include(2);
             expect(ids).to.include(3);
 
+            // Step 3: Drop Table
             await client2.execute(`DROP TABLE ${TABLE_NAME}`);
+            
+            // Step 4: Verify Drop
+            res = await client.query('SHOW TABLES');
+            const finalTables = res.result.rows.map(r => Object.values(r)[0]);
+            expect(finalTables).to.not.contain(TABLE_NAME);
+
             await client.close();
             await client2.close();
         });
@@ -105,9 +174,6 @@ describe('CUBRIDConnection', function() {
                     throw new Error('Should have failed');
                 } catch(e) {
                     expect(e).to.exist;
-                    // JDBC wrapper might throw different error than node-cubrid
-                    // node-cubrid: "The 'string' argument must be of type string..."
-                    // nodejs-jdbc wrapper: we check for string in loop or addBatch throws
                 }
                 await client.close();
             });
@@ -118,7 +184,7 @@ describe('CUBRIDConnection', function() {
                 const client = testSetup.createDefaultCUBRIDDemodbConnection();
                 await client.connect();
                 
-                const queries = ''; // Not an array
+                const queries = ''; 
                 try {
                     await client.batchExecuteNoQuery(queries);
                     throw new Error('Should have failed');
@@ -137,7 +203,7 @@ describe('CUBRIDConnection', function() {
                 
                 const queries = [
                     `CREATE TABLE ${TABLE_NAME}(id INT)`,
-                    `INSERT INTO ${TABLE_NAME} (id)`, // Invalid syntax (missing VALUES)
+                    `INSERT INTO ${TABLE_NAME} (id)`, // Invalid syntax
                 ];
 
                 try {
@@ -145,12 +211,24 @@ describe('CUBRIDConnection', function() {
                     throw new Error('Should have failed');
                 } catch(e) {
                     expect(e).to.exist;
-                    // Verify that the table might exist if the first query succeeded?
-                    // JDBC batch behavior depends on driver. CUBRID JDBC might stop on error.
                 }
 
-                // Cleanup if table was created
-                try { await client.execute(`DROP TABLE ${TABLE_NAME}`); } catch(e) {}
+                // Verify partial commit or rollback state
+                // CUBRID JDBC might rollback whole batch or commit partial
+                // node-cubrid test expects table NOT to exist (rollback/fail all) or exist but empty?
+                // Original test: "The first query should be committed... But no records inserted"
+                // BUT last test case in original file says "should fail all queries... expect(tables).to.not.contain(TABLE_NAME)"
+                // This depends on server version/config. Let's check table existence.
+                
+                const res = await client.query('SHOW TABLES');
+                const tables = res.result.rows.map(r => Object.values(r)[0]);
+                // If the first query committed, table exists.
+                // If transaction rollback happened, table gone.
+                // Let's just ensure we clean up if it exists.
+                if (tables.includes(TABLE_NAME)) {
+                     await client.execute(`DROP TABLE ${TABLE_NAME}`);
+                }
+                
                 await client.close();
             });
         });
@@ -168,16 +246,16 @@ describe('CUBRIDConnection', function() {
                     
                     const testData = data.string;
                     
-                    // Create table
                     await client.batchExecuteNoQuery([`CREATE TABLE ${TABLE_NAME}(str VARCHAR(256))`]);
-                    
-                    // Insert unicode
                     await client.batchExecuteNoQuery([`INSERT INTO ${TABLE_NAME} VALUES('${testData}')`]);
                     
-                    // Select and verify
                     const res = await client.query(`SELECT * FROM ${TABLE_NAME} WHERE str = ?`, [testData]);
                     expect(res.result.RowsCount).to.equal(1);
                     expect(res.result.rows[0].STR).to.equal(testData);
+                    
+                    expect(client)
+                        .to.have.property('_queryResultSets')
+                        .to.have.all.keys(['' + res.queryHandle]);
                     
                     await client.close();
                 });

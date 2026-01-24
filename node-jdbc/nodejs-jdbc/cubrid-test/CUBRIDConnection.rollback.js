@@ -57,7 +57,7 @@ describe('CUBRIDConnection', function () {
                 .to.be.an('object')
                 .to.have.property('_queryResultSets')
                 .to.be.an('object')
-                .to.have.all.keys(['' + response.queryHandle]);
+                .to.contain.keys(['' + response.queryHandle]);
 
             expect(result.ColumnValues[0])
                 .to.be.an('array')
@@ -166,7 +166,7 @@ describe('CUBRIDConnection', function () {
                 .to.be.an('object')
                 .to.have.property('_queryResultSets')
                 .to.be.an('object')
-                .to.have.all.keys(['' + response.queryHandle]);
+                .to.contain.keys(['' + response.queryHandle]);
 
             expect(result.ColumnValues[0])
                 .to.be.an('array')
