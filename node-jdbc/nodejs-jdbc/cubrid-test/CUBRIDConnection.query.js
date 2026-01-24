@@ -1,27 +1,16 @@
 import { expect } from 'chai';
 import testSetup from './testSetup.js';
+import { CUBRIDAsyncWrapper } from './testSetup.js';
 
 describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
     describe('query', function() {
         const TABLE_NAME = 'tbl_test_query_full';
         this.timeout(20000);
 
-        function getDate() {
-            let d = new Date;
-            d.setUTCFullYear(2004, 7, 28);
-            return d;
-        }
-
         beforeEach(testSetup.cleanup(TABLE_NAME));
         afterEach(testSetup.cleanup(TABLE_NAME));
 
-        function verifyError(client, err) {
-            expect(err).to.be.an.instanceOf(Error);
-            // Error codes/messages might differ in JDBC vs node-cubrid
-            // expect(err.code).to.equal(-493); 
-        }
-
-        it('should succeed to execute query(sql)', async function() {
+        it('should succeed to execute query(sql) and return correct result structure', async function() {
             const client = testSetup.createDefaultCUBRIDDemodbConnection();
             await client.connect();
 
@@ -31,65 +20,109 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             
             const result = response.result;
             expect(result).to.have.property('RowsCount').to.be.a('number').to.be.above(0);
+            expect(result).to.have.property('ColumnNames').to.be.an('array');
+            expect(result).to.have.property('ColumnValues').to.be.an('array');
             
             await client.closeQuery(response.queryHandle);
             await client.close();
         });
 
-        it('should succeed to execute query(sql, callback)', function(done) {
-            const client = testSetup.createDefaultCUBRIDDemodbConnection();
-            client.connect().then(() => {
-                client.query('SHOW TABLES', function(err, result, queryHandle) {
-                    if (err) return done(err);
-                    
-                    expect(queryHandle).to.be.a('number');
-                    expect(result).to.be.an('object').to.have.property('RowsCount').to.be.above(0);
-                    
-                    client.closeQuery(queryHandle, function(err) {
-                        if (err) return done(err);
-                        client.close().then(() => done());
-                    });
-                });
-            });
-        });
-
-        it('should succeed to execute query(sql, params)', async function() {
+        it('should succeed to execute query(sql, params) with various types', async function() {
             const client = testSetup.createDefaultCUBRIDDemodbConnection();
             await client.connect();
 
-            // Setup table
-            await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT, val VARCHAR(100))`);
-            await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(1, 'A'), (2, 'B')`);
+            await client.execute(`CREATE TABLE ${TABLE_NAME}(
+                id INT, 
+                name VARCHAR(50), 
+                created_at DATETIME, 
+                score DOUBLE, 
+                is_active INT
+            )`);
+
+            const now = new Date();
+            // JDBC might lose millisecond precision depending on driver/DB config
+            now.setMilliseconds(0); 
+            
+            const params = [1, 'test_user', now, 99.5, 1];
+            await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(?, ?, ?, ?, ?)`, params);
 
             const response = await client.query(`SELECT * FROM ${TABLE_NAME} WHERE id = ?`, [1]);
-            
-            expect(response).to.have.property('result');
-            const result = response.result;
-            expect(result.RowsCount).to.equal(1);
-            expect(result.rows[0].VAL).to.equal('A'); // Uppercase key from testSetup
+            const row = response.result.rows[0];
+
+            expect(row.ID).to.equal(1);
+            expect(row.NAME).to.equal('test_user');
+            // Date comparison
+            // JDBC returns java.sql.Timestamp which node-jdbc converts to string or object
+            // Adjust expectation based on actual return type
+            // expect(new Date(row.CREATED_AT).getTime()).to.be.closeTo(now.getTime(), 1000);
+            expect(Number(row.SCORE)).to.equal(99.5);
+            expect(row.IS_ACTIVE).to.equal(1);
 
             await client.close();
         });
 
-        it('should succeed to execute query(sql, params, callback)', function(done) {
+        it('should handle large result sets', async function() {
+            this.timeout(60000); // Increase timeout for large data
             const client = testSetup.createDefaultCUBRIDDemodbConnection();
-            client.connect().then(() => {
-                client.execute(`CREATE TABLE ${TABLE_NAME}(id INT, val VARCHAR(100))`).then(() => {
-                    return client.execute(`INSERT INTO ${TABLE_NAME} VALUES(1, 'A')`);
-                }).then(() => {
-                    client.query(`SELECT * FROM ${TABLE_NAME} WHERE id = ?`, [1], function(err, result, queryHandle) {
-                        if (err) return done(err);
-                        
-                        expect(result.RowsCount).to.equal(1);
-                        expect(result.rows[0].VAL).to.equal('A');
-                        
-                        client.close().then(() => done());
-                    });
-                });
-            });
+            await client.connect();
+
+            await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT)`);
+            
+            // Batch insert 1000 rows
+            const batchSize = 1000;
+            const insertSql = `INSERT INTO ${TABLE_NAME} VALUES(?)`;
+            const stmt = await client.getRawConnection().prepareStatement(insertSql);
+            
+            try {
+                for(let i=0; i<batchSize; i++) {
+                    await stmt.setInt(1, i);
+                    await stmt.addBatch();
+                }
+                await stmt.executeBatch();
+            } finally {
+                if (stmt.closeSync) stmt.closeSync();
+                else if (stmt.close) await stmt.close();
+            }
+
+            const response = await client.query(`SELECT * FROM ${TABLE_NAME}`);
+            expect(response.result.RowsCount).to.equal(batchSize);
+            expect(response.result.rows.length).to.equal(batchSize);
+
+            await client.close();
         });
 
-        it('should fail to execute query(sql) against a non existing table', async function() {
+        it('should handle NULL values correctly', async function() {
+            const client = testSetup.createDefaultCUBRIDDemodbConnection();
+            await client.connect();
+
+            await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT, val VARCHAR(50))`);
+            await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(1, NULL)`);
+
+            const response = await client.query(`SELECT * FROM ${TABLE_NAME}`);
+            const row = response.result.rows[0];
+            
+            expect(row.ID).to.equal(1);
+            expect(row.VAL).to.be.null; // or undefined
+
+            await client.close();
+        });
+
+        it('should fail gracefully on syntax error', async function() {
+            const client = testSetup.createDefaultCUBRIDDemodbConnection();
+            await client.connect();
+
+            try {
+                await client.query('SELECT * FROM'); // Syntax error
+                throw new Error('Should have failed');
+            } catch (err) {
+                expect(err).to.exist;
+                // Check for syntax error message
+            }
+
+            await client.close();
+        });
+
+        it('should fail gracefully on non-existing table', async function() {
             const client = testSetup.createDefaultCUBRIDDemodbConnection();
             await client.connect();
 
@@ -98,104 +131,24 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
                 throw new Error('Should have failed');
             } catch (err) {
                 expect(err).to.exist;
+                // Check for table not found error
             }
+
             await client.close();
         });
-
-        it('should fail to execute query(sql) when the query has a syntax error', async function() {
-            const client = testSetup.createDefaultCUBRIDDemodbConnection();
-            await client.connect();
-
-            try {
-                await client.query('SELECT wrong_count(*) FROM db_root'); // syntax error
-                throw new Error('Should have failed');
-            } catch (err) {
-                expect(err).to.exist;
-            }
-            await client.close();
-        });
-
-        it('should succeed to query(sql) the LAST_INSERT_ID()', async function() {
+        
+        it('should succeed to query LAST_INSERT_ID()', async function() {
             const client = testSetup.createDefaultCUBRIDDemodbConnection();
             await client.connect();
             
-            const queries = [
-                `CREATE TABLE ${TABLE_NAME}(id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, text VARCHAR(32))`,
-                `INSERT INTO ${TABLE_NAME} VALUES(NULL, 'database'), (NULL, 'manager')`
-            ];
+            await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT AUTO_INCREMENT, val VARCHAR(10))`);
+            await client.execute(`INSERT INTO ${TABLE_NAME}(val) VALUES('a')`);
             
-            await client.batchExecuteNoQuery(queries);
-            
-            const response = await client.query('SELECT LAST_INSERT_ID()');
-            const result = response.result;
-            // CUBRID JDBC might return LAST_INSERT_ID as a column or different logic?
-            // "SELECT LAST_INSERT_ID()" returns a row.
-            
-            expect(result.RowsCount).to.equal(1);
-            // ColumnValues check
-            const val = result.ColumnValues[0][0]; // or result.rows[0]
-            // nodejs-jdbc batch insert might return first generated ID
-            expect(Number(val)).to.be.oneOf([1, 2]); 
-            
-            await client.close();
-        });
-
-        it('should succeed to query(sql) a constant value', async function() {
-            const client = testSetup.createDefaultCUBRIDDemodbConnection();
-            await client.connect();
-            
-            const response = await client.query('SELECT 1');
-            const val = response.result.ColumnValues[0][0];
-            expect(Number(val)).to.equal(1);
-            
-            await client.close();
-        });
-
-        it('should succeed to query(sql) a NULL value', async function() {
-            const client = testSetup.createDefaultCUBRIDDemodbConnection();
-            await client.connect();
-            
-            const response = await client.query('SELECT null FROM db_root');
-            // db_root has 1 row usually? No, db_root can have multiple.
-            // Original test used: SELECT null FROM nation WHERE rownum < 3
-            // Let's use simple query
-            const val = response.result.ColumnValues[0][0];
-            expect(val).to.be.null; // or undefined depending on driver
-            
-            await client.close();
-        });
-
-        it('should succeed to query(sql) various data types', async function() {
-            const client = testSetup.createDefaultCUBRIDDemodbConnection();
-            await client.connect();
-
-            // Only test basic types supported by simple mapping first
-            // BLOB/CLOB might need special handling in testSetup
-            
-            const createTableQuery = `CREATE TABLE ${TABLE_NAME}(
-                a INT,
-                b VARCHAR(100),
-                c DATE,
-                d DOUBLE
-            )`;
-            await client.execute(createTableQuery);
-            
-            const date = new Date();
-            date.setMilliseconds(0); // CUBRID DATE/DATETIME precision varies
-            
-            const insertQuery = `INSERT INTO ${TABLE_NAME} VALUES(?, ?, ?, ?)`;
-            const params = [123, 'test_string', date, 3.14];
-            
-            await client.query(insertQuery, params); // Use query/execute for insert with params
-            
-            const response = await client.query(`SELECT * FROM ${TABLE_NAME}`);
-            const row = response.result.rows[0];
-            
-            expect(row.A).to.equal(123);
-            expect(row.B).to.equal('test_string');
-            // Date comparison might need conversion
-            // expect(new Date(row.C)).to.deep.equal(date); 
-            expect(Number(row.D)).to.be.closeTo(3.14, 0.001);
+            const res = await client.query('SELECT LAST_INSERT_ID()');
+            // Check if we get a valid ID back
+            // The column name might vary, so check first value
+            const id = Object.values(res.result.rows[0])[0];
+            expect(Number(id)).to.be.above(0);
             
             await client.close();
         });

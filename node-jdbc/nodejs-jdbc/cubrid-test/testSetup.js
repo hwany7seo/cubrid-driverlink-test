@@ -38,12 +38,21 @@ const config = {
     }
 };
 
-const jdbcInstance = new JDBC(config);
+// Global default instance
+const defaultJdbcInstance = new JDBC(config);
 
 class CUBRIDAsyncWrapper {
     constructor(cfg = config) {
         this.config = cfg;
-        this.jdbc = jdbcInstance;
+        // Check if config is different from default
+        if (JSON.stringify(cfg) !== JSON.stringify(config)) {
+            this.jdbc = new JDBC(cfg);
+            this.isCustomConfig = true;
+        } else {
+            this.jdbc = defaultJdbcInstance;
+            this.isCustomConfig = false;
+        }
+        
         this.connObj = null;
         this.conn = null;
         this.brokerInfo = { protocolVersion: 0 }; 
@@ -66,14 +75,21 @@ class CUBRIDAsyncWrapper {
                     try {
                         const stmt = await this.conn.createStatement();
                         await stmt.execute("ROLLBACK");
-                        if (stmt.close) await stmt.close();
+                        // Use closeSync for raw java objects if available, or try/catch
+                        if (stmt.closeSync) stmt.closeSync();
+                        else if (stmt.close) await stmt.close();
                     } catch(e) {}
                     
                     try { await this.conn.setAutoCommit(true); } catch(e) {}
                 }
             } catch (e) {}
             
-            await this.jdbc.release(this.connObj);
+            try {
+                await this.jdbc.release(this.connObj);
+            } catch (e) {
+                // If release fails, it might be because the connection is already closed or broken
+            }
+            
             this.connObj = null;
             this.conn = null;
             this._queryResultSets = {};
@@ -91,7 +107,10 @@ class CUBRIDAsyncWrapper {
             const result = { tables: [], views: [] };
             const rs = await meta.getTables(null, null, "%", null);
             const tables = await this._processResultSet(rs);
-            if (rs && rs.close) await rs.close();
+            if (rs) {
+                if (rs.closeSync) rs.closeSync();
+                else if (rs.close) await rs.close();
+            }
             if (callback) callback(null, result);
             return result;
         } catch(e) {
@@ -114,6 +133,8 @@ class CUBRIDAsyncWrapper {
         try {
             let result;
             if (params && Array.isArray(params)) {
+                // Use wrapper prepareStatement if possible, but here we use raw for internal logic
+                // But wait, using raw PreparedStatement means we need to handle types manually
                 const ps = await this.conn.prepareStatement(sql);
                 try {
                     for (let i = 0; i < params.length; i++) {
@@ -137,6 +158,10 @@ class CUBRIDAsyncWrapper {
                         } else if (typeof val === 'number') {
                              if (Number.isInteger(val)) await ps.setInt(i + 1, val);
                              else await ps.setDouble(i + 1, val);
+                        } else if (val === null || val === undefined) {
+                             // Types.NULL is usually 0, but safe way is setString null or setNull
+                             // java.sql.Types.VARCHAR is 12
+                             await ps.setNull(i + 1, 12); 
                         } else {
                              await ps.setString(i + 1, String(val));
                         }
@@ -153,7 +178,10 @@ class CUBRIDAsyncWrapper {
                         };
                     }
                 } finally {
-                    if (ps && typeof ps.close === 'function') await ps.close();
+                    if (ps) {
+                        if (ps.closeSync) ps.closeSync();
+                        else if (ps.close) await ps.close();
+                    }
                 }
             } else {
                 const stmt = await this.conn.createStatement();
@@ -169,7 +197,10 @@ class CUBRIDAsyncWrapper {
                         };
                     }
                 } finally {
-                    if (stmt.close) await stmt.close();
+                    if (stmt) {
+                        if (stmt.closeSync) stmt.closeSync();
+                        else if (stmt.close) await stmt.close();
+                    }
                 }
             }
 
@@ -202,7 +233,17 @@ class CUBRIDAsyncWrapper {
     }
 
     async _processResultSet(rs) {
-        const rows = rs.toObjArray(); 
+        let rows = [];
+        // nodejs-jdbc usually wraps ResultSet and provides toObjArray()
+        if (rs && typeof rs.toObjArray === 'function') {
+             rows = await rs.toObjArray();
+        } else {
+             // Fallback if toObjArray is not available (should not happen with standard nodejs-jdbc)
+             // But if we use raw java object, we need this.
+             // For now assume nodejs-jdbc wrapper is returned.
+             console.warn("ResultSet does not have toObjArray function");
+        }
+        
         const normalized = rows.map(row => {
             const newRow = {};
             for (const key in row) newRow[key.toUpperCase()] = row[key];
@@ -223,7 +264,12 @@ class CUBRIDAsyncWrapper {
         };
     }
 
-    async batchExecuteNoQuery(sqls) {
+    async batchExecuteNoQuery(sqls, callback) {
+        if (typeof sqls === 'function') {
+            callback = sqls;
+            sqls = undefined;
+        }
+
         if (!this.conn) await this.connect();
         const stmt = await this.conn.createStatement();
         try {
@@ -236,15 +282,27 @@ class CUBRIDAsyncWrapper {
             }
             const counts = await stmt.executeBatch();
             
-            return {
+            const result = {
                 queryHandle: Math.floor(Math.random() * 10000),
                 result: {
                     RowsCount: counts.reduce((a, b) => a + (b > 0 ? b : 0), 0),
                     ColumnValues: [] 
                 }
             };
+
+            if (callback) {
+                callback(null, result.result, result.queryHandle);
+            }
+            return result;
+        } catch (e) {
+            if (callback) {
+                callback(e);
+                return;
+            }
+            throw e;
         } finally {
-             await stmt.close();
+             if (stmt.closeSync) stmt.closeSync();
+             else if (stmt.close) await stmt.close();
         }
     }
 
@@ -314,7 +372,8 @@ class CUBRIDAsyncWrapper {
             try {
                 await stmt.execute("ROLLBACK");
             } finally {
-                if (stmt.close) await stmt.close();
+                if (stmt.closeSync) stmt.closeSync();
+                else if (stmt.close) await stmt.close();
             }
             if (callback) callback(null);
         } catch (e) {
@@ -352,14 +411,24 @@ class CUBRIDAsyncWrapper {
             setString: async (idx, val) => ps.setString(idx, val),
             setDouble: async (idx, val) => ps.setDouble(idx, val),
             setBytes: async (idx, val) => ps.setBytes(idx, val),
+            setNull: async (idx, type) => ps.setNull(idx, type),
+            addBatch: async () => ps.addBatch(),
+            executeBatch: async () => ps.executeBatch(),
             executeUpdate: async () => ps.executeUpdate(),
             executeQuery: async () => {
                 const rs = await ps.executeQuery();
                 rs.toObjArrayAsync = async () => this._processResultSet(rs);
-                rs.closeAsync = async () => { if (rs.close) await rs.close(); };
+                // rs.close might be async or sync depending on impl
+                rs.closeAsync = async () => { 
+                    if (rs.closeSync) rs.closeSync();
+                    else if (rs.close) await rs.close(); 
+                };
                 return rs;
             },
-            close: async () => { if (ps.close) await ps.close(); }
+            close: async () => { 
+                if (ps.closeSync) ps.closeSync();
+                else if (ps.close) await ps.close(); 
+            }
         };
     }
 }
@@ -378,6 +447,8 @@ export function createDefaultCUBRIDDemodbConnection() {
 export function cleanup(tableName) {
     return async function() {
         if (this && this.timeout) this.timeout(20000);
+        
+        // Close all active clients to free up the pool
         while (activeClients.length > 0) {
             const client = activeClients.pop();
             try { 
@@ -387,6 +458,8 @@ export function cleanup(tableName) {
                 ]);
             } catch(e) {}
         }
+        
+        // Create a new client to drop the table
         const client = new CUBRIDAsyncWrapper(config);
         try {
             await client.connect();
@@ -398,5 +471,5 @@ export function cleanup(tableName) {
     };
 }
 
-export { CUBRIDAsyncWrapper };
-export default { config, defaultConfig, createDefaultCUBRIDDemodbConnection, cleanup, CUBRIDAsyncWrapper };
+export { CUBRIDAsyncWrapper, ErrorMessages };
+export default { config, defaultConfig, createDefaultCUBRIDDemodbConnection, cleanup, CUBRIDAsyncWrapper, ErrorMessages };

@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import testSetup from './testSetup.js';
+import { CUBRIDAsyncWrapper } from './testSetup.js';
 
 describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
     describe('execute', function() {
@@ -9,13 +10,16 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
         beforeEach(testSetup.cleanup(TABLE_NAME));
         afterEach(testSetup.cleanup(TABLE_NAME));
 
-        it('should execute simple DDL (CREATE/DROP)', async function() {
+        it('should execute simple DDL (CREATE/DROP) and return correct RowsCount', async function() {
             const client = testSetup.createDefaultCUBRIDDemodbConnection();
             await client.connect();
             
-            await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT)`);
-            // Check if table exists (implied by success)
-            await client.execute(`DROP TABLE ${TABLE_NAME}`);
+            // DDL usually returns 0 affected rows
+            let res = await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT)`);
+            expect(res.result.RowsCount).to.equal(0);
+            
+            res = await client.execute(`DROP TABLE ${TABLE_NAME}`);
+            expect(res.result.RowsCount).to.equal(0);
             
             await client.close();
         });
@@ -27,18 +31,21 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT, val VARCHAR(50))`);
             
             // Execute with params
-            await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(?, ?)`, [1, 'test']);
-            await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(?, ?)`, [2, 'test2']);
+            let res = await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(?, ?)`, [1, 'test']);
+            expect(res.result.RowsCount).to.equal(1);
+            
+            res = await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(?, ?)`, [2, 'test2']);
+            expect(res.result.RowsCount).to.equal(1);
             
             // Verify
-            const res = await client.query(`SELECT * FROM ${TABLE_NAME} ORDER BY id`);
-            expect(res.result.RowsCount).to.equal(2);
-            expect(res.result.rows[0].VAL).to.equal('test');
+            const queryRes = await client.query(`SELECT * FROM ${TABLE_NAME} ORDER BY id`);
+            expect(queryRes.result.RowsCount).to.equal(2);
+            expect(queryRes.result.rows[0].VAL).to.equal('test');
             
             await client.close();
         });
 
-        it('should execute UPDATE and return row count', async function() {
+        it('should execute UPDATE and return correct row count', async function() {
             const client = testSetup.createDefaultCUBRIDDemodbConnection();
             await client.connect();
             
@@ -48,6 +55,48 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             const res = await client.execute(`UPDATE ${TABLE_NAME} SET id = id + 10 WHERE id > ?`, [1]);
             // execute should return result object with RowsCount for update
             expect(res.result.RowsCount).to.equal(2); // 2 and 3 updated
+            
+            await client.close();
+        });
+
+        it('should rollback transaction when AutoCommit is disabled', async function() {
+            const client = testSetup.createDefaultCUBRIDDemodbConnection();
+            await client.connect();
+            
+            await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT)`);
+            
+            // Disable AutoCommit
+            await client.setAutoCommitMode(false);
+            
+            await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(1)`);
+            
+            // Rollback
+            await client.rollback();
+            
+            // Check if inserted data is gone
+            const res = await client.query(`SELECT COUNT(*) as cnt FROM ${TABLE_NAME}`);
+            expect(Number(res.result.rows[0].CNT)).to.equal(0);
+            
+            await client.close();
+        });
+
+        it('should commit transaction manually when AutoCommit is disabled', async function() {
+            const client = testSetup.createDefaultCUBRIDDemodbConnection();
+            await client.connect();
+            
+            await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT)`);
+            
+            // Disable AutoCommit
+            await client.setAutoCommitMode(false);
+            
+            await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(1)`);
+            
+            // Commit
+            await client.commit();
+            
+            // Check if inserted data persists
+            const res = await client.query(`SELECT COUNT(*) as cnt FROM ${TABLE_NAME}`);
+            expect(Number(res.result.rows[0].CNT)).to.equal(1);
             
             await client.close();
         });
@@ -73,6 +122,8 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
                 throw new Error('Should have failed');
             } catch (e) {
                 expect(e).to.exist;
+                // JDBC specific error checking
+                // e.g. "Table not found"
             }
             
             await client.close();
@@ -85,9 +136,7 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT)`);
             try {
                 await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(?)`, [1, 2]); // Too many params
-                // JDBC might ignore extra params or throw error depending on driver
-                // If it doesn't throw, we can't test failure. 
-                // But usually it throws "Parameter index out of range".
+                // throw new Error('Should have failed'); // JDBC might be lenient depending on driver
             } catch (e) {
                 expect(e).to.exist;
             }
