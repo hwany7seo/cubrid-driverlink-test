@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use utf8;
+use open ':std', ':encoding(UTF-8)';
 use Test::More;
 use DBI qw(:sql_types);
 use Time::HiRes qw(time);
@@ -8,7 +10,7 @@ use JSON;
 use threads;
 use Config::Simple;
 
-my $test_count = 5;
+my $test_count = 10;
 my $iteration_count = 1;
 
 my $dsn = 'DBI:ODBC:CUBRID Driver';
