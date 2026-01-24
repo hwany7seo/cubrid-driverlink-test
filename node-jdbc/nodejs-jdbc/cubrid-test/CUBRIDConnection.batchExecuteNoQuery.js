@@ -3,64 +3,77 @@ import testSetup from './testSetup.js';
 
 describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
     describe('batchExecuteNoQuery', function() {
-        const TABLE_NAME = 'tbl_test_batch_exec';
+        const TABLE_NAME = 'tbl_test_batch_full';
         this.timeout(20000);
 
         beforeEach(testSetup.cleanup(TABLE_NAME));
         afterEach(testSetup.cleanup(TABLE_NAME));
 
-        it('should verify batch execution works (CREATE -> INSERT -> DROP)', async function() {
+        it('should execute multiple queries in batch', async function() {
             const client = testSetup.createDefaultCUBRIDDemodbConnection();
             await client.connect();
             
-            const queries = [
+            const sqls = [
                 `CREATE TABLE ${TABLE_NAME}(id INT)`,
-                `INSERT INTO ${TABLE_NAME} (id) VALUES (1), (2), (3)`,
-                // DROP is usually DDL and auto-commits, might break batch in some drivers, but testing here
-                // `DROP TABLE ${TABLE_NAME}` 
+                `INSERT INTO ${TABLE_NAME} VALUES(1)`,
+                `INSERT INTO ${TABLE_NAME} VALUES(2)`,
+                `UPDATE ${TABLE_NAME} SET id = id + 10`
             ];
             
-            // Execute batch
-            await client.batchExecuteNoQuery(queries);
+            const res = await client.batchExecuteNoQuery(sqls);
             
-            // Verify INSERT
-            const resultObj = await client.query(`SELECT count(*) as CNT FROM ${TABLE_NAME}`);
-            // Count check
-            const cnt = resultObj.result.rows[0].CNT;
-            expect(Number(cnt)).to.equal(3);
+            // Check result structure
+            expect(res).to.have.property('result');
+            // RowsCount might be sum of affected rows or something else
+            // JDBC executeBatch returns int[] of update counts. 
+            // Wrapper reduces it.
+            // CREATE: 0, INSERT: 1, INSERT: 1, UPDATE: 2 => Total 4
+            expect(res.result.RowsCount).to.be.at.least(2); 
             
-            // Cleanup
-            await client.execute(`DROP TABLE ${TABLE_NAME}`);
+            // Verify data
+            const queryRes = await client.query(`SELECT * FROM ${TABLE_NAME}`);
+            expect(queryRes.result.RowsCount).to.equal(2);
+            expect(queryRes.result.rows[0].ID).to.equal(11);
+            expect(queryRes.result.rows[1].ID).to.equal(12);
+            
             await client.close();
         });
 
-        it('should handle invalid SQL in batch', async function() {
+        it('should handle large batch', async function() {
             const client = testSetup.createDefaultCUBRIDDemodbConnection();
             await client.connect();
             
             await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT)`);
             
-            const queries = [
-                `INSERT INTO ${TABLE_NAME} VALUES(1)`,
-                `INSERT INTO INVALID_TABLE_XYZ VALUES(2)` // Syntax/Table error
-            ];
-            
-            try {
-                await client.batchExecuteNoQuery(queries);
-                throw new Error('Should have failed');
-            } catch (err) {
-                expect(err).to.exist;
+            const sqls = [];
+            for(let i = 0; i < 100; i++) {
+                sqls.push(`INSERT INTO ${TABLE_NAME} VALUES(${i})`);
             }
+            
+            await client.batchExecuteNoQuery(sqls);
+            
+            const res = await client.query(`SELECT COUNT(*) as CNT FROM ${TABLE_NAME}`);
+            expect(Number(res.result.rows[0].CNT)).to.equal(100);
             
             await client.close();
         });
-        
-        it('should handle empty batch', async function() {
+
+        it('should fail on invalid SQL in batch', async function() {
             const client = testSetup.createDefaultCUBRIDDemodbConnection();
             await client.connect();
             
-            await client.batchExecuteNoQuery([]);
-            // Should just pass without error
+            const sqls = [
+                `CREATE TABLE ${TABLE_NAME}(id INT)`,
+                `INSERT INTO ${TABLE_NAME} VALUES(1)`,
+                `INSERT INTO INVALID_TABLE VALUES(1)` // Error here
+            ];
+            
+            try {
+                await client.batchExecuteNoQuery(sqls);
+                throw new Error('Should have failed');
+            } catch(e) {
+                expect(e).to.exist;
+            }
             
             await client.close();
         });

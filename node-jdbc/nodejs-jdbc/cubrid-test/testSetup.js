@@ -67,13 +67,35 @@ class CUBRIDAsyncWrapper {
         }
     }
 
-    async execute(sql) {
+    async execute(sql, params, callback) {
+        return this.query(sql, params, callback);
+    }
+
+    async getSchema(callback) {
         if (!this.conn) throw new Error('Not connected');
-        const stmt = await this.conn.createStatement();
+        // Simple mock or basic metadata implementation
         try {
-            return await stmt.executeUpdate(sql);
-        } finally {
-            if (stmt.close) await stmt.close();
+            const meta = await this.conn.getMetaData();
+            // This is complex to map 1:1 to node-cubrid schema object
+            // returning a minimal structure for now
+            const result = {
+                tables: [],
+                views: []
+            };
+            
+            // Try to get tables
+            const rs = await meta.getTables(null, null, "%", null);
+            const tables = await this._processResultSet(rs);
+            // close rs
+            if (rs && rs.close) await rs.close();
+            
+            // process tables...
+            
+            if (callback) callback(null, result);
+            return result;
+        } catch(e) {
+            if (callback) callback(e);
+            throw e;
         }
     }
 
@@ -163,6 +185,10 @@ class CUBRIDAsyncWrapper {
     }
 
     async queryAll(sql, params, callback) {
+        return this.query(sql, params, callback);
+    }
+
+    async fetch(sql, params, callback) {
         return this.query(sql, params, callback);
     }
 
