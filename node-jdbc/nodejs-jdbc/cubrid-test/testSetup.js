@@ -4,13 +4,13 @@ import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
+const ErrorMessages = require('../../node-cubrid/src/constants/ErrorMessages');
+
 // Try to require java from nodejs-jdbc dependency or relative path
-// Since nodejs-jdbc depends on java, it should be in node_modules
 let java;
 try {
     java = require('java');
 } catch (e) {
-    // If not found directly, try to find it in nodejs-jdbc's node_modules
     try {
         java = require('nodejs-jdbc/node_modules/java');
     } catch (e2) {
@@ -21,14 +21,12 @@ try {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 1. JVM Setup (One-time initialization for nodejs-jdbc)
 if (!isJvmCreated()) {
     addOption("-Djava.awt.headless=true");
     addOption("-Xmx512m");
     setupClasspath([path.resolve(__dirname, '../../lib/cubrid-jdbc-11.3.0.0047.jar')]);
 }
 
-// 2. Configuration (Target: 192.168.2.32, User: dba)
 const config = {
     url: 'jdbc:cubrid:192.168.2.32:33000:demodb:dba::?charSet=utf-8',
     drivername: 'cubrid.jdbc.driver.CUBRIDDriver',
@@ -40,18 +38,14 @@ const config = {
     }
 };
 
-// Singleton JDBC instance to share connection pool across tests
 const jdbcInstance = new JDBC(config);
 
-// 3. Wrapper to map node-cubrid API to nodejs-jdbc API
 class CUBRIDAsyncWrapper {
     constructor(cfg = config) {
         this.config = cfg;
-        this.jdbc = jdbcInstance; // Use shared instance
+        this.jdbc = jdbcInstance;
         this.connObj = null;
         this.conn = null;
-        
-        // Mock properties
         this.brokerInfo = { protocolVersion: 0 }; 
         this._queryResultSets = {}; 
     }
@@ -67,19 +61,22 @@ class CUBRIDAsyncWrapper {
     async close() {
         if (this.connObj) {
             try {
-                // Try to rollback any active transaction before releasing to pool
-                // This prevents returning a connection with active transaction to the pool
                 if (this.conn) {
-                    try { await this.conn.rollback(); } catch(e) {}
-                    try { await this.conn.setAutoCommit(true); } catch(e) {} // Reset to autoCommit
+                    // Use explicit SQL ROLLBACK to ensure it works across drivers and avoids method overload issues
+                    try {
+                        const stmt = await this.conn.createStatement();
+                        await stmt.execute("ROLLBACK");
+                        if (stmt.close) await stmt.close();
+                    } catch(e) {}
+                    
+                    try { await this.conn.setAutoCommit(true); } catch(e) {}
                 }
-            } catch (e) {
-                // Ignore cleanup errors
-            }
+            } catch (e) {}
             
             await this.jdbc.release(this.connObj);
             this.connObj = null;
             this.conn = null;
+            this._queryResultSets = {};
         }
     }
 
@@ -88,25 +85,13 @@ class CUBRIDAsyncWrapper {
     }
 
     async getSchema(callback) {
-        if (!this.conn) throw new Error('Not connected');
-        // Simple mock or basic metadata implementation
+        if (!this.conn) await this.connect();
         try {
             const meta = await this.conn.getMetaData();
-            // This is complex to map 1:1 to node-cubrid schema object
-            // returning a minimal structure for now
-            const result = {
-                tables: [],
-                views: []
-            };
-            
-            // Try to get tables
+            const result = { tables: [], views: [] };
             const rs = await meta.getTables(null, null, "%", null);
             const tables = await this._processResultSet(rs);
-            // close rs
             if (rs && rs.close) await rs.close();
-            
-            // process tables...
-            
             if (callback) callback(null, result);
             return result;
         } catch(e) {
@@ -121,30 +106,25 @@ class CUBRIDAsyncWrapper {
             params = undefined;
         }
 
-        if (!this.conn) throw new Error('Not connected');
+        if (!this.conn) await this.connect();
         
-        // Simple heuristic to decide executeQuery vs executeUpdate
         const trimmedSql = sql.trim().toUpperCase();
         const isSelect = trimmedSql.startsWith('SELECT') || trimmedSql.startsWith('SHOW') || trimmedSql.startsWith('CALL');
 
         try {
             let result;
-            // If params provided, use PreparedStatement
             if (params && Array.isArray(params)) {
                 const ps = await this.conn.prepareStatement(sql);
                 try {
                     for (let i = 0; i < params.length; i++) {
                         const val = params[i];
                         if (val instanceof Date) {
-                             // Format as 'YYYY-MM-DD HH:mm:ss.SSS' for CUBRID
                              const pad = (n) => n < 10 ? '0' + n : n;
                              const pad3 = (n) => n < 10 ? '00' + n : (n < 100 ? '0' + n : n);
                              const str = `${val.getFullYear()}-${pad(val.getMonth()+1)}-${pad(val.getDate())} ${pad(val.getHours())}:${pad(val.getMinutes())}:${pad(val.getSeconds())}.${pad3(val.getMilliseconds())}`;
                              await ps.setString(i + 1, str);
                         } else if (Buffer.isBuffer(val)) {
-                             // Create Java byte array using java module
                              if (java) {
-                                 // Convert unsigned bytes (0-255) to signed bytes (-128-127) for Java
                                  const signedBytes = [];
                                  for (const b of val) {
                                      signedBytes.push(b > 127 ? b - 256 : b);
@@ -152,7 +132,6 @@ class CUBRIDAsyncWrapper {
                                  const byteArray = java.newArray('byte', signedBytes);
                                  await ps.setBytes(i + 1, byteArray);
                              } else {
-                                 // Fallback: try array (might fail as seen before)
                                  await ps.setBytes(i + 1, Array.from(val));
                              }
                         } else if (typeof val === 'number') {
@@ -177,7 +156,6 @@ class CUBRIDAsyncWrapper {
                     if (ps && typeof ps.close === 'function') await ps.close();
                 }
             } else {
-                // Simple Statement
                 const stmt = await this.conn.createStatement();
                 try {
                     if (isSelect) {
@@ -191,7 +169,6 @@ class CUBRIDAsyncWrapper {
                         };
                     }
                 } finally {
-                    // check_toObjArray verified stmt has close(), and safe check is good
                     if (stmt.close) await stmt.close();
                 }
             }
@@ -210,7 +187,9 @@ class CUBRIDAsyncWrapper {
     }
     
     async closeQuery(handle, callback) {
-        // Mock implementation as query() already closes resources
+        if (this._queryResultSets[handle]) {
+            delete this._queryResultSets[handle];
+        }
         if (callback) callback(null);
     }
 
@@ -233,13 +212,11 @@ class CUBRIDAsyncWrapper {
         const queryHandle = Math.floor(Math.random() * 10000);
         this._queryResultSets[queryHandle] = true;
 
-        // Mimic node-cubrid result structure
         return { 
             result: {
                 RowsCount: normalized.length,
-                ColumnValues: normalized.map(r => Object.values(r)), // For tests checking ColumnValues
+                ColumnValues: normalized.map(r => Object.values(r)),
                 ColumnNames: normalized.length > 0 ? Object.keys(normalized[0]) : [],
-                // Helper for easier testing (not in original node-cubrid but useful)
                 rows: normalized 
             },
             queryHandle: queryHandle 
@@ -247,7 +224,7 @@ class CUBRIDAsyncWrapper {
     }
 
     async batchExecuteNoQuery(sqls) {
-        if (!this.conn) throw new Error('Not connected');
+        if (!this.conn) await this.connect();
         const stmt = await this.conn.createStatement();
         try {
             if (!Array.isArray(sqls)) {
@@ -272,55 +249,93 @@ class CUBRIDAsyncWrapper {
     }
 
     async getEngineVersion() {
-        if (!this.conn) throw new Error('Not connected');
+        if (!this.conn) await this.connect();
         const meta = await this.conn.getMetaData();
         const name = await meta.getDatabaseProductName();
         const ver = await meta.getDatabaseProductVersion();
         return `${name} ${ver}`;
     }
 
+    async getAutoCommitMode() {
+        if (!this.conn) await this.connect();
+        return await this.conn.getAutoCommit();
+    }
+
     async setAutoCommit(autoCommit) {
-        if (this.conn) {
-            await this.conn.setAutoCommit(Boolean(autoCommit));
-            try {
-                // Verify status
-                const ac = await this.conn.getAutoCommit();
-                if (ac !== Boolean(autoCommit)) {
-                   // Retry once if failed
-                   await this.conn.setAutoCommit(Boolean(autoCommit));
-                }
-            } catch(e) {}
+        if (!this.conn) await this.connect();
+        await this.conn.setAutoCommit(Boolean(autoCommit));
+    }
+
+    async setAutoCommitMode(autoCommit, callback) {
+        try {
+            await this.setAutoCommit(autoCommit);
+            if (callback) callback(null);
+        } catch (e) {
+            if (callback) callback(e);
+            else throw e;
         }
     }
 
-    async commit() {
-        if (this.conn) await this.conn.commit();
+    async commit(callback) {
+        if (!this.conn) {
+             const err = new Error(ErrorMessages.ERROR_CLOSED_CONNECTION_COMMIT);
+             if (callback) return callback(err);
+             throw err;
+        }
+        try {
+            if (await this.conn.getAutoCommit()) {
+                const err = new Error(ErrorMessages.ERROR_AUTO_COMMIT_ENABLED_COMMIT);
+                if (callback) return callback(err);
+                throw err;
+            }
+            await this.conn.commit();
+            if (callback) callback(null);
+        } catch(e) {
+            if (callback) callback(e);
+            else throw e;
+        }
     }
 
-    async rollback() {
-        if (this.conn) {
-            try {
-                // Use SQL command for ROLLBACK to avoid method mapping issues with nodejs-jdbc
-                // calling the unimplemented rollback(Savepoint) method instead of rollback()
-                const stmt = await this.conn.createStatement();
-                try {
-                    await stmt.execute("ROLLBACK");
-                } finally {
-                    // CUBRIDStatement might not have close() exposed via wrapper in some cases,
-                    // but check_toObjArray verified it works.
-                    // However, to be safe:
-                    if (stmt.close) await stmt.close();
-                }
-            } catch (e) {
-                // Check for generic error message wrapping the cause
-                if (e.message && (e.message.includes('auto-commit') || e.message.includes('UnsupportedOperationException'))) return;
-                throw e;
+    async rollback(callback) {
+        if (!this.conn) {
+             const err = new Error(ErrorMessages.ERROR_NO_ROLLBACK);
+             if (callback) return callback(err);
+             throw err;
+        }
+
+        try {
+            if (await this.conn.getAutoCommit()) {
+                const err = new Error(ErrorMessages.ERROR_NO_ROLLBACK);
+                if (callback) return callback(err);
+                throw err;
             }
+
+            const stmt = await this.conn.createStatement();
+            try {
+                await stmt.execute("ROLLBACK");
+            } finally {
+                if (stmt.close) await stmt.close();
+            }
+            if (callback) callback(null);
+        } catch (e) {
+            if (e.message && (e.message.includes('auto-commit') || e.message.includes('UnsupportedOperationException'))) {
+                if (callback) callback(null);
+                return;
+            }
+            if (callback) callback(e);
+            else throw e;
         }
     }
     
-    async beginTransaction() {
-        await this.setAutoCommit(false);
+    async beginTransaction(callback) {
+        if (!this.conn) await this.connect();
+        try {
+            await this.setAutoCommit(false);
+            if (callback) callback(null);
+        } catch(e) {
+            if (callback) callback(e);
+            else throw e;
+        }
     }
     
     setEnforceOldQueryProtocol() {}
@@ -330,9 +345,8 @@ class CUBRIDAsyncWrapper {
     }
     
     async prepareStatement(sql) {
-        if (!this.conn) throw new Error('Not connected');
+        if (!this.conn) await this.connect();
         const ps = await this.conn.prepareStatement(sql);
-        // Return a wrapper that mimics node-cubrid usage in tests or provides standard JDBC async methods
         return {
             setInt: async (idx, val) => ps.setInt(idx, val),
             setString: async (idx, val) => ps.setString(idx, val),
@@ -341,7 +355,6 @@ class CUBRIDAsyncWrapper {
             executeUpdate: async () => ps.executeUpdate(),
             executeQuery: async () => {
                 const rs = await ps.executeQuery();
-                // Add helper to fetch results
                 rs.toObjArrayAsync = async () => this._processResultSet(rs);
                 rs.closeAsync = async () => { if (rs.close) await rs.close(); };
                 return rs;
@@ -351,12 +364,9 @@ class CUBRIDAsyncWrapper {
     }
 }
 
-// 4. Exports
 export { config };
-// Alias for tests using defaultConfig
 export const defaultConfig = config;
 
-// Track active clients to ensure cleanup
 const activeClients = [];
 
 export function createDefaultCUBRIDDemodbConnection() {
@@ -368,8 +378,6 @@ export function createDefaultCUBRIDDemodbConnection() {
 export function cleanup(tableName) {
     return async function() {
         if (this && this.timeout) this.timeout(20000);
-        
-        // Close all active clients first to release locks
         while (activeClients.length > 0) {
             const client = activeClients.pop();
             try { 
@@ -379,13 +387,11 @@ export function cleanup(tableName) {
                 ]);
             } catch(e) {}
         }
-        
         const client = new CUBRIDAsyncWrapper(config);
         try {
             await client.connect();
             await client.execute(`DROP TABLE IF EXISTS ${tableName}`);
         } catch (e) {
-            // Ignore
         } finally {
             try { await client.close(); } catch(e) {}
         }

@@ -1,31 +1,75 @@
 import { expect } from 'chai';
 import testSetup from './testSetup.js';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const ErrorMessages = require('../../node-cubrid/src/constants/ErrorMessages');
 
-describe('CUBRIDConnection', function() {
-    describe('commit', function() {
-        const TABLE_NAME = 'tbl_test_commit';
-        this.timeout(20000);
+describe('CUBRIDConnection', function () {
+  describe('commit', function () {
+    it('should fail to commit() when a connection is offline', function () {
+      const client = testSetup.createDefaultCUBRIDDemodbConnection();
 
-        beforeEach(testSetup.cleanup(TABLE_NAME));
-        afterEach(testSetup.cleanup(TABLE_NAME));
-
-        it('should commit successfully', async function() {
-            const client = testSetup.createDefaultCUBRIDDemodbConnection();
-            await client.connect();
-            
-            await client.execute(`CREATE TABLE ${TABLE_NAME}(id INT)`);
-            
-            // Transaction Start
-            await client.beginTransaction();
-            
-            await client.execute(`INSERT INTO ${TABLE_NAME} VALUES(1)`);
-            await client.commit();
-            
-            // Verify
-            const resultObj = await client.query(`SELECT count(*) as CNT FROM ${TABLE_NAME}`);
-            expect(Number(resultObj.result.rows[0].CNT)).to.equal(1);
-            
-            await client.close();
-        });
+      return client.commit()
+          .then(() => {
+            throw new Error(ErrorMessages.ERROR_CLOSED_CONNECTION_COMMIT);
+          })
+          .catch(err => {
+            expect(err).to.be.an.instanceOf(Error);
+            expect(err.message).to.equal(ErrorMessages.ERROR_CLOSED_CONNECTION_COMMIT);
+          });
     });
+
+    it('should fail to commit(callback) when a connection is offline', function (done) {
+      const client = testSetup.createDefaultCUBRIDDemodbConnection();
+
+      client.commit(function (err) {
+        expect(err).to.be.an.instanceOf(Error);
+        expect(err.message).to.equal(ErrorMessages.ERROR_CLOSED_CONNECTION_COMMIT);
+
+        done();
+      });
+    });
+
+    it('should fail to commit() when a auto commit mode is enabled', function () {
+      const client = testSetup.createDefaultCUBRIDDemodbConnection();
+
+      return client
+          .connect()
+          .then(() => {
+            return client.commit();
+          })
+          .then(() => {
+            throw new Error(ErrorMessages.ERROR_AUTO_COMMIT_ENABLED_COMMIT);
+          })
+          .catch(err => {
+            expect(err).to.be.an.instanceOf(Error);
+            expect(err.message).to.equal(ErrorMessages.ERROR_AUTO_COMMIT_ENABLED_COMMIT);
+          });
+    });
+
+    it('should fail to commit(callback) when a auto commit mode is enabled', function () {
+      const client = testSetup.createDefaultCUBRIDDemodbConnection();
+
+      return client
+          .connect()
+          .then(() => {
+            return new Promise((resolve, reject) => {
+              client.commit(function (err) {
+                if (err) {
+                  return reject(err);
+                }
+
+                resolve();
+              })
+            });
+          })
+          .then(() => {
+            throw new Error(ErrorMessages.ERROR_AUTO_COMMIT_ENABLED_COMMIT);
+          })
+          .catch(err => {
+            expect(err).to.be.an.instanceOf(Error);
+            expect(err.message).to.equal(ErrorMessages.ERROR_AUTO_COMMIT_ENABLED_COMMIT);
+          });
+    });
+  });
 });

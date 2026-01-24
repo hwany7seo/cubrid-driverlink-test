@@ -50,26 +50,28 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Println(id)
-		fmt.Println(a_bit)
-		fmt.Println(b_vbit)
-		fmt.Println(c_num)
-		fmt.Println(d_float)
-		fmt.Println(e_double)
-		fmt.Println(f_date)
-		fmt.Println(g_time)
-		fmt.Println(g_timest)
-		fmt.Println(h_set)
-		fmt.Println(i_bigint)
-		fmt.Println(j_datetm)
-		fmt.Println(k_blob)
-		fmt.Println(l_clob)
+		fmt.Println("--------example.go---------")
+		fmt.Println("id: ", id)
+		fmt.Println("a_bit: ", a_bit)
+		fmt.Println("b_vbit: ", b_vbit)
+		fmt.Println("c_num: ", c_num)
+		fmt.Println("d_float: ", d_float)
+		fmt.Println("e_double: ", e_double)
+		fmt.Println("f_date: ", f_date)
+		fmt.Println("g_time: ", g_time)
+		fmt.Println("g_timest: ", g_timest)
+		fmt.Println("h_set: ", h_set)
+		fmt.Println("i_bigint: ", i_bigint)
+		fmt.Println("j_datetm: ", j_datetm)
+		fmt.Println("k_blob: ", k_blob)
+		fmt.Println("l_clob: ", l_clob)
+		fmt.Println("--------------------------------")
 	}
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
 	}
 
-	drop_table(db)
+	// drop_table(db)
 }
 
 func create_table_and_insert_data(db *sql.DB) {
