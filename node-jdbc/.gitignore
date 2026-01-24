@@ -1,2 +1,6 @@
+node-cubrid/
 node_modules/
 package-lock.json
+nodejs-jdbc/nodejs-jdbc-ori
+nodejs-jdbc/node_modules
+nodejs-jdbc/package-lock.json

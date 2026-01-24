@@ -1,4 +1,4 @@
-본 테스트는 [node-jdbc](https://github.com/CraZySacX/node-jdbc) 인터페이스를 통해 cubrid jdbc를 호출하는 형태로 사용됨.
+본 테스트는 [nodejs-jdbc](https://github.com/pueteam/nodejs-jdbc) 인터페이스를 통해 cubrid jdbc를 호출하는 형태로 사용됨.
 
 본 테스트는 아래와 같은 환경에서 테스트 됨
 - node v18.20.8 (https://nodejs.org/en)
