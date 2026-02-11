@@ -1,1 +1,5 @@
 .vscode/
+go-odbc/cubrid-odbc
+go-odbc/cubrid-odbc.exe
+node-jdbc/package-lock.json
+node-odbc/package-lock.json
