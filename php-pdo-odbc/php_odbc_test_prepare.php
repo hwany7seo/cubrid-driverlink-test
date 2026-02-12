@@ -3,9 +3,9 @@ ob_implicit_flush(true);
 ini_set('output_buffering', 'off');
 ini_set('implicit_flush', true);
 
-$insert_count = 100;
+$insert_count = 5;
 // $dsn = "CUBRID Driver";
-$dsn = "CUBRID Driver Unicode";
+$dsn = "CUBRID Driver";
 $user = "dba";
 $password = "";
 
@@ -27,7 +27,7 @@ try {
     $insertSQL = "INSERT INTO test_table (id, name) VALUES (?, ?)";
     $stmt = odbc_prepare($conn, $insertSQL);
     for ($i = 1; $i <= $insert_count; $i++) {
-        $name = 'phpodbc' . $i;
+        $name = '큐phpodbc' . $i;
         odbc_execute($stmt, array($i, $name));
     }
     odbc_commit($conn);
@@ -51,13 +51,10 @@ try {
         $rows[] = $row;
         $rowCount++;
         if ($rowCount <= 5) {
-            // 배열 구조 확인을 위한 디버깅
             error_log("Row structure: " . print_r($row, true));
-            // id와 name 값 출력
             if (isset($row['id']) && isset($row['name'])) {
                 error_log("Row {$rowCount}: ID={$row['id']}, Name={$row['name']}");
             } else {
-                // 숫자 인덱스로 접근 시도
                 error_log("Row {$rowCount}: ID={$row[0]}, Name={$row[1]}");
             }
         }

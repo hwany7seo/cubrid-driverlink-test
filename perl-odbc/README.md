@@ -10,3 +10,15 @@
 
 Known Issue
 - prepare 후 execute시에 bind 값이 최초값으로 지속됨.
+
+
+
+Linux
+
+sudo dnf reinstall gcc-toolset-9*
+sudo dnf install perl-App-cpanminus openssl-devel perl-LWP-Protocol-https
+
+
+DBI 설치 실패 시 
+/opt/rh/gcc-toolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9/plugin 폴더에
+ annobin.so.0.0.0파일을 gcc-annobin.so 심볼릭 링크파일을 생성해야합니다.

@@ -3,10 +3,10 @@ require 'json'
 require 'time'
 require 'inifile'
 require 'dbi'
-require 'dbd/odbc'
+require 'dbd/ODBC'
 require 'odbc_utf8'
 
-ITERATIONS = 100
+ITERATIONS = 10
 
 # Fixnum aliasing for Ruby 2.4+
 unless defined?(Fixnum)
@@ -30,7 +30,8 @@ def test_table_insertion_dbi_odbc(dbi_dsn, user, password)
   sth = dbh.prepare("INSERT INTO test_table (id, name) VALUES (?, ?)") 
   raise "DBI.prepare failed" if sth.nil? 
   iterations.times do |i| 
-    sth.execute(i + 1, "ruodbc#{i+1}") 
+    sth.execute(i + 1, "한ruodbc#{i+1}") 
+    puts "Inserted row #{i+1}"
   end 
   dbh.commit 
   end_time = Time.now 
@@ -60,7 +61,7 @@ def test_data_selection_dbi_odbc(dbi_dsn, user, password)
   puts "Data all selected. rowCount: #{rows.size}"
   for i in 0..rows.size-1
     row = rows[i]
-    # puts "Row1 #{i}: ID=#{row[0]}, Name=#{row[1]}"
+    puts "Row1 #{i}: ID=#{row[0]}, Name=#{row[1]}"
   end
 
   start_time = Time.now
@@ -95,6 +96,7 @@ def test_table_insertion_odbc(dsn, user, password)
   sth = dbh.prepare("INSERT INTO test_table (id, name) VALUES (?, ?)")
   raise "DBI.prepare failed" if sth.nil?
   iterations.times do |i|
+    puts "Inserting row #{i+1}"
     sth.execute(i + 1, "rubyodb#{i+1}")
   end
   dbh.commit
@@ -127,7 +129,7 @@ def test_data_selection_odbc(dsn, user, password)
   puts "Data all selected. rowCount: #{rows.size}"
   for i in 0..rows.size-1
     row = rows[i]
-    # puts "Row1 #{i}: ID=#{row[0]}, Name=#{row[1]}"
+    puts "Row1 #{i}: ID=#{row[0]}, Name=#{row[1]}"
   end
 
   start_time = Time.now

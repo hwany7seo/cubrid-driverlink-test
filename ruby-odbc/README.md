@@ -1,3 +1,4 @@
+WINDOWS
 본 테스트는 [Ruby ODBC](https://github.com/larskanis/ruby-odbc) 인터페이스를 통해 cubrid jdbc를 호출하는 형태로 사용됨.
 
 본 테스트는 아래와 같은 환경에서 테스트 됨
@@ -25,3 +26,15 @@ gem install ruby-odbc-0.999992.gem
 
 예제는 DBI를 사용하여 ruby-odbc와 DBI(with DBD:ODBC)를 사용하는 방식 두가지로
 작성되어 있습니다.
+
+
+
+LINUX
+- 테스트 방법
+-- ruby 설치
+'''
+$ curl -sSL https://get.rvm.io | bash -s stable
+$ sudo rvm requirements run
+$ sudo rvm install ruby-3.3.7
+
+- 

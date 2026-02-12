@@ -4,10 +4,11 @@ import assert from 'assert';
 import fs from "node:fs";
 import {expect} from "chai";
 
-const stressLoad = 100
+const stressLoad = 5
 
 // Define your database connection details
-const connectionString = "driver={CUBRID Driver};server=192.168.2.32;port=33000;uid=dba;pwd=;db_name=demodb;"
+// const connectionString = "driver={CUBRID Driver};server=192.168.2.32;port=33000;uid=dba;pwd=;db_name=demodb;"
+const connectionString = "DSN=CUBRID Driver;UID=dba;PWD=;DBNAME=demodb;"
 
 let connection;
 let statement;
@@ -49,7 +50,7 @@ describe('ODBC Performance Tests', function() {
         await statement.prepare(`INSERT INTO test_table (id, name) VALUES (?, ?)`);
         
         for (let i = 0; i < stressLoad; i++) {
-            await statement.bind([i, `nododb${i}`]);
+            await statement.bind([i, `한nododb${i}`]);
             await statement.execute();
         }
         await connection.commit();
@@ -70,6 +71,7 @@ describe('ODBC Performance Tests', function() {
                                             FROM test_table WHERE id = ?`, [i]);
             if (result && result.length > 0) {
                 count += 1;
+                console.log(`id = ${result[0].id} name = ${result[0].name}`);
             }
         }
         const end = Date.now();

@@ -1,6 +1,6 @@
 #! /bin/bash
 
-PYTHON_VERSION=3.12
+PYTHON_VERSION=3.10
 PYTHON_VERSION_MINOR=$(echo $PYTHON_VERSION | cut -d '.' -f 2)
 PYTHON_PATH=$(which python$PYTHON_VERSION)
 PIP_PATH=$(which pip$PYTHON_VERSION)
@@ -20,5 +20,5 @@ else
     $PYTHON_PATH -m $PIP_PATH install pyodbc
 fi
 
-$PYTHON_PATH odbc_anci.py
+$PYTHON_PATH odbc_hangle.py
 #$PYTHON_PATH odbc.py

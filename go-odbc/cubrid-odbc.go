@@ -55,6 +55,7 @@ func main() {
 
 		_, err := insert_stmt.Exec(i, name)
 		if err != nil {
+			fmt.Printf("insert %d, name: %s, error: %s\n", i, name, err)
 			tx.Rollback()
 			log.Fatal(err)
 		}

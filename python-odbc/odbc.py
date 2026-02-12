@@ -23,11 +23,13 @@ class ODBC:
         print("Connecting to database...", flush=True)
         # self.conn = pyodbc.connect(f"driver={self.driver};server={self.server};port={self.port};uid={self.uid};pwd={self.pwd};db_name={self.db_name};")
         self.conn = pyodbc.connect(
-            DSN=self.dsn, 
-            UID=self.uid, 
-            PWD=self.pwd,
-            charset="utf-8"
-        )
+        
+        # self.conn = pyodbc.connect(
+        #     DSN=self.dsn, 
+        #     UID=self.uid, 
+        #     PWD=self.pwd,
+        #     charset="utf-8"
+        # )
         self.conn.autocommit = False
         print("Database connected successfully", flush=True)
         self.cur = self.conn.cursor()

@@ -8,7 +8,7 @@ use JSON;
 use threads;
 use Config::Simple;
 
-my $test_count = 100;
+my $test_count = 5;
 my $iteration_count = 1;
 
 my $dsn = 'DBI:ODBC:CUBRID Driver';
@@ -19,6 +19,9 @@ sub connect_odbc {
     diag("##################################\n# Connecting to ODBC\n##################################");
     my $dbh = DBI->connect($dsn, $user, $password, { 'RaiseError' => 1, 'PrintError' => 1, 'AutoCommit' => 0 });
     $dbh->{odbc_disable_bind_by_name} = 1;
+    $dbh->{LongReadLen} = 65535;
+    $dbh->{LongTruncOk} = 1;
+    $dbh->{odbc_utf8_on} = 1;
 
     if (!$dbh) {
         die "Failed to connect to ODBC: $DBI::errstr";
@@ -39,7 +42,7 @@ sub test_table_insertion_odbc {
     $dbh->{AutoCommit} = 0;
     for my $i (1 .. $test_count) {
         $sth->bind_param(1, $i) or die "Bind failed for ID: " . $sth->errstr;
-        $sth->bind_param(2, "perldt$i") or die "Bind failed for Name: " . $sth->errstr;
+        $sth->bind_param(2, "한perldt$i") or die "Bind failed for Name: " . $sth->errstr;
         # print "Binding ID=$i, Name=perldt$i\n";
         $sth->execute() or die "Execute failed: " . $sth->errstr;
     }
@@ -55,15 +58,18 @@ sub test_table_insertion_odbc {
 sub test_data_selection_odbc {
     diag("##################################\n# Test: Data Selection Test\n##################################\n");
     my $dbh = shift;
-    my $rows;
+    my $rows = 0;
     
     my $start_time = time();
     for my $i (1 .. $test_count) {
-        my $sth = $dbh->do("SELECT * FROM test_table WHERE id = $i");
-        if ($sth) {
+        my $sth = $dbh->prepare("SELECT id, name FROM test_table WHERE id = ?");
+        $sth->execute($i);
+        my ($id, $name) = $sth->fetchrow_array();
+        if (defined $id) {
             $rows++;
-            # diag("id = $i name = $sth");
+            diag("id = $id name = $name");
         }
+        $sth->finish();
     }
 
     my $end_time = time();

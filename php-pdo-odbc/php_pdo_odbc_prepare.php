@@ -1,8 +1,9 @@
 <?php
-$dsn = 'odbc:Driver={CUBRID Driver};db_name=demodb;server=192.168.2.32;port=33000';
+// $dsn = 'odbc:Driver={CUBRID_Unicode};db_name=demodb;server=192.168.2.32;port=33000';
+$dsn = 'odbc:CUBRID Driver';
 $username = 'dba';
 $password = '';
-$insert_count = 100;
+$insert_count = 5;
 
 try {
     $options = getopt("c:");
@@ -27,7 +28,7 @@ try {
 
     for ($i = 1; $i <= $insert_count; $i++) {
         $id = $i;
-        $name = 'pdoodbc' . $i;
+        $name = '큐pdoodbc' . $i;
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->bindParam(':name', $name, PDO::PARAM_STR);
         $stmt->execute();
@@ -54,7 +55,7 @@ try {
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $rows[] = $row;
         $rowCount++;
-        //error_log("Row: " . $row['id'] . " - " . $row['name']);
+        error_log("Row: " . $row['id'] . " - " . $row['name']);
     }
 
     $startTime = microtime(true);
