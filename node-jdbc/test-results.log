@@ -1,0 +1,266 @@
+==========================================
+CUBRID node-cubrid vs JDBC Comparison Test
+==========================================
+
+Running all JDBC compatibility tests...
+
+Test files to convert: 23
+Not supported features: 14
+
+
+  CUBRID (JDBC)
+    createConnection
+      ✔ should succeed to create and close a connection (185ms)
+      - should get active host - NOT SUPPORTED
+      - should handle connection timeout at instance level - NOT SUPPORTED
+      ✔ should create connection with different parameters
+
+  CUBRIDConnection.batchExecuteNoQuery - NOT SUPPORTED IN JDBC
+    - should fail - batchExecuteNoQuery() - JDBC uses addBatch/executeBatch
+Feature not supported: batchExecuteNoQuery() - JDBC uses addBatch/executeBatch
+    ✔ should document why this is not supported
+
+  CUBRIDConnection.beginTransaction - NOT SUPPORTED IN JDBC
+    - should fail - beginTransaction() - JDBC uses setAutoCommit(false)
+Feature not supported: beginTransaction() - JDBC uses setAutoCommit(false)
+    ✔ should document why this is not supported
+
+  CUBRIDConnection (JDBC)
+    close
+      - should emit disconnect event on close - NOT SUPPORTED
+      ✔ should succeed to close when connection is not established
+      ✔ should succeed to close established connection
+
+  CUBRIDConnection.closeQuery - NOT SUPPORTED IN JDBC
+    - should fail - closeQuery() - JDBC uses ResultSet.close()
+Feature not supported: closeQuery() - JDBC uses ResultSet.close()
+    ✔ should document why this is not supported
+
+  CUBRIDConnection (JDBC)
+    commit
+      ✔ should fail to commit when connection is offline
+      ✔ should succeed to commit transaction
+      ✔ should commit after insert
+
+  CUBRIDConnection (JDBC)
+    connect
+      ✔ should succeed to connect to a valid server
+      ✔ should fail to connect to wrong database
+      ✔ should succeed to connect multiple times
+      - should emit connect event - NOT SUPPORTED
+
+  CUBRIDConnection (JDBC)
+    end
+      ✔ should end connection (alias for close)
+      ✔ should succeed to end when not connected
+
+  CUBRIDConnection (JDBC)
+    execute
+      ✔ should execute simple DDL
+      ✔ should execute INSERT with parameters
+      ✔ should execute multiple statements
+
+  CUBRIDConnection.executeWithTypedParams - NOT SUPPORTED IN JDBC
+    - should fail - executeWithTypedParams() - JDBC uses setInt/setString methods
+Feature not supported: executeWithTypedParams() - JDBC uses setInt/setString methods
+    ✔ should document why this is not supported
+
+  CUBRIDConnection.fetch - NOT SUPPORTED IN JDBC
+    - should fail - fetch() method - JDBC uses ResultSet.next() instead
+Feature not supported: fetch() method - JDBC uses ResultSet.next() instead
+    ✔ should document why this is not supported
+
+  CUBRIDConnection.getConnectionTimeout - NOT SUPPORTED IN JDBC
+    - should fail - getConnectionTimeout() - set at URL level in JDBC
+Feature not supported: getConnectionTimeout() - set at URL level in JDBC
+    ✔ should document why this is not supported
+
+  CUBRIDConnection.getDatabaseParameter - NOT SUPPORTED IN JDBC
+    - should fail - getDatabaseParameter() - CUBRID-specific, not in JDBC
+Feature not supported: getDatabaseParameter() - CUBRID-specific, not in JDBC
+    ✔ should document why this is not supported
+
+  CUBRIDConnection.getEngineVersion - NOT SUPPORTED IN JDBC
+    - should fail - getEngineVersion() - JDBC does not expose CUBRID engine version
+Feature not supported: getEngineVersion() - JDBC does not expose CUBRID engine version
+    ✔ should document why this is not supported
+
+  CUBRIDConnection.getSchema - NOT SUPPORTED IN JDBC
+    - should fail - getSchema() - JDBC uses DatabaseMetaData
+Feature not supported: getSchema() - JDBC uses DatabaseMetaData
+    ✔ should document why this is not supported
+
+  CUBRIDConnection.lobRead - NOT SUPPORTED IN JDBC
+    - should fail - lobRead() - JDBC LOB API is different
+Feature not supported: lobRead() - JDBC LOB API is different
+    ✔ should document why this is not supported
+
+  CUBRIDConnection.lobWrite - NOT SUPPORTED IN JDBC
+    - should fail - lobWrite() - JDBC LOB API is different
+Feature not supported: lobWrite() - JDBC LOB API is different
+    ✔ should document why this is not supported
+
+  CUBRIDConnection (JDBC)
+    query
+      ✔ should execute simple query
+      ✔ should execute query on SHOW TABLES
+      ✔ should execute query with parameters
+      ✔ should fail to query non-existing table
+      - should manage query handles - NOT SUPPORTED
+
+  CUBRIDConnection.queryAll - NOT SUPPORTED IN JDBC
+    - should fail - queryAll() method - JDBC does not have this convenience method
+Feature not supported: queryAll() method - JDBC does not have this convenience method
+    ✔ should document why this is not supported
+
+  CUBRIDConnection (JDBC)
+    rollback
+      ✔ should succeed to rollback transaction
+      ✔ should fail to rollback when autocommit is ON
+
+  CUBRIDConnection (JDBC)
+    setAutoCommitMode
+      ✔ should set auto commit mode to false
+      ✔ should maintain auto commit mode across transactions
+      - should get auto commit mode synchronously - NOT SUPPORTED
+
+  CUBRIDConnection.setConnectionTimeout - NOT SUPPORTED IN JDBC
+    - should fail - setConnectionTimeout() - set at URL level in JDBC
+Feature not supported: setConnectionTimeout() - set at URL level in JDBC
+    ✔ should document why this is not supported
+
+  CUBRIDConnection.setDatabaseParameter - NOT SUPPORTED IN JDBC
+    - should fail - setDatabaseParameter() - CUBRID-specific, not in JDBC
+Feature not supported: setDatabaseParameter() - CUBRID-specific, not in JDBC
+    ✔ should document why this is not supported
+
+  CUBRID JDBC Compatibility Tests
+    Connection Management
+✗ Multiple connections: No more pool connections available
+      1) should create multiple connections
+⊗ Connection timeout configuration: JDBC connection timeout is set at URL level, not per-connection
+      ✔ should handle connection timeout - NOT SUPPORTED
+⊗ Get active host: JDBC does not expose active host information like node-cubrid
+      ✔ should get active host info - NOT SUPPORTED
+    Query Execution
+✓ Simple query execution
+      ✔ should execute simple query
+✓ Parameterized query
+      ✔ should execute query with parameters
+⊗ Query handle management: JDBC uses Statement/ResultSet objects, not query handles like node-cubrid
+      ✔ should handle query handle management - NOT SUPPORTED
+⊗ Multiple queries require explicit ResultSet close: JDBC requires explicit ResultSet.close() for each query, node-cubrid auto-manages query handles
+      ✔ should execute multiple queries without explicit close - DIFFERENT
+    Transaction Management
+✓ Transaction commit
+      ✔ should commit transaction
+✓ Transaction rollback
+      ✔ should rollback transaction
+⊗ Get autocommit mode: JDBC getAutoCommit() exists but requires callback conversion, node-cubrid provides sync getter
+      ✔ should get autocommit mode - NOT FULLY SUPPORTED
+    Protocol and Version
+⊗ Get engine version: JDBC does not expose CUBRID engine version directly like node-cubrid.getEngineVersion()
+      ✔ should get engine version - NOT SUPPORTED
+⊗ Old query protocol: JDBC does not expose protocol selection, node-cubrid allows setEnforceOldQueryProtocol()
+      ✔ should use old query protocol - NOT SUPPORTED
+⊗ Broker info: JDBC does not expose broker information (protocolVersion, etc.) like node-cubrid
+      ✔ should get broker info - NOT SUPPORTED
+    Data Types
+✓ Date/Time data types
+      ✔ should handle Date types
+⊗ LOB types (BLOB/CLOB): JDBC LOB handling is different from node-cubrid lobRead/lobWrite methods
+      ✔ should handle LOB types - LIMITED SUPPORT
+✓ ENUM data type
+      ✔ should handle ENUM types
+    Schema and Metadata
+⊗ Get schema (getSchema): JDBC uses DatabaseMetaData, node-cubrid provides getSchema() method
+      ✔ should get schema information - NOT SUPPORTED
+⊗ Database parameters (getDatabaseParameter): JDBC does not expose CUBRID-specific database parameters like node-cubrid
+      ✔ should get database parameters - NOT SUPPORTED
+⊗ Set database parameters (setDatabaseParameter): JDBC does not expose CUBRID-specific database parameter setting
+      ✔ should set database parameters - NOT SUPPORTED
+    Batch Operations
+✗ Batch execution: NOT IMPLEMENTED
+      2) should execute batch queries
+⊗ batchExecuteNoQuery method: node-cubrid batchExecuteNoQuery() method not available in JDBC, use addBatch/executeBatch instead
+      ✔ should use batchExecuteNoQuery - NOT SUPPORTED
+    Connection Features
+⊗ Connection events: node-cubrid emits events (connect, disconnect, error), JDBC uses callbacks only
+      ✔ should handle connection events - NOT SUPPORTED
+⊗ Socket access (_socket property): node-cubrid exposes _socket, JDBC does not expose underlying socket
+      ✔ should access socket properties - NOT SUPPORTED
+⊗ Query result set management: node-cubrid uses _queryResultSets object, JDBC requires explicit ResultSet management
+      ✔ should manage query result sets - DIFFERENT
+⊗ Typed parameters method: node-cubrid executeWithTypedParams() not available, JDBC uses setInt/setString/etc methods
+      ✔ should use typed parameters (executeWithTypedParams) - NOT SUPPORTED
+⊗ queryAll method: node-cubrid queryAll() method not available in JDBC
+      ✔ should fetch with queryAll - NOT SUPPORTED
+⊗ fetch method for cursor: node-cubrid fetch() method not available, JDBC uses ResultSet.next()
+      ✔ should use fetch for cursor - NOT SUPPORTED
+
+=== Test Summary ===
+Passed: 6
+Failed: 2
+Not Supported: 19
+
+=== Not Supported Features ===
+- Connection timeout configuration: JDBC connection timeout is set at URL level, not per-connection
+- Get active host: JDBC does not expose active host information like node-cubrid
+- Query handle management: JDBC uses Statement/ResultSet objects, not query handles like node-cubrid
+- Multiple queries require explicit ResultSet close: JDBC requires explicit ResultSet.close() for each query, node-cubrid auto-manages query handles
+- Get autocommit mode: JDBC getAutoCommit() exists but requires callback conversion, node-cubrid provides sync getter
+- Get engine version: JDBC does not expose CUBRID engine version directly like node-cubrid.getEngineVersion()
+- Old query protocol: JDBC does not expose protocol selection, node-cubrid allows setEnforceOldQueryProtocol()
+- Broker info: JDBC does not expose broker information (protocolVersion, etc.) like node-cubrid
+- LOB types (BLOB/CLOB): JDBC LOB handling is different from node-cubrid lobRead/lobWrite methods
+- Get schema (getSchema): JDBC uses DatabaseMetaData, node-cubrid provides getSchema() method
+- Database parameters (getDatabaseParameter): JDBC does not expose CUBRID-specific database parameters like node-cubrid
+- Set database parameters (setDatabaseParameter): JDBC does not expose CUBRID-specific database parameter setting
+- batchExecuteNoQuery method: node-cubrid batchExecuteNoQuery() method not available in JDBC, use addBatch/executeBatch instead
+- Connection events: node-cubrid emits events (connect, disconnect, error), JDBC uses callbacks only
+- Socket access (_socket property): node-cubrid exposes _socket, JDBC does not expose underlying socket
+- Query result set management: node-cubrid uses _queryResultSets object, JDBC requires explicit ResultSet management
+- Typed parameters method: node-cubrid executeWithTypedParams() not available, JDBC uses setInt/setString/etc methods
+- queryAll method: node-cubrid queryAll() method not available in JDBC
+- fetch method for cursor: node-cubrid fetch() method not available, JDBC uses ResultSet.next()
+
+=== Failed Tests ===
+- Multiple connections: No more pool connections available
+- Batch execution: NOT IMPLEMENTED
+
+
+  62 passing (496ms)
+  20 pending
+  2 failing
+
+  1) CUBRID JDBC Compatibility Tests
+       Connection Management
+         should create multiple connections:
+     Error: No more pool connections available
+      at Pool.reserve (node_modules/jdbc/lib/pool.js:201:14)
+      at conn2 (file:///home/hwanyseo/source/fork/test/cubrid-driverlink-test/node-jdbc/cubrid-test/jdbc-compatibility-test.js:103:30)
+      at new Promise (<anonymous>)
+      at Context.<anonymous> (file:///home/hwanyseo/source/fork/test/cubrid-driverlink-test/node-jdbc/cubrid-test/jdbc-compatibility-test.js:102:37)
+      at process.processImmediate (node:internal/timers:476:21)
+
+  2) CUBRID JDBC Compatibility Tests
+       Batch Operations
+         should execute batch queries:
+     Error: NOT IMPLEMENTED
+      at Statement.addBatch (node_modules/jdbc/lib/statement.js:13:19)
+      at file:///home/hwanyseo/source/fork/test/cubrid-driverlink-test/node-jdbc/cubrid-test/jdbc-compatibility-test.js:468:31
+      at new Promise (<anonymous>)
+      at Context.<anonymous> (file:///home/hwanyseo/source/fork/test/cubrid-driverlink-test/node-jdbc/cubrid-test/jdbc-compatibility-test.js:467:23)
+
+
+
+
+==========================================
+Test Summary
+==========================================
+
+Tests completed. Check the output above for:
+  ✓ Passing tests (supported features)
+  - Skipped tests (not supported in JDBC)
+  ✗ Failing tests (implementation issues)
+

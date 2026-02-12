@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import jinst from '../node_modules/jdbc/lib/jinst.js';
 import winston from 'winston';
 
-const insertCount = 100;
+const insertCount = 200;
 
 const logger = winston.createLogger({
     level: 'error',
@@ -19,10 +19,10 @@ const logger = winston.createLogger({
 global.logger = logger;
 global.winston = winston;
 
+// JVM 초기화 수정
 if (!jinst.isJvmCreated()) {
-    jinst.addOption("-Xrs");
-    jinst.addOption("-XX:+UseG1GC");
-    jinst.addOption("-XX:MaxGCPauseMillis=200");
+    jinst.addOption("-Djava.awt.headless=true");
+    jinst.addOption("-Xmx512m");
     jinst.setupClasspath(['./lib/cubrid-jdbc-11.3.0.0047.jar']);
 }
 
@@ -169,7 +169,7 @@ describe('CUBRID Node.js Performance Tests', function() {
             });
 
             await new Promise((resolve, reject) => {
-                preparedStatement.setString(2, `cunode${i}`, (err) => {
+                preparedStatement.setString(2, `한cunode${i}`, (err) => {
                     if (err) reject(err);
                     else resolve();
                 });
@@ -255,8 +255,12 @@ describe('CUBRID Node.js Performance Tests', function() {
             
             const hasNext = await new Promise((resolve, reject) => {
                 result.toObject((err, data) => {
-                    if (err) reject(err);
-                    else resolve(data.rows.length > 0);
+                    if (err) { 
+                        reject(err);
+                    } else if (data.rows.length > 0) {
+                        console.log(`id = ${data.rows[0].id} name = ${data.rows[0].name}`);
+                        resolve();
+                    }
                 });
             });
 

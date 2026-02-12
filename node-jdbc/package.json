@@ -12,10 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "chai": "^4.3.7",
-    "jdbc": "^0.7.5",
+    "java": "^0.12.1",
+    "jdbc": "^0.7.6",
     "mocha": "^11.1.0",
-    "winston": "^3.11.0",
-    "java": "^0.12.1"
+    "winston": "^3.11.0"
   },
   "java": {
     "dependencies": [
@@ -38,5 +38,3 @@
     ]
   }
 }
-
-
