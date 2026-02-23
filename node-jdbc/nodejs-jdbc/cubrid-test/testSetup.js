@@ -188,10 +188,19 @@ class CUBRIDAsyncWrapper {
     async rollback() {
         if (this.conn) {
             try {
-                await this.conn.rollback();
+                // Use SQL command for ROLLBACK to avoid method mapping issues with nodejs-jdbc
+                // calling the unimplemented rollback(Savepoint) method instead of rollback()
+                const stmt = await this.conn.createStatement();
+                try {
+                    await stmt.execute("ROLLBACK");
+                } finally {
+                    // CUBRIDStatement might not have close() exposed via wrapper in some cases,
+                    // but check_toObjArray verified it works.
+                    // However, to be safe:
+                    if (stmt.close) await stmt.close();
+                }
             } catch (e) {
                 // Check for generic error message wrapping the cause
-                // CUBRID JDBC throws UnsupportedOperationException if autoCommit is true
                 if (e.message && (e.message.includes('auto-commit') || e.message.includes('UnsupportedOperationException'))) return;
                 throw e;
             }
