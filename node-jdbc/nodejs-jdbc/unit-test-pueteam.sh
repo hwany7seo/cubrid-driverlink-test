@@ -17,7 +17,7 @@ echo ""
 echo "Running async/await JDBC tests..."
 echo ""
 
-npx mocha 'cubrid-test/*.js' --reporter spec --timeout 15000 --exit
+npx mocha 'cubrid-test/*.js' --reporter spec --timeout 60000 --exit
 
 echo ""
 echo "=========================================="

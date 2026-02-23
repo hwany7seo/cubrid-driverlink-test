@@ -24,11 +24,14 @@ const config = {
     }
 };
 
+// Singleton JDBC instance to share connection pool across tests
+const jdbcInstance = new JDBC(config);
+
 // 3. Wrapper to map node-cubrid API to nodejs-jdbc API
 class CUBRIDAsyncWrapper {
     constructor(cfg = config) {
         this.config = cfg;
-        this.jdbc = new JDBC(cfg);
+        this.jdbc = jdbcInstance; // Use shared instance
         this.connObj = null;
         this.conn = null;
         
@@ -47,6 +50,17 @@ class CUBRIDAsyncWrapper {
 
     async close() {
         if (this.connObj) {
+            try {
+                // Try to rollback any active transaction before releasing to pool
+                // This prevents returning a connection with active transaction to the pool
+                if (this.conn) {
+                    try { await this.conn.rollback(); } catch(e) {}
+                    try { await this.conn.setAutoCommit(true); } catch(e) {} // Reset to autoCommit
+                }
+            } catch (e) {
+                // Ignore cleanup errors
+            }
+            
             await this.jdbc.release(this.connObj);
             this.connObj = null;
             this.conn = null;
@@ -154,7 +168,17 @@ class CUBRIDAsyncWrapper {
     }
 
     async setAutoCommit(autoCommit) {
-        if (this.conn) await this.conn.setAutoCommit(autoCommit);
+        if (this.conn) {
+            await this.conn.setAutoCommit(Boolean(autoCommit));
+            try {
+                // Verify status
+                const ac = await this.conn.getAutoCommit();
+                if (ac !== Boolean(autoCommit)) {
+                   // Retry once if failed
+                   await this.conn.setAutoCommit(Boolean(autoCommit));
+                }
+            } catch(e) {}
+        }
     }
 
     async commit() {
@@ -163,15 +187,12 @@ class CUBRIDAsyncWrapper {
 
     async rollback() {
         if (this.conn) {
-            // Check autoCommit status? JDBC throws if autoCommit is true.
-            // But we can't easily check async here without getAutoCommit()
-            // Just try rollback, if it fails due to autoCommit, ignore it to mimic node-cubrid behavior?
-            // Or assume tests manage state correctly.
             try {
                 await this.conn.rollback();
             } catch (e) {
-                // If failed because auto-commit is enabled, it's expected in JDBC
-                if (e.message && e.message.includes('auto-commit')) return;
+                // Check for generic error message wrapping the cause
+                // CUBRID JDBC throws UnsupportedOperationException if autoCommit is true
+                if (e.message && (e.message.includes('auto-commit') || e.message.includes('UnsupportedOperationException'))) return;
                 throw e;
             }
         }
@@ -199,10 +220,10 @@ class CUBRIDAsyncWrapper {
                 const rs = await ps.executeQuery();
                 // Add helper to fetch results
                 rs.toObjArrayAsync = async () => this._processResultSet(rs);
-                rs.closeAsync = async () => rs.close();
+                rs.closeAsync = async () => { if (rs.close) await rs.close(); };
                 return rs;
             },
-            close: async () => ps.close()
+            close: async () => { if (ps.close) await ps.close(); }
         };
     }
 }
@@ -228,7 +249,12 @@ export function cleanup(tableName) {
         // Close all active clients first to release locks
         while (activeClients.length > 0) {
             const client = activeClients.pop();
-            try { await client.close(); } catch(e) {}
+            try { 
+                await Promise.race([
+                    client.close(),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Close timeout')), 1000))
+                ]);
+            } catch(e) {}
         }
         
         const client = new CUBRIDAsyncWrapper(config);

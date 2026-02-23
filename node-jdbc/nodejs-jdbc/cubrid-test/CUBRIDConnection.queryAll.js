@@ -19,8 +19,8 @@ describe('CUBRIDConnection (nodejs-jdbc Wrapper)', function() {
             // Using queryAll alias
             const result = await client.queryAll(`SELECT * FROM ${TABLE_NAME}`);
             
-            expect(result.result).to.be.an('array');
-            expect(result.result.length).to.equal(2);
+            expect(result.result.rows).to.be.an('array');
+            expect(result.result.rows.length).to.equal(2);
             
             await client.close();
         });
