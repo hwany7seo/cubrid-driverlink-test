@@ -1,0 +1,15 @@
+{
+  "name": "cubrid-nodejs-jdbc-test",
+  "version": "1.0.0",
+  "description": "CUBRID JDBC tests using pueteam/nodejs-jdbc wrapper",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "mocha 'cubrid-test/*.js' --reporter spec --timeout 15000 --exit"
+  },
+  "dependencies": {
+    "chai": "^4.3.7",
+    "nodejs-jdbc": "^0.1.5",
+    "mocha": "^10.2.0"
+  }
+}

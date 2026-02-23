@@ -3,7 +3,6 @@ import jdbc from 'jdbc';
 import jinst from '../node_modules/jdbc/lib/jinst.js';
 import testSetup from './testSetup.js';
 
-// JVM 초기화
 if (!jinst.isJvmCreated()) {
     jinst.addOption("-Djava.awt.headless=true");
     jinst.addOption("-Xmx512m");
