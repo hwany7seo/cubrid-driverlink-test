@@ -21,7 +21,7 @@ ok ($dbh->do("DROP TABLE IF EXISTS $table"));
 
 my $create = <<EOT;
 CREATE TABLE $table (
-        id int NOT NULL default 0,
+        id int(4) NOT NULL default 0,
         name varchar(64) default '',
         answers enum('yes', 'no', 'cancel')
         )

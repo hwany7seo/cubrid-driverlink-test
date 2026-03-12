@@ -1,1 +1,6 @@
 .vscode/
+php-pdo-odbc/cubrid-pdo/
+php-pdo-odbc/cubrid-php/
+python-odbc/cubrid-python/
+ruby-odbc/cubrid-ruby/
+*.code-workspace

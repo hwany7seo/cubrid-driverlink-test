@@ -11,11 +11,6 @@
 #### 테스트 실행
 - run_tests.bat 실행 (환경설정 포함)
 
-#### Known Issue
-- prepare 후 execute시에 bind 값이 최초값으로 지속됨.
-
-
-
 ### Linux (Rocky 8.10)
 #### 사전 설치
 ```
@@ -33,3 +28,9 @@ sudo dnf install perl-App-cpanminus openssl-devel perl-LWP-Protocol-https
 ```
 $> sh test_linux.sh
 ```
+
+## 결과
+### 미지원
+- last_insert_id (ODBC 미지원)
+### 확인 필요
+- bind_enum_apis-341.t에서 열거형 bind_param시 INDEX를 지원 관련.
