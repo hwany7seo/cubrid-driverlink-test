@@ -1,3 +1,0 @@
-  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests2/run-test.py", line 22
-    __import__(modname)
-IndentationError: unexpected indent

@@ -1,3 +1,0 @@
-  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests2/executemany_primary.py", line 93
-    self.assertEqual(value[1:5],'-924')
-IndentationError: unexpected indent

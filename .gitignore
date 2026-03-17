@@ -4,3 +4,4 @@ php-pdo-odbc/cubrid-php/
 python-odbc/cubrid-python/
 ruby-odbc/cubrid-ruby/
 *.code-workspace
+python-odbc/to_pyodbc/**/*.result

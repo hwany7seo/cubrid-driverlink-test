@@ -1,4 +1,0 @@
-  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests2/fetchall_dataType_test.py", line 82
-    print(def test_short(self):)
-          ^^^
-SyntaxError: invalid syntax
