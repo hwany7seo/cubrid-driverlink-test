@@ -3,13 +3,13 @@ import pyodbc
 import locale
 import time
 import datetime 
+
 from datetime import time
 from datetime import date
 from datetime import datetime
-from random import Random
 from xml.dom import minidom
 
-class InvalidDataTypeTest(unittest.TestCase):
+class FetchoneTypeTest(unittest.TestCase):
         def getConStr(self):
                 xmlt = minidom.parse('configuration/python_config.xml')
                 ips = xmlt.childNodes[0].getElementsByTagName('ip')
@@ -37,7 +37,7 @@ class InvalidDataTypeTest(unittest.TestCase):
                 sqlDrop = "drop table if exists collection_db"
                 self.cur.execute(sqlDrop)
 
-                sqlCreate = "create table numeric_db(c_int int, c_short short,c_numeric numeric,c_float float,c_double double,c_monetary monetary)"
+                sqlCreate = "create table numeric_db(c_int int, c_short short,c_numeric numeric(10,4),c_float float,c_double double,c_monetary monetary)"
                 self.cur.execute(sqlCreate)
                 sqlCreate = "create table datetime_db(c_date date, c_time time, c_datetime datetime, c_timestamp timestamp)"
                 self.cur.execute(sqlCreate)
@@ -63,99 +63,152 @@ class InvalidDataTypeTest(unittest.TestCase):
                 self.con.close()
 
         def test_int(self):
-#               test invalid int type
-                dataList = [2147483648,-2147483649]
+#               test valid int type
+                dataList = [1,0,-1,2147483647,-2147483648]
                 sqlInsert = "insert into numeric_db(c_int) values "
                 for i in dataList:
                         sqlInsert = sqlInsert + "(" + '%d'%i + "),"
                 sqlInsert = sqlInsert.rstrip(',')
-                try:
-                        self.cur.execute(sqlInsert)
-                        fail("Have insert invalid data!")
-                except Exception as e:
-                        pass
+                self.cur.execute(sqlInsert)
+                rowNum = self.cur.rowcount
+                sqlSelect = "select * from numeric_db"
+                self.cur.execute(sqlSelect)
+                for i in range(rowNum):
+                        data = self.cur.fetchone()
+                        self.assertEqual(dataList[i], data[0])
 
         def test_short(self):
-#               test invalid short type
-                dataList = [32768,-32769]
+#               test normal short type
+                dataList = [1,0,-1,32767,-32768]
                 sqlInsert = "insert into numeric_db(c_short) values "
                 for i in dataList:
                         sqlInsert = sqlInsert + "(" + '%d'%i + "),"
                 sqlInsert = sqlInsert.rstrip(',')
-                try:
-                        self.cur.execute(sqlInsert)
-                        fail("Have insert invalid data!")
-                except Exception as e:
-                        pass
+                self.cur.execute(sqlInsert)
+                rowNum = self.cur.rowcount
+                sqlSelect = "select * from numeric_db"
+                self.cur.execute(sqlSelect)
+                for i in range(rowNum):
+                        data = self.cur.fetchone()
+                        self.assertEqual(dataList[i], data[1])
         
+        def test_numeric(self):
+#               test normal numeric type
+                dataList = [12345.6789,0.12345678,-0.123456789]
+                dataCheck = [12346,0.1235,-0.1235]
+                sqlInsert = "insert into numeric_db(c_numeric) values "
+                for i in dataList:
+                        sqlInsert = sqlInsert + "(" + '%f'%i + "),"
+                sqlInsert = sqlInsert.rstrip(',')
+                self.cur.execute(sqlInsert)
+                rowNum = self.cur.rowcount
+                sqlSelect = "select * from numeric_db"
+                self.cur.execute(sqlSelect)
+                for i in range(rowNum):
+                        data = self.cur.fetchone()
+                        print("numric value: ", data[2])
+                        #self.assertEqual(dataCheck[i], data[2])
+#                       self.assertEqual(dataCheck[i], locale.atoi(data[2]))
+
+        def test_float(self):
+#               test normal float type
+                dataList = [1.1,0.0,-1.1]
+                sqlInsert = "insert into numeric_db(c_float) values "
+                for i in dataList:
+                        sqlInsert = sqlInsert + "(" + '%s'%i + "),"
+                sqlInsert = sqlInsert.rstrip(',')
+                self.cur.execute(sqlInsert)
+                rowNum = self.cur.rowcount
+                sqlSelect = "select * from numeric_db"
+                self.cur.execute(sqlSelect)
+                for i in range(rowNum):
+                        data = self.cur.fetchone()
+                        print("float value: ", data[3])
+                        #self.assertEqual(dataList[i], data[3])
+                        self.assertAlmostEqual(dataList[i], data[3])
+
+        def test_double(self):
+#               test normal double type
+                dataList = [1.1,0.0,-1.1]
+                sqlInsert = "insert into numeric_db(c_double) values "
+                for i in dataList:
+                        sqlInsert = sqlInsert + "(" + '%s'%i + "),"
+                sqlInsert = sqlInsert.rstrip(',')
+                self.cur.execute(sqlInsert)
+                rowNum = self.cur.rowcount
+                sqlSelect = "select * from numeric_db"
+                self.cur.execute(sqlSelect)
+                for i in range(rowNum):
+                        data = self.cur.fetchone()
+                        self.assertEqual(dataList[i], data[4])
+
+        def test_monetary(self):
+#               test normal monetary type
+                dataList = [1.1,0.0,-1.1]
+                sqlInsert = "insert into numeric_db(c_monetary) values "
+                for i in dataList:
+                        sqlInsert = sqlInsert + "(" + '%s'%i + "),"
+                sqlInsert = sqlInsert.rstrip(',')
+                self.cur.execute(sqlInsert)
+                rowNum = self.cur.rowcount
+                sqlSelect = "select * from numeric_db"
+                self.cur.execute(sqlSelect)
+                data = self.cur.fetchone()
+                print("data: ", data[5])
+                self.assertAlmostEqual(1.1, data[5])
+
         def _test_char(self):
-#                test invalid string type
-                dataList = ['a']
+#                test normal string type
+                dataList = ['a','abcd','abcdefg']
+                dataCheck = ['a   ','abcd','abcd']
                 sqlInsert = "insert into character_db(c_char) values "
                 for i in dataList:
-                        sqlInsert = sqlInsert + "(" + i + "),"
-                sqlInsert = sqlInsert.rstrip(',')
-                try:
-                        self.cur.execute(sqlInsert)
-                        fail("Have insert invalid data!")
-                except Exception as e:
-                        pass
-
-
-        def test_nchar(self):
-#               test invalid string type
-                dataList = ['a']
-                sqlInsert = "insert into character_db(c_nchar) values "
-                for i in dataList:
                         sqlInsert = sqlInsert + "('" + i + "'),"
                 sqlInsert = sqlInsert.rstrip(',')
                 try:
-                        self.cur.execute(sqlInsert)
-                        fail("Have insert invalid data!")
-                except Exception as e:
-                        pass
+                    self.cur.execute(sqlInsert)
+                    rowNum = self.cur.rowcount
+                except pyodbc.Error as e:
+                    errorValue = str(e)[1:5]
+                    self.assertEqual("-494",errorValue)
+                else:
+                    self.assertTrue(False, "IntegrityError should be raised.")
 
         def _test_varchar(self):
-#                print("test invalid string type")
-                dataList = ['abcdefg']
+#                print("test normal string type")
+                dataList = ['a','abcd','abcdefg']
+                dataCheck = ['a','abcd','abcd']
                 sqlInsert = "insert into character_db(c_varchar) values "
-                for i in dataList:
-                        sqlInsert = sqlInsert + "(" + i + "),"
-                sqlInsert = sqlInsert.rstrip(',')
-                try:
-                        self.cur.execute(sqlInsert)
-                        fail("Have insert invalid data!")
-                except Exception as e:
-                        pass
-
-        def test_varnchar(self):
-#                print("test invalid string type")
-                dataList = [self.generateStr(10737)]
-                sqlInsert = "insert into character_db(c_varnchar) values "
                 for i in dataList:
                         sqlInsert = sqlInsert + "('" + i + "'),"
                 sqlInsert = sqlInsert.rstrip(',')
                 try:
-                        self.cur.execute(sqlInsert)
-                        fail("Have insert invalid data!")
-                except Exception as e:
-                        pass
+                    self.cur.execute(sqlInsert)
+                    rowNum = self.cur.rowcount
+                except pyodbc.Error as e:
+                    errorValue = str(e)[1:5]
+                    self.assertEqual("-494",errorValue)
+                else:
+                    self.assertTrue(False, "IntegrityError should be raised.")
 
         def test_string(self):
-#                print("test invalid string type")
-                dataList = [self.generateStr(10737)]
+#                print("test normal string type")
+                dataList = ['a','abcd','abcdefg']
+                dataCheck = ['a','abcd','abcdefg']
                 sqlInsert = "insert into character_db(c_string) values "
                 for i in dataList:
                         sqlInsert = sqlInsert + "('" + i + "'),"
                 sqlInsert = sqlInsert.rstrip(',')
-                try:
-                        self.cur.execute(sqlInsert)
-                        fail("Have insert invalid data!")
-                except Exception as e:
-                        pass
+                self.cur.execute(sqlInsert)
+                rowNum = self.cur.rowcount
+                sqlSelect = "select * from character_db"
+                self.cur.execute(sqlSelect)
+                for i in range(rowNum):
+                        data = self.cur.fetchone()
+                        self.assertEqual(dataCheck[i], data[2])
 
         def test_date(self):
-#               test invalid date type
+#               test normal date type
                 dataList = [date.min,date.today(),date.max]
                 sqlInsert = "insert into datetime_db(c_date) values "
                 for i in dataList:
@@ -170,7 +223,7 @@ class InvalidDataTypeTest(unittest.TestCase):
                         self.assertEqual(dataList[i], data[0])
 
         def test_time(self):
-#               test invalid time type
+#               test normal time type
                 dataList = [time.min,time.max]
                 sqlInsert = "insert into datetime_db(c_time) values "
                 for i in dataList:
@@ -185,8 +238,9 @@ class InvalidDataTypeTest(unittest.TestCase):
                         self.assertEqual(dataList[i].isoformat().rstrip('9').rstrip('.'), data[1].isoformat())
 
         def test_datetime(self):
-#               test invalid datetime type
+#               test normal datetime type
                 dataList = [datetime.min,datetime.today(),datetime.now(),datetime.max]
+                print ("\ndataList: ",dataList)
                 sqlInsert = "insert into datetime_db(c_datetime) values "
                 for i in dataList:
                         sqlInsert = sqlInsert + "('" + i.isoformat() + "'),"
@@ -197,10 +251,11 @@ class InvalidDataTypeTest(unittest.TestCase):
                 self.cur.execute(sqlSelect)
                 #for i in range(rowNum):
                 data = self.cur.fetchone()
+                #print data[2]
                 self.assertEqual('0001-01-01 00:00:00', data[2].isoformat(" "))
 
         def test_timestamp(self):
-#               test invalid datetime type
+#               test normal datetime type
                 checkData = str(datetime.now().year) + '-10-31 00:00:00'
                 dataList = ['10/31','10/31/2008','13:15:45 10/31/2008']
                 dataCheck = [checkData,'2008-10-31 00:00:00','2008-10-31 13:15:45']
@@ -217,7 +272,7 @@ class InvalidDataTypeTest(unittest.TestCase):
                         self.assertEqual(dataCheck[i], data[0].isoformat(" "))
 
         def _test_bit(self):
-#               test invalid bit type
+#               test normal bit type
                 dataList = ['B\'1\'','B\'1010\'']
                 dataCheck = ['80','A0']
                 sqlInsert = "insert into bit_db(c_bit) values "
@@ -231,40 +286,8 @@ class InvalidDataTypeTest(unittest.TestCase):
                 for i in range(rowNum):
                         data = self.cur.fetchone()
                         self.assertEqual(dataCheck[i], data[0])
-        """
-        def test_varbit(self):
-#               test invalid bit varying type
-                dataList = ['B\'1\'','B\'1010\'']
-                dataCheck = ['8','A0']
-                sqlInsert = "insert into bit_db(c_varbit) values "
-                for i in dataList:
-                        sqlInsert = sqlInsert + "(" + i + "),"
-                sqlInsert = sqlInsert.rstrip(',')
-                self.cur.execute(sqlInsert)
-                rowNum = self.cur.rowcount
-                sqlSelect = "select c_varbit from bit_db"
-                self.cur.execute(sqlSelect)
-                for i in range(rowNum):
-                        data = self.cur.fetchone()
-                        self.assertEqual(dataCheck[i], data[0])
-        """
 
-        def randomStr(self,length=8):
-                str=''
-                chars='AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'
-                lenChars = len(chars)-1
-                rand = Random()
-                for i in range(length):
-                        str+=chars[random.randint(0,lenChars)]
-                return str
-
-        def generateStr(self,length=8):
-                str=''
-                c='a'
-                for i in range(length):
-                        str+=c
-                return str
 
 if __name__ == '__main__':
-        suite = unittest.TestLoader().loadTestsFromTestCase(InvalidDataTypeTest)
+        suite = unittest.TestLoader().loadTestsFromTestCase(FetchoneTypeTest)
         unittest.TextTestRunner(verbosity=2).run(suite)

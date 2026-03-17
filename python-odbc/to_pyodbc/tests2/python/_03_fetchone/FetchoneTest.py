@@ -18,7 +18,7 @@ class FetchoneTest(unittest.TestCase):
 
         def setUp(self):
                 conStr = self.getConStr()                
-                self.con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+                self.con = pyodbc.connect(conStr)
 #                self.con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
                 self.cur = self.con.cursor()
 
@@ -76,14 +76,14 @@ class FetchoneTest(unittest.TestCase):
                 data2 = self.cur.fetchone()
                 self.assertEqual(None,data2)
 
-        def test_ValidConn(self):
+        def test_InvalidConn(self):
                 try:
-                        self.con1 = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+                        self.con1 = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=invalid_db')
                         self.con1.close()
-                except Exception as e:
-                        pass
+                except pyodbc.Error as e:
+                        self.assertEqual("HY000", e.args[0])
                 else:
-                        fail("connection should not be established")
+                        self.fail("connection should not be established")
 
 
 if __name__ == '__main__':

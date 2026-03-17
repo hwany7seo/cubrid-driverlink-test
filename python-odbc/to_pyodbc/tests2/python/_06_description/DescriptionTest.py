@@ -18,7 +18,7 @@ class FetchoneDescriptionTest(unittest.TestCase):
 
         def setUp(self):
                 conStr = self.getConStr()                
-                self.con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')                
+                self.con = pyodbc.connect(conStr)                
                 self.cur = self.con.cursor()
 
                 sqlDrop = "drop table if exists numeric_db"
@@ -79,6 +79,8 @@ class FetchoneDescriptionTest(unittest.TestCase):
                 self.cur.execute(sqlSelect)
                 dataDesc = self.cur.description
                 dataCheck = (('c_bit', 5, 0, 0, 8, 0, 1), ('c_varbit', 6, 0, 0, 8, 0, 1))
+                print("dataDesc: ", dataDesc)
+                print("dataCheck: ", dataCheck)
                 self.assertEqual(dataCheck, dataDesc)
 
         def test_desc_char(self):
@@ -100,19 +102,19 @@ class FetchoneDescriptionTest(unittest.TestCase):
         def test_all(self):
                 sqlSelect = "select * from numeric_db"
                 self.cur.execute(sqlSelect)
-print(self.cur.description)
+                print(self.cur.description)
                 sqlSelect = "select * from datetime_db"
                 self.cur.execute(sqlSelect)
-print(self.cur.description)
+                print(self.cur.description)
                 sqlSelect = "select * from bit_db"
                 self.cur.execute(sqlSelect)
-print(self.cur.description)
+                print(self.cur.description)
                 sqlSelect = "select * from character_db"
                 self.cur.execute(sqlSelect)
-print(self.cur.description)
+                print(self.cur.description)
                 sqlSelect = "select * from collection_db"
                 self.cur.execute(sqlSelect)
-print(self.cur.description                )
+                print(self.cur.description)
 
 
 if __name__ == '__main__':

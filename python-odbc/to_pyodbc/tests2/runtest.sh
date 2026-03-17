@@ -1,4 +1,3 @@
-import pyodbc
 #!/bin/bash
 . ./init.sh
 
@@ -11,7 +10,7 @@ testcases=python_testcase_list
 MEM_LOG=memoryLeaklog
 FUNC_LOG=function_result
 VALGRIND="valgrind --leak-check=full"
-python="python"
+python="python3"
 test_mode="normal"
 test_case="functional_only"
 all_test_result_file=tests2.result
@@ -25,8 +24,9 @@ rm $all_test_result_file
 get_options "$@"
 
 python_version_major=$(python_version_check $python)
+echo "python_version_major: $python_version_major"
 
-if [ x"$python_version_major" != "x2" ];then
+if [ x"$python_version_major" != "x3" ];then
     echo -n "We do not support this version: "
     $python --version
     exit
@@ -34,16 +34,16 @@ fi
 
 echo "Python DBI Test Begin... ($python), test_mode = $test_mode, test_case = $test_case"
 
-cubrid server stop $db
-cubrid createdb $db $CUBRID_LANG
-cubrid server restart $db
-cubrid server restart demodb
-cubrid broker restart
+# cubrid server stop $db
+# cubrid createdb $db $CUBRID_LANG
+# cubrid server restart $db
+# cubrid server restart demodb
+# cubrid broker restart
 brokerPort=`cubrid broker status -b|grep broker1|awk '{print $4}'`
 ipaddress=$(hostname -i)
 
 echo "<PythonConfig>"            >  $PYTHON_CON
-echo "  <ip>localhost</ip>"        >> $PYTHON_CON
+echo "  <ip>test-db-server</ip>"        >> $PYTHON_CON
 echo "  <port>$brokerPort</port>"    >> $PYTHON_CON
 echo "  <dbname>$db</dbname>"        >> $PYTHON_CON
 echo "  <remoteIP>$ipaddress</remoteIP>">> $PYTHON_CON
@@ -76,8 +76,8 @@ if [ "$test_case" != "functional_only" ];then
     done
 fi
 
-cubrid server stop $db
-cubrid deletedb $db
+# cubrid server stop $db
+# cubrid deletedb $db
 rm -f $testcases
 rm -rf lob
 

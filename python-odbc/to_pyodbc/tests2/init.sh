@@ -1,4 +1,3 @@
-import pyodbc
 # supplmentatry functions for python test
 
 function check_verdict ()

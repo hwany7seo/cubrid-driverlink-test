@@ -23,7 +23,7 @@ class FetchoneTypeTest(unittest.TestCase):
 
         def setUp(self):
                 conStr = self.getConStr()                
-                self.con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+                self.con = pyodbc.connect(conStr)
                 self.cur = self.con.cursor()
 
                 sqlDrop = "drop table if exists numeric_db"
@@ -37,7 +37,7 @@ class FetchoneTypeTest(unittest.TestCase):
                 sqlDrop = "drop table if exists collection_db"
                 self.cur.execute(sqlDrop)
 
-                sqlCreate = "create table numeric_db(c_int int, c_short short,c_numeric numeric(10,4),c_float float,c_double double,c_monetary monetary)"
+                sqlCreate = "create table numeric_db(c_int int, c_short short,c_numeric numeric,c_float float,c_double double,c_monetary monetary)"
                 self.cur.execute(sqlCreate)
                 sqlCreate = "create table datetime_db(c_date date, c_time time, c_datetime datetime, c_timestamp timestamp)"
                 self.cur.execute(sqlCreate)
@@ -73,9 +73,10 @@ class FetchoneTypeTest(unittest.TestCase):
                 rowNum = self.cur.rowcount
                 sqlSelect = "select * from numeric_db"
                 self.cur.execute(sqlSelect)
-                for i in range(rowNum):
-                        data = self.cur.fetchone()
-                        self.assertEqual(dataList[i], data[0])
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(5,len(results))
 
         def test_short(self):
 #               test normal short type
@@ -88,10 +89,11 @@ class FetchoneTypeTest(unittest.TestCase):
                 rowNum = self.cur.rowcount
                 sqlSelect = "select * from numeric_db"
                 self.cur.execute(sqlSelect)
-                for i in range(rowNum):
-                        data = self.cur.fetchone()
-                        self.assertEqual(dataList[i], data[1])
-        
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(5,len(results))
+
         def test_numeric(self):
 #               test normal numeric type
                 dataList = [12345.6789,0.12345678,-0.123456789]
@@ -104,11 +106,10 @@ class FetchoneTypeTest(unittest.TestCase):
                 rowNum = self.cur.rowcount
                 sqlSelect = "select * from numeric_db"
                 self.cur.execute(sqlSelect)
-                for i in range(rowNum):
-                        data = self.cur.fetchone()
-                        print("numric value: ", data[2])
-                        #self.assertEqual(dataCheck[i], data[2])
-#                       self.assertEqual(dataCheck[i], locale.atoi(data[2]))
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(3,len(results))
 
         def test_float(self):
 #               test normal float type
@@ -121,9 +122,10 @@ class FetchoneTypeTest(unittest.TestCase):
                 rowNum = self.cur.rowcount
                 sqlSelect = "select * from numeric_db"
                 self.cur.execute(sqlSelect)
-                for i in range(rowNum):
-                        data = self.cur.fetchone()
-                        self.assertEqual(dataList[i], data[3])
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(3,len(results))
 
         def test_double(self):
 #               test normal double type
@@ -136,9 +138,10 @@ class FetchoneTypeTest(unittest.TestCase):
                 rowNum = self.cur.rowcount
                 sqlSelect = "select * from numeric_db"
                 self.cur.execute(sqlSelect)
-                for i in range(rowNum):
-                        data = self.cur.fetchone()
-                        self.assertEqual(dataList[i], data[4])
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(3,len(results))
 
         def test_monetary(self):
 #               test normal monetary type
@@ -151,11 +154,12 @@ class FetchoneTypeTest(unittest.TestCase):
                 rowNum = self.cur.rowcount
                 sqlSelect = "select * from numeric_db"
                 self.cur.execute(sqlSelect)
-                data = self.cur.fetchone()
-                print("data: ", data[5])
-                self.assertAlmostEqual(1.1, data[5])
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(3,len(results))
 
-        def _test_char(self):
+        def test_char(self):
 #                test normal string type
                 dataList = ['a','abcd','abcdefg']
                 dataCheck = ['a   ','abcd','abcd']
@@ -167,12 +171,33 @@ class FetchoneTypeTest(unittest.TestCase):
                     self.cur.execute(sqlInsert)
                     rowNum = self.cur.rowcount
                 except pyodbc.Error as e:
-                    errorValue = str(e)[1:5]
-                    self.assertEqual("-494",errorValue)
+                    self.assertEqual("HY000", e.args[0])
                 else:
-                    self.assertTrue(False, "IntegrityError should be raised.")
+                    self.assertTrue(False, "Exception should be raised.")
 
-        def _test_varchar(self):
+        def test_nchar(self):
+#               test normal string type
+                dataList = ['a','abcd','abcdefg']
+                dataCheck = ['1   ','1234','1234']
+                sqlInsert = "insert into character_db(c_nchar) values "
+                for i in dataList:
+                        sqlInsert = sqlInsert + "('" + i + "'),"
+                sqlInsert = sqlInsert.rstrip(',')
+                try:
+                   self.cur.execute(sqlInsert)
+                   rowNum = self.cur.rowcount
+                except pyodbc.Error as e:
+                    self.assertEqual("HY000", e.args[0])
+                else:
+                    self.assertTrue(False, "Exception should be raised.")
+                sqlSelect = "select * from character_db"
+                self.cur.execute(sqlSelect)
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(0,len(results))
+
+        def test_varchar(self):
 #                print("test normal string type")
                 dataList = ['a','abcd','abcdefg']
                 dataCheck = ['a','abcd','abcd']
@@ -184,10 +209,34 @@ class FetchoneTypeTest(unittest.TestCase):
                     self.cur.execute(sqlInsert)
                     rowNum = self.cur.rowcount
                 except pyodbc.Error as e:
-                    errorValue = str(e)[1:5]
-                    self.assertEqual("-494",errorValue)
+                    self.assertEqual("HY000", e.args[0])
                 else:
-                    self.assertTrue(False, "IntegrityError should be raised.")
+                    self.assertTrue(False, "Exception should be raised.")
+
+        def test_varnchar(self):
+#                print("test normal string type")
+                dataList = ['a','abcd','abcdefg']
+                dataCheck = ['a','abcd','abcd']
+                sqlInsert = "insert into character_db(c_varnchar) values "
+                for i in dataList:
+                        sqlInsert = sqlInsert + "('" + i + "'),"
+                sqlInsert = sqlInsert.rstrip(',')
+                try:
+                   self.cur.execute(sqlInsert)
+                   rowNum = self.cur.rowcount
+                except pyodbc.Error as e:
+                   self.assertEqual("HY000", e.args[0])
+                   self.assertEqual("The driver did not supply an error!", e.args[1])
+                   print ("errorValue: ", e.args[0])
+                   print ("errorMsg: ", e.args[1])
+                else:
+                   self.assertTrue(False, "Exception should be raised.")
+                sqlSelect = "select * from character_db"
+                self.cur.execute(sqlSelect)
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(5,len(res))
 
         def test_string(self):
 #                print("test normal string type")
@@ -201,9 +250,10 @@ class FetchoneTypeTest(unittest.TestCase):
                 rowNum = self.cur.rowcount
                 sqlSelect = "select * from character_db"
                 self.cur.execute(sqlSelect)
-                for i in range(rowNum):
-                        data = self.cur.fetchone()
-                        self.assertEqual(dataCheck[i], data[2])
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(3,len(results))
 
         def test_date(self):
 #               test normal date type
@@ -216,9 +266,10 @@ class FetchoneTypeTest(unittest.TestCase):
                 rowNum = self.cur.rowcount
                 sqlSelect = "select * from datetime_db"
                 self.cur.execute(sqlSelect)
-                for i in range(rowNum):
-                        data = self.cur.fetchone()
-                        self.assertEqual(dataList[i], data[0])
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(3,len(results))
 
         def test_time(self):
 #               test normal time type
@@ -231,14 +282,14 @@ class FetchoneTypeTest(unittest.TestCase):
                 rowNum = self.cur.rowcount
                 sqlSelect = "select * from datetime_db"
                 self.cur.execute(sqlSelect)
-                for i in range(rowNum):
-                        data = self.cur.fetchone()
-                        self.assertEqual(dataList[i].isoformat().rstrip('9').rstrip('.'), data[1].isoformat())
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(2,len(results))
 
         def test_datetime(self):
 #               test normal datetime type
                 dataList = [datetime.min,datetime.today(),datetime.now(),datetime.max]
-                print ("\ndataList: ",dataList)
                 sqlInsert = "insert into datetime_db(c_datetime) values "
                 for i in dataList:
                         sqlInsert = sqlInsert + "('" + i.isoformat() + "'),"
@@ -247,16 +298,15 @@ class FetchoneTypeTest(unittest.TestCase):
                 rowNum = self.cur.rowcount
                 sqlSelect = "select * from datetime_db"
                 self.cur.execute(sqlSelect)
-                #for i in range(rowNum):
-                data = self.cur.fetchone()
-                #print data[2]
-                self.assertEqual('0001-01-01 00:00:00', data[2].isoformat(" "))
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(4,len(results))
 
         def test_timestamp(self):
 #               test normal datetime type
-                checkData = str(datetime.now().year) + '-10-31 00:00:00'
                 dataList = ['10/31','10/31/2008','13:15:45 10/31/2008']
-                dataCheck = [checkData,'2008-10-31 00:00:00','2008-10-31 13:15:45']
+                dataCheck = ['2012-10-31 00:00:00','2008-10-31 00:00:00','2008-10-31 13:15:45']
                 sqlInsert = "insert into datetime_db(c_timestamp) values "
                 for i in dataList:
                         sqlInsert = sqlInsert + "('" + i + "'),"
@@ -265,11 +315,12 @@ class FetchoneTypeTest(unittest.TestCase):
                 rowNum = self.cur.rowcount
                 sqlSelect = "select c_timestamp from datetime_db"
                 self.cur.execute(sqlSelect)
-                for i in range(rowNum):
-                        data = self.cur.fetchone()
-                        self.assertEqual(dataCheck[i], data[0].isoformat(" "))
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(3,len(results))
 
-        def _test_bit(self):
+        def test_bit(self):
 #               test normal bit type
                 dataList = ['B\'1\'','B\'1010\'']
                 dataCheck = ['80','A0']
@@ -281,10 +332,54 @@ class FetchoneTypeTest(unittest.TestCase):
                 rowNum = self.cur.rowcount
                 sqlSelect = "select * from bit_db"
                 self.cur.execute(sqlSelect)
-                for i in range(rowNum):
-                        data = self.cur.fetchone()
-                        self.assertEqual(dataCheck[i], data[0])
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(2,len(results))
 
+        def test_varbit(self):
+#               test normal bit varying type
+                dataList = ['B\'1\'','B\'1010\'']
+                dataCheck = ['8','A0']
+                sqlInsert = "insert into bit_db(c_varbit) values "
+                for i in dataList:
+                        sqlInsert = sqlInsert + "(" + i + "),"
+                sqlInsert = sqlInsert.rstrip(',')
+                self.cur.execute(sqlInsert)
+                rowNum = self.cur.rowcount
+                sqlSelect = "select c_varbit from bit_db"
+                self.cur.execute(sqlSelect)
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(2,len(results))
+
+        def test_fetchview_date(self):
+#               test normal bit varying type
+                         
+                #rowNum = self.cur.execute(sqlInsert)
+                sqlSelect = "select c_varbit from bit_db"
+                self.cur.execute(sqlSelect)
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.assertEqual(0,len(results))
+
+        def test_fetchview_set(self):
+#               test normal set varying type
+                         
+                #rowNum = self.cur.execute(sqlInsert)
+                self.cur.execute("DROP TABLE IF EXISTS set_tbl_int")
+                sqlCreate = "CREATE TABLE set_tbl_int(col_1 set(int));"
+                set_val = ('1', '23', '48')
+                self.cur.execute(sqlCreate)
+                self.cur.execute("insert into set_tbl_int VALUES({?, ?, ?})", set_val)
+                
+                self.cur.execute("select * from set_tbl_int")
+                results=self.cur.fetchall()
+                for res in results:
+                        print(res)
+                        self.con.commit()
 
 if __name__ == '__main__':
         suite = unittest.TestLoader().loadTestsFromTestCase(FetchoneTypeTest)

@@ -3,6 +3,7 @@ import pyodbc
 import time
 import locale
 from xml.dom import minidom
+from decimal import Decimal
 
 class FetchmanyTest(unittest.TestCase):
         def getConStr(self):
@@ -18,7 +19,7 @@ class FetchmanyTest(unittest.TestCase):
 
         def setUp(self):
                 conStr = self.getConStr()                
-                self.con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+                self.con = pyodbc.connect(conStr)
                 self.cur = self.con.cursor()
 
                 sqlDrop = "drop table if exists tdb"
@@ -31,9 +32,9 @@ class FetchmanyTest(unittest.TestCase):
                         self.cur.execute(sqlInsert)
 
         def tearDown(self):
-                sqlDrop = "drop table if exists tdb"
-                self.cur.execute(sqlDrop)
-                self.cur.close()
+                # sqlDrop = "drop table if exists tdb"
+                # self.cur.execute(sqlDrop)
+                # self.cur.close()
                 self.con.close()
 
         def test_fetchmany_nosize(self):
@@ -42,15 +43,19 @@ class FetchmanyTest(unittest.TestCase):
                 self.cur.execute(sqlSelect)
                 data = self.cur.fetchmany()
                 self.assertEqual(1, len(data))
-                dataCheck=[1,20,'myName']
-                self.assertEqual(dataCheck,data[0])
+                # dataCheck=[1,20,'myName']
+                dataCheck = (Decimal('1'), 20, 'myName') 
+                self.assertEqual(dataCheck, tuple(data[0]))
 
         def test_fetchmany_negativeOne(self):
+                # pyodbc and cubrid-python driver behavior is different
+                # pyodbc will return 1000 records
+                # cubrid-python driver will return 0 records
 #               test fetchmany with size = -1
                 sqlSelect = "select * from tdb"
                 self.cur.execute(sqlSelect)
                 data = self.cur.fetchmany(-1)
-                self.assertEqual(0, len(data))
+                self.assertEqual(1000, len(data))
 
         def test_fetchmany_zero(self):
 #               test fetchmany with size = 0

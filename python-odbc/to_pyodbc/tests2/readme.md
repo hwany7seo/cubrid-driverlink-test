@@ -1,4 +1,3 @@
-import pyodbc
 * 'valgrind' is required to run memory leak test
 * Python 3.x is not supported
 

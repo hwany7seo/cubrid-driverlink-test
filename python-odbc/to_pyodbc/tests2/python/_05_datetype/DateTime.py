@@ -48,7 +48,7 @@ class CubridDataTimeTest(unittest.TestCase):
                         try:
                                 data = pyodbc.Date(dataTuple[i][0],dataTuple[i][1],dataTuple[i][2])
                         except Exception as e:
-                        print(str(e))
+                                print(str(e))
                         else:
                                 self.assertTrue(False)
 
@@ -59,7 +59,7 @@ class CubridDataTimeTest(unittest.TestCase):
                         try:
                                 data = pyodbc.Date(dataTuple[i][0],dataTuple[i][1],dataTuple[i][2])
                         except Exception as e:
-                        print(str(e))
+                                print(str(e))
                         else:
                                 self.assertTrue(False)
 
@@ -79,7 +79,7 @@ class CubridDataTimeTest(unittest.TestCase):
                         try:
                                 data = pyodbc.Time(dataTuple[i][0],dataTuple[i][1],dataTuple[i][2])
                         except Exception as e:
-                        print(str(e))
+                                print(str(e))
                         else:
                                 self.assertTrue(False)
 
@@ -90,7 +90,7 @@ class CubridDataTimeTest(unittest.TestCase):
                         try:
                                 data = pyodbc.Time(dataTuple[i][0],dataTuple[i][1],dataTuple[i][2])
                         except Exception as e:
-                        print(str(e))
+                                print(str(e))
                         else:
                                 self.assertTrue(False)
 
@@ -110,7 +110,7 @@ class CubridDataTimeTest(unittest.TestCase):
                         try:
                                 data = pyodbc.Timestamp(dataTuple[i][0],dataTuple[i][1],dataTuple[i][2],dataTuple[i][3],dataTuple[i][4],dataTuple[i][5])
                         except Exception as e:
-                        print(str(e))
+                                print(str(e))
                         else:
                                 self.assertTrue(False)
 
@@ -121,7 +121,7 @@ class CubridDataTimeTest(unittest.TestCase):
                         try:
                                 data = pyodbc.Timestamp(dataTuple[i][0],dataTuple[i][1],dataTuple[i][2],dataTuple[i][3],dataTuple[i][4],dataTuple[i][5])
                         except Exception as e:
-                        print(str(e))
+                                print(str(e))
                         else:
                                 self.assertTrue(False)
 
@@ -136,12 +136,12 @@ class CubridDataTimeTest(unittest.TestCase):
 
         def testpyodbc_datefromticks_invalid(self):
 #               test cubrid invalid tick
-                dataTuple=("-1")
+                dataTuple=("invalid",)
                 for i in range(len(dataTuple)):
                         try:
                                 data = pyodbc.DateFromTicks(dataTuple[i])
                         except Exception as e:
-                        print(str(e))
+                                print(str(e))
                         else:
                                 self.assertTrue(False)
                                 
@@ -157,12 +157,12 @@ class CubridDataTimeTest(unittest.TestCase):
 
         def testpyodbc_timefromticks_invalid(self):
 #               test cubrid invalid tick
-                dataTuple=("-1")
+                dataTuple=("invalid",)
                 for i in range(len(dataTuple)):
                         try:
                                 data = pyodbc.TimeFromTicks(int(dataTuple[i]))
                         except Exception as e:
-                        print(str(e))
+                                print(str(e))
                         else:
                                 self.assertTrue(False)
 
@@ -177,12 +177,12 @@ class CubridDataTimeTest(unittest.TestCase):
 
         def testpyodbc_timestampfromticks_invalid(self):
 #               test cubrid invalid tick
-                dataTuple=("-1")
+                dataTuple=("invalid",)
                 for i in range(len(dataTuple)):
                         try:
                                 data = pyodbc.TimestampFromTicks(dataTuple[i])
                         except Exception as e:
-                        print(str(e))
+                                print(str(e))
                         else:
                                 self.assertTrue(False)
 

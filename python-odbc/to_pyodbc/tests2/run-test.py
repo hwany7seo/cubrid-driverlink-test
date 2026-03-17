@@ -1,4 +1,3 @@
-import pyodbc
 import unittest
 import sys
 import os
@@ -17,7 +16,7 @@ def importModule():
             for name in files:
                 if os.path.splitext(name)[1] == '.py':
                     modname=os.path.splitext(name)[0]
-print(os.path.join(root, name))
+                    print(os.path.join(root, name))
                     #print("import: ")+os.path.splitext(name)[0]
                     __import__(modname)
                     mod = sys.modules[modname]
