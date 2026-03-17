@@ -19,7 +19,7 @@ class SetTest(unittest.TestCase):
 
     def setUp(self):
         conStr = self.getConStr()
-        self.con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+        self.con = pyodbc.connect(self.getConStr())
         self.cur = self.con.cursor()
 
     def tearDown(self):
@@ -43,7 +43,7 @@ class SetTest(unittest.TestCase):
             print("errorValue: ",errorValue)
         self.assertEqual(self.con.escape_string("cubrid \ Laptop"),"cubrid \ Laptop")
     def test_row_to_dict(self):
-        con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+        con = pyodbc.connect(self.getConStr())
         c = con.cursor()
 
         c.prepare("DROP TABLE IF EXISTS cubrid_test")

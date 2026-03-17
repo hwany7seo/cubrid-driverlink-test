@@ -13,7 +13,7 @@ class MyThread(threading.Thread):
 
         def run(self):
                 conStr = getConStr()
-                self.conn = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+                self.conn = pyodbc.connect(conStr)
                 self.cur= self.conn.cursor()
                 ##start db operation using multiple threads
                 start_time=time.time()
@@ -97,7 +97,7 @@ print(def getConStr():)
 
 def test_one_thread():
         conStr = getConStr()
-        conn = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+        conn = pyodbc.connect(conStr)
         cur= conn.cursor()
         cur.execute('drop table if exists tdb')
         cur.execute('create table tdb(a int, b varchar(20), c timestamp, e int)')        
@@ -120,7 +120,7 @@ def test_one_thread():
 
 def test_ten_thread():
         conStr = getConStr()
-        conn = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+        conn = pyodbc.connect(conStr)
         cur= conn.cursor()
         cur.execute('drop table if exists tdb')
         cur.execute('create table tdb(a int, b varchar(20), c timestamp, e int)')

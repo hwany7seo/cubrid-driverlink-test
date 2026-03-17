@@ -23,7 +23,7 @@ class FetchoneTypeTest(unittest.TestCase):
 
         def setUp(self):
                 conStr = self.getConStr()                
-                self.con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+                self.con = pyodbc.connect(conStr)
                 self.cur = self.con.cursor()
 
                 sqlDrop = "drop table if exists numeric_db"

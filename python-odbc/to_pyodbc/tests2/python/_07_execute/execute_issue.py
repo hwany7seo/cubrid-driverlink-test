@@ -19,7 +19,7 @@ class IssueTest(unittest.TestCase):
 
         def setUp(self):
                 conStr = self.getConStr()                
-                self.con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+                self.con = pyodbc.connect(self.getConStr())
                 self.cur = self.con.cursor()
                 self.cur.execute("DROP TABLE IF EXISTS issue")
                 self.cur.execute("CREATE TABLE issue(nameid int primary key ,age int,name VARCHAR(40))")
@@ -32,14 +32,14 @@ class IssueTest(unittest.TestCase):
         def test_connect(self):
                 print("\nconnect url is empty")
                 try:
-                    self.con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+                    self.con = pyodbc.connect(self.getConStr())
                 except Exception as e:
                     errorValue=str(e)
                     print(errorValue)
                     self.assertEqual(errorValue,"(-20030, 'ERROR: CCI, -20030, Invalid url string')")
 
                 try:
-                    self.con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+                    self.con = pyodbc.connect(self.getConStr())
                 except Exception as e:
                     errorValue=str(e)
                     print(errorValue)

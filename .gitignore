@@ -5,3 +5,4 @@ python-odbc/cubrid-python/
 ruby-odbc/cubrid-ruby/
 *.code-workspace
 python-odbc/to_pyodbc/**/*.result
+python-odbc/**/__pycache__/

@@ -18,7 +18,7 @@ class DBAPI20Test(unittest.TestCase):
     port = ports[0].childNodes[0].toxml()
     dbnames = xmlt.childNodes[0].getElementsByTagName('dbname')
     dbname = dbnames[0].childNodes[0].toxml()
-    conStr = "CUBRID:"+ip+":"+port+":"+dbname+":::"
+    conStr = "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
     user = 'dba'
     password = ''
     charset = 'utf8'
@@ -74,7 +74,7 @@ class DBAPI20Test(unittest.TestCase):
 
     def _connect(self):
         try:
-            con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+            con = pyodbc.connect(self.conStr)
             self._check_table_exist(con)
             return con
         except AttributeError:
@@ -740,7 +740,7 @@ class DBAPI20Test(unittest.TestCase):
         # APIS-426
     def test_execute_args(self):
         ret = 0
-        con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+        con = pyodbc.connect(self.conStr)
         try:
             cur = con.cursor()
 
@@ -766,12 +766,12 @@ class DBAPI20Test(unittest.TestCase):
         self.assertEqual(ret, 0)
 
     def test_connect1(self):
-        con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+        con = pyodbc.connect(self.conStr)
         self.assertIsNotNone(con)
         con.close()
 
     def test_connect2(self):
-        con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+        con = pyodbc.connect(self.conStr)
         self.assertEqual(con.charset, self.charset)
         con.close()
 

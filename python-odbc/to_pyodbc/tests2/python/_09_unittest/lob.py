@@ -26,7 +26,7 @@ class CubridTest(unittest.TestCase):
         dbnames = xmlt.childNodes[0].getElementsByTagName('dbname')
         dbname = dbnames[0].childNodes[0].toxml()
         conStr = "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
-        con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+        con = pyodbc.connect(conStr)
         cur=con.cursor()
         lob=con.lob()
         try:

@@ -18,7 +18,7 @@ class pyodbc_crud_test(unittest.TestCase):
     port = ports[0].childNodes[0].toxml()
     dbnames = xmlt.childNodes[0].getElementsByTagName('dbname')
     dbname = dbnames[0].childNodes[0].toxml()
-    conStr = "CUBRID:"+ip+":"+port+":"+dbname+":::"
+    conStr = "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
 
     connect_args = (conStr, 'dba', '')
     connect_kw_args = {}
@@ -27,7 +27,7 @@ class pyodbc_crud_test(unittest.TestCase):
     table_name = 'test_crud_table'
 
     def setUp(self):
-        self.con = pyodbc.connect('DRIVER={CUBRID Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+        self.con = pyodbc.connect(self.conStr)
         self.cur = self.con.cursor()
 
     def tearDown(self):

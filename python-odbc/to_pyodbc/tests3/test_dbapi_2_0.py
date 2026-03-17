@@ -40,12 +40,12 @@ def test_connect(cubrid_db_connection):
 
 def test_connect_empty_dsn():
     with pytest.raises(pyodbc.InterfaceError):
-        pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+        pyodbc.connect('')
 
 
 def test_connect_no_dsn():
     with pytest.raises(pyodbc.InterfaceError):
-        pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+        pyodbc.connect()
 
 
 def test_apilevel():

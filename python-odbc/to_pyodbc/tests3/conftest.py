@@ -12,24 +12,22 @@ import pytest
 import pyodbc
 
 
+from xml.dom import minidom
+
 def _get_connect_args():
-    ip = "test-db-server"
-    port = "33000"
-    dbname = "demodb"
-    user = "dba"
-    password = ""
-
-    return {
-        'dsn': f"CUBRID:{ip}:{port}:{dbname}:::",
-        'user': user,
-        'password': password,
-    }
-
+    xmlt = minidom.parse('configuration/python_config.xml')
+    ips = xmlt.childNodes[0].getElementsByTagName('ip')
+    ip = ips[0].childNodes[0].toxml()
+    ports = xmlt.childNodes[0].getElementsByTagName('port')
+    port = ports[0].childNodes[0].toxml()
+    dbnames = xmlt.childNodes[0].getElementsByTagName('dbname')
+    dbname = dbnames[0].childNodes[0].toxml()
+    return "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
 
 @pytest.fixture
 def cubrid_connection():
-    args = _get_connect_args()
-    conn = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+    conStr = _get_connect_args()
+    conn = pyodbc.connect(conStr)
     yield conn
 
     conn.close()
@@ -47,8 +45,8 @@ def cubrid_cursor(cubrid_connection):
 
 @pytest.fixture
 def cubrid_db_connection():
-    args = _get_connect_args()
-    conn = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+    conStr = _get_connect_args()
+    conn = pyodbc.connect(conStr)
     yield conn
     conn.close()
 
