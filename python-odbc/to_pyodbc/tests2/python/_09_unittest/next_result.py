@@ -26,8 +26,8 @@ class CubridTest(unittest.TestCase):
         cur=con.cursor()
         lob=con.lob()
         try:
-print(con)
-print(cur)
+           print(con)
+           print(cur)
            cur.prepare("drop table if exists nextResult_tb")
            cur.execute()
            cur.prepare("create table nextResult_tb(id int)")
@@ -47,7 +47,7 @@ print(cur)
            while row:
               print ("row value: ", row)
               row=cur.fetch_row() 
-print(row)
+           print(row)
         except Exception as e:
               errorValue=str(e)
               print("errorValue: ",errorValue)
@@ -55,8 +55,8 @@ print(row)
            lob.close()
            cur.close()
            con.close()   
-print(cur)
-print(con)
+           print(cur)
+           print(con)
 
 if __name__ == '__main__':
     #unittest.main(defaultTest = 'suite')

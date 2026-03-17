@@ -18,7 +18,7 @@ class ExecuteSelectCalculateTest(unittest.TestCase):
 
         def setUp(self):
                 conStr = self.getConStr()                
-                self.conn = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+                self.conn = pyodbc.connect(conStr)
                 self.cursor= self.conn.cursor()
                 dropSql='drop table if exists nonormal_tb'
                 self.cursor.execute(dropSql)
@@ -52,7 +52,7 @@ class ExecuteSelectCalculateTest(unittest.TestCase):
                 self.row=self.cursor.fetchone ()
                 print(self.row[0])
                 value=self.row[0]
-                self.assertEqual(value,'86400000')
+                self.assertEqual(value,86400000)
 
 
                 print("SELECT date'2002-1-1' + '10' ")
@@ -60,7 +60,7 @@ class ExecuteSelectCalculateTest(unittest.TestCase):
                 self.row=self.cursor.fetchone ()
                 print(self.row[0])
                 value=self.row[0]
-                self.assertEqual(value.isoformat(),'2002-1-11')
+                self.assertEqual(value.isoformat(),'2002-01-11')
 
 
                 print("SELECT '1'+'1' ")
@@ -90,7 +90,7 @@ class ExecuteSelectCalculateTest(unittest.TestCase):
                 self.row=self.cursor.fetchone ()
                 print(self.row[0])
                 value=self.row[0]
-                self.assertEqual(value,9)
+                self.assertEqual(value,8)
 
                 print("SELECT LENGTH('')")
                 self.cursor.execute("SELECT LENGTH('')")

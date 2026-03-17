@@ -19,7 +19,7 @@ class ExecuteTriggerTest(unittest.TestCase):
 
         def setUp(self):
                 conStr = self.getConStr()                
-                self.conn = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+                self.conn = pyodbc.connect(conStr)
                 self.cursor= self.conn.cursor()
                 self.cursor.execute("drop class if exists hi")
                 self.cursor.execute("drop class if exists tt1")

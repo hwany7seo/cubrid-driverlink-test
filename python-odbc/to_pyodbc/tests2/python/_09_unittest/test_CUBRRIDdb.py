@@ -62,7 +62,7 @@ class DBAPI20Test(unittest.TestCase):
             # Must exist
             paramstyle = self.driver.paramstyle
             # Must be a valid value
-            self.failUnless(paramstyle in (
+            self.assertTrue(paramstyle in (
                 'qmark', 'numeric', 'format', 'pyformat'
                 ))
         except AttributeError:
@@ -71,11 +71,11 @@ class DBAPI20Test(unittest.TestCase):
     def test_Exceptions(self):
         # Make sure required exceptions exist, and are in the
         # defined heirarchy.
-        self.failUnless(issubclass(self.driver.Error, Exception))
-        self.failUnless(
+        self.assertTrue(issubclass(self.driver.Error, Exception))
+        self.assertTrue(
                 issubclass(self.driver.InterfaceError, self.driver.Error)
                 )
-        self.failUnless(
+        self.assertTrue(
                 issubclass(self.driver.DatabaseError,self.driver.Error)
                 )
 
@@ -160,11 +160,11 @@ class DBAPI20Test(unittest.TestCase):
             cur.execute("insert into %sbooze value ('Victoria Bitter')" % (
                     self.table_prefix
                     ))
-            self.failUnless(cur.rowcount in (-1, 1),
+            self.assertTrue(cur.rowcount in (-1, 1),
                     'cursor.rowcount should == number or rows inserted, or '
                     'set to -1 after executing an insert statment')
             cur.execute("select name from %sbooze" % self.table_prefix)
-            self.failUnless(cur.rowcount in (-1,1),
+            self.assertTrue(cur.rowcount in (-1,1),
                     'cursor.rowcount should == number of rows returned, or '
                     'set to -1 after executing a select statement')
             self.executeDDL2(cur)
@@ -203,7 +203,7 @@ class DBAPI20Test(unittest.TestCase):
         cur.execute("insert into %sbooze values ('Victoria Bitter')" % (
             self.table_prefix
             ))
-        self.failUnless(cur.rowcount in (-1, 1))
+        self.assertTrue(cur.rowcount in (-1, 1))
 
         if self.driver.paramstyle == 'qmark':
             cur.execute(
@@ -232,7 +232,7 @@ class DBAPI20Test(unittest.TestCase):
                 )
         else:
             self.fail('Invalid paramstyle')
-        self.failUnless(cur.rowcount in (-1, 1))
+        self.assertTrue(cur.rowcount in (-1, 1))
 
         cur.execute('select name from %sbooze' % self.table_prefix)
         res = cur.fetchall()
@@ -308,7 +308,7 @@ class DBAPI20Test(unittest.TestCase):
             self.assertEqual(cur.fetchone(), None,
                     'cursor.fetchone should return None if a query '
                     'retrieves no rows')
-            self.failUnless(cur.rowcount in (-1, 0))
+            self.assertTrue(cur.rowcount in (-1, 0))
 
             # cursor.fetchone should raise an Error if called after
             # executing a query that cannnot return rows
@@ -327,7 +327,7 @@ class DBAPI20Test(unittest.TestCase):
                     )
             self.assertEqual(cur.fetchone(), None,
                     'cursor.fetchone should return None if no more rows available')
-            self.failUnless(cur.rowcount in (-1, 1))
+            self.assertTrue(cur.rowcount in (-1, 1))
         finally:
             con.close()
 
@@ -398,7 +398,7 @@ class DBAPI20Test(unittest.TestCase):
             self.assertEqual(len(r), 0,
                     'cursor.fetchmany should return an empty sequence after '
                     'results are exhausted')
-            self.failUnless(cur.rowcount in (-1, 6))
+            self.assertTrue(cur.rowcount in (-1, 6))
 
             # Same as above, using cursor.arraysize
             cur.arraysize = 4
@@ -410,12 +410,12 @@ class DBAPI20Test(unittest.TestCase):
             self.assertEqual(len(r), 2)
             r = cur.fetchmany() # Should be an empty sequence
             self.assertEqual(len(r),0)
-            self.failUnless(cur.rowcount in (-1,6))
+            self.assertTrue(cur.rowcount in (-1,6))
 
             cur.arraysize = 6
             cur.execute('select name from %sbooze' % self.table_prefix)
             rows = cur.fetchmany() # Should get all rows
-            self.failUnless(cur.rowcount in (-1,6))
+            self.assertTrue(cur.rowcount in (-1,6))
             self.assertEqual(len(rows),6)
             rows = [r[0] for r in rows]
             rows.sort()
@@ -427,7 +427,7 @@ class DBAPI20Test(unittest.TestCase):
             self.assertEqual(len(rows), 0,
                     'cursor.fetchmany should return an empty sequence if '
                     'called after the whole result set has been fetched')
-            self.failUnless(cur.rowcount in (-1,6))
+            self.assertTrue(cur.rowcount in (-1,6))
 
             self.executeDDL2(cur)
             cur.execute('select name from %sbarflys' % self.table_prefix)
@@ -435,7 +435,7 @@ class DBAPI20Test(unittest.TestCase):
             self.assertEqual(len(r), 0,
                     'cursor.fetchmany should return an empty sequence '
                     'if query retrieved no rows')
-            self.failUnless(cur.rowcount in (-1, 0))
+            self.assertTrue(cur.rowcount in (-1, 0))
         finally:
             con.close()
 
@@ -451,7 +451,7 @@ class DBAPI20Test(unittest.TestCase):
 
             cur.execute('select name from %sbooze' % self.table_prefix)
             rows = cur.fetchall()
-            self.failUnless(cur.rowcount in (-1, len(self.samples)))
+            self.assertTrue(cur.rowcount in (-1, len(self.samples)))
             self.assertEqual(len(rows), len(self.samples),
                     'cursor.fetchall did not retrieve all rows')
             rows = [r[0] for r in rows]
@@ -463,12 +463,12 @@ class DBAPI20Test(unittest.TestCase):
             self.assertEqual(len(rows), 0,
                     'cursor.fetchall should return an empty list if called '
                     'after the whole result set has been fetched')
-            self.failUnless(cur.rowcount in (-1, len(self.samples)))
+            self.assertTrue(cur.rowcount in (-1, len(self.samples)))
             
             self.executeDDL2(cur)
             cur.execute('select name from %sbarflys' % self.table_prefix)
             rows = cur.fetchall()
-            self.failUnless(cur.rowcount in (-1,0))
+            self.assertTrue(cur.rowcount in (-1,0))
             self.assertEqual(len(rows), 0,
                     'cursor.fetchall should return an empty list '
                     'if a select query returns no rows')
@@ -487,7 +487,7 @@ class DBAPI20Test(unittest.TestCase):
             rows23 = cur.fetchmany(2)
             rows4 = cur.fetchone()
             rows56 = cur.fetchall()
-            self.failUnless(cur.rowcount in (-1, 6))
+            self.assertTrue(cur.rowcount in (-1, 6))
             self.assertEqual(len(rows23), 2,
                     'fetchmany returned incorrect number of rows')
             self.assertEqual(len(rows56), 2,
@@ -507,7 +507,7 @@ class DBAPI20Test(unittest.TestCase):
     def test_threadsafety(self):
         try:
             threadsafety = self.driver.threadsafety
-            self.failUnless(threadsafety in (0,1,2,3))
+            self.assertTrue(threadsafety in (0,1,2,3))
         except AttributeError:
             self.fail("Driver doesn't define threadsafety")
 
@@ -527,23 +527,23 @@ class DBAPI20Test(unittest.TestCase):
                 int(time.mktime((2002,12,25,13,45,30,0,0,0))))
 
     def test_STRING(self):
-        self.failUnless(hasattr(self.driver,'STRING'),
+        self.assertTrue(hasattr(self.driver,'STRING'),
                 'module.STRING must be defined')
 
     def test_BINARY(self):
-        self.failUnless(hasattr(self.driver, 'BINARY'),
+        self.assertTrue(hasattr(self.driver, 'BINARY'),
                 'module.BINARY must be defined')
             
     def test_NUMBER(self):
-        self.failUnless(hasattr(self.driver,'NUMBER'),
+        self.assertTrue(hasattr(self.driver,'NUMBER'),
                 'module.NUMBER must be defined')
 
     def test_DATETIME(self):
-        self.failUnless(hasattr(self.driver,'DATETIME'),
+        self.assertTrue(hasattr(self.driver,'DATETIME'),
                 'module.DATETIME must be defined')
 
     def test_ROWID(self):
-        self.failUnless(hasattr(self.driver,'ROWID'),
+        self.assertTrue(hasattr(self.driver,'ROWID'),
                 'module.ROWID must be defined')
         
 def suite():

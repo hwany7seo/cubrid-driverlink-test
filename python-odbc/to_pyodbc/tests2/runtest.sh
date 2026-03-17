@@ -34,11 +34,13 @@ fi
 
 echo "Python DBI Test Begin... ($python), test_mode = $test_mode, test_case = $test_case"
 
-# cubrid server stop $db
-# cubrid createdb $db $CUBRID_LANG
-# cubrid server restart $db
-# cubrid server restart demodb
-# cubrid broker restart
+cubrid server stop $db
+cubrid deletedb $db
+cubrid server stop $db
+cubrid createdb $db $CUBRID_LANG
+cubrid server restart $db
+cubrid server restart demodb
+cubrid broker restart
 brokerPort=`cubrid broker status -b|grep broker1|awk '{print $4}'`
 ipaddress=$(hostname -i)
 
@@ -76,8 +78,6 @@ if [ "$test_case" != "functional_only" ];then
     done
 fi
 
-# cubrid server stop $db
-# cubrid deletedb $db
 rm -f $testcases
 rm -rf lob
 

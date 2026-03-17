@@ -35,7 +35,7 @@ class Enum03Test(unittest.TestCase):
                 self.cursor.execute("SELECT VERSION()")
                 self.row=self.cursor.fetchone ()
                 c=self.row[0]
-print(c)
+                print(c)
                 #self.assertEqual(c,'8.4.1.559')
                 
         def test_02insert(self):
@@ -63,7 +63,7 @@ print(c)
                 self.cursor.execute(nsql4)
                 self.row_sl=self.cursor.fetchone ()
                 c_sl=self.row_sl[0]
-                self.assertEqual(c_sl,repr(0))
+                self.assertEqual(c_sl,0)
                 self.conn.commit()
 
 if __name__ == '__main__':

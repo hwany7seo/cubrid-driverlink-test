@@ -35,14 +35,14 @@ class IssueTest(unittest.TestCase):
                     self.con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
                 except Exception as e:
                     errorValue=str(e)
-print(errorValue)
+                    print(errorValue)
                     self.assertEqual(errorValue,"(-20030, 'ERROR: CCI, -20030, Invalid url string')")
 
                 try:
                     self.con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
                 except Exception as e:
                     errorValue=str(e)
-print(errorValue)
+                    print(errorValue)
                     self.assertEqual(errorValue,"Required argument 'url' (pos 1) not found")
 
         def test_execute(self):
@@ -51,7 +51,7 @@ print(errorValue)
                     self.cur.execute("error information")
                 except Exception as e:
                     errorValue=str(e)
-print(errorValue)
+                    print(errorValue)
                     self.assertEqual(errorValue[1:5],'-493')
 
                 print("\nexecute empty statement")
@@ -59,13 +59,13 @@ print(errorValue)
                     self.cur.execute()
                 except Exception as e:
                     errorValue=str(e)
-print(errorValue)
+                    print(errorValue)
                     self.assertEqual(errorValue,"execute() takes at least 2 arguments (1 given)")
                 try:
                     self.cur.execute("")
                 except Exception as e:
                     errorValue=str(e)
-print(errorValue)
+                    print(errorValue)
                     self.assertEqual(errorValue[1:5],"-424")
 
                 print("\ncol_count==0")
@@ -73,13 +73,13 @@ print(errorValue)
                     self.cur.execute("create table nocolumn()")
                 except Exception as e:
                     errorValue=str(e)
-print(errorValue)
+                    print(errorValue)
                     self.assertEqual(errorValue[1:5],'-493')
                 try:
                     self.cur.execute("select from issue")
                 except Exception as e:
                     errorValue=str(e)
-print(errorValue)
+                    print(errorValue)
                     self.assertEqual(errorValue[1:5],'-493')
 
         def test_executeParam(self):
@@ -88,7 +88,7 @@ print(errorValue)
                     self.cur.execute("insert into issue values()",(1,58,'aaaa'))
                 except Exception as e:
                     errorValue=str(e)
-print(errorValue)
+                    print(errorValue)
                     self.assertEqual(errorValue,"(-30014, 'ERROR: CLIENT, -30014, Some parameter not binded')")
 
                 print("\nparameter's index<1 or index>bind_num")
@@ -96,7 +96,7 @@ print(errorValue)
                     self.cur.execute("insert into issue(nameid,age) values(?,?,?)",(1,58))
                 except Exception as e:
                     errorValue=str(e)
-print(errorValue)
+                    print(errorValue)
                     self.assertEqual(errorValue[1:5],'-494')                   
 
                 print("\nparameter's value is not corret")
@@ -104,7 +104,7 @@ print(errorValue)
                     self.cur.execute("insert into issue values(?,?,?)",(8,'58aaa','aaaa'))
                 except Exception as e:
                     errorValue=str(e)
-print(errorValue)
+                    print(errorValue)
                     self.assertEqual(errorValue[1:5],'-494') 
         def test_(self):
                 print("\nparameter_count==0")
@@ -112,7 +112,7 @@ print(errorValue)
                     self.cur.execute("insert into issue values()",(1,58,'aaaa'))
                 except Exception as e:
                     errorValue=str(e)
-print(errorValue)
+                    print(errorValue)
                     self.assertEqual(errorValue,"(-30014, 'ERROR: CLIENT, -30014, Some parameter not binded')")
 
 if __name__ == '__main__':

@@ -2,6 +2,8 @@ import unittest
 import pyodbc
 import locale
 import time
+import datetime
+from decimal import Decimal
 from xml.dom import minidom
 
 class FetchoneDescriptionTest(unittest.TestCase):
@@ -62,7 +64,7 @@ class FetchoneDescriptionTest(unittest.TestCase):
                 sqlSelect = "select * from numeric_db"
                 self.cur.execute(sqlSelect)
                 dataDesc = self.cur.description                
-                dataCheck = (('c_int', 8, 0, 0, 10, 0, 1), ('c_short', 9, 0, 0, 5, 0, 1), ('c_numeric', 7, 0, 0, 15, 0, 1), ('c_float', 11, 0, 0, 7, 0, 1), ('c_double', 12, 0, 0, 15, 0, 1), ('c_monetary', 10, 0, 0, 15, 0, 1))
+                dataCheck = (('c_int', int, None, 11, 11, 0, True), ('c_short', int, None, 6, 6, 0, True), ('c_numeric', Decimal, None, 15, 15, 0, True), ('c_float', float, None, 15, 15, 0, True), ('c_double', float, None, 22, 22, 0, True), ('c_monetary', float, None, 22, 22, 0, True))
                 self.assertEqual(dataCheck, dataDesc)
 
         def test_desc_datetime(self):
@@ -70,7 +72,7 @@ class FetchoneDescriptionTest(unittest.TestCase):
                 sqlSelect = "select * from datetime_db"
                 self.cur.execute(sqlSelect)
                 dataDesc = self.cur.description
-                dataCheck = (('c_date', 13, 0, 0, 10, 0, 1), ('c_time', 14, 0, 0, 8, 0, 1), ('c_datetime', 22, 0, 0, 23, 3, 1), ('c_timestamp', 15, 0, 0, 19, 0, 1))
+                dataCheck = (('c_date', datetime.date, None, 10, 10, 0, True), ('c_time', datetime.time, None, 11, 11, 0, True), ('c_datetime', datetime.datetime, None, 23, 23, 0, True), ('c_timestamp', datetime.datetime, None, 23, 23, 0, True))
                 self.assertEqual(dataCheck, dataDesc)
 
         def test_desc_bit(self):
@@ -78,7 +80,7 @@ class FetchoneDescriptionTest(unittest.TestCase):
                 sqlSelect = "select * from bit_db"
                 self.cur.execute(sqlSelect)
                 dataDesc = self.cur.description
-                dataCheck = (('c_bit', 5, 0, 0, 8, 0, 1), ('c_varbit', 6, 0, 0, 8, 0, 1))
+                dataCheck = (('c_bit', bytearray, None, 4, 4, 0, True), ('c_varbit', bytearray, None, 4, 4, 0, True))
                 print("dataDesc: ", dataDesc)
                 print("dataCheck: ", dataCheck)
                 self.assertEqual(dataCheck, dataDesc)
@@ -88,7 +90,7 @@ class FetchoneDescriptionTest(unittest.TestCase):
                 sqlSelect = "select * from character_db"
                 self.cur.execute(sqlSelect)
                 dataDesc = self.cur.description
-                dataCheck = (('c_char', 1, 0, 0, 4, 0, 1), ('c_varchar', 2, 0, 0, 4, 0, 1), ('c_string', 2, 0, 0, 1073741823, 0, 1), ('c_nchar', 3, 0, 0, 4, 0, 1), ('c_varnchar', 4, 0, 0, 4, 0, 1))
+                dataCheck = (('c_char', str, None, 4, 4, 0, True), ('c_varchar', str, None, 4, 4, 0, True), ('c_string', str, None, 1073741823, 1073741823, 0, True), ('c_nchar', str, None, 4, 4, 0, True), ('c_varnchar', str, None, 4, 4, 0, True))
                 self.assertEqual(dataCheck, dataDesc)
 
         def test_desc_collection(self):
@@ -96,7 +98,7 @@ class FetchoneDescriptionTest(unittest.TestCase):
                 sqlSelect = "select * from collection_db"
                 self.cur.execute(sqlSelect)
                 dataDesc = self.cur.description
-                dataCheck = (('c_set', 32, 0, 0, 0, 0, 1), ('c_multiset', 64, 0, 0, 0, 0, 1), ('c_sequence', 96, 0, 0, 0, 0, 1))
+                dataCheck = (('c_set', str, None, 1073741823, 1073741823, 0, True), ('c_multiset', str, None, 1073741823, 1073741823, 0, True), ('c_sequence', str, None, 1073741823, 1073741823, 0, True))
                 self.assertEqual(dataCheck, dataDesc)
 
         def test_all(self):

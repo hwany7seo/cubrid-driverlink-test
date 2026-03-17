@@ -55,7 +55,7 @@ class ExecuteIndexTest(unittest.TestCase):
                    print (self.value[0],self.value[1],self.value[2])
                 self.cursor.execute("select /*+ recompile */ count(*) from t use index (_t_id) where id > 1;")
                 self.row_sl=self.cursor.fetchone()
-                self.assertEqual(self.row_sl[0],repr(3))
+                self.assertEqual(self.row_sl[0],3)
 
                 print("join tests")
                 self.cursor.execute("select /*+ recompile */ * from t force index (_t_val) inner join u use index (_u_id) on t.fk = u.id where right(text, 2) < 'zz' and u.id < 100")
@@ -64,7 +64,7 @@ class ExecuteIndexTest(unittest.TestCase):
                    print (self.value[0],self.value[1],self.value[2],self.value[3],self.value[4],self.value[5])
                 self.cursor.execute("select /*+ recompile */ count(*) from t force index (_t_val) inner join u use index (_u_id) on t.fk = u.id where right(text, 2) < 'zz' and u.id < 100")
                 self.row_sl=self.cursor.fetchone()
-                self.assertEqual(self.row_sl[0],repr(5))
+                self.assertEqual(self.row_sl[0],5)
 
                 print("SUBSELECT tests")
                 self.cursor.execute("select /*+ recompile */ * from t force index (_t_val) inner join (select * from u force index (_u_id) where right(text, 2) < 'zz') x on t.fk = x.id ")
@@ -73,7 +73,7 @@ class ExecuteIndexTest(unittest.TestCase):
                    print (self.value[0],self.value[1],self.value[2],self.value[3],self.value[4],self.value[5])
                 self.cursor.execute("select /*+ recompile */ count(*) from t force index (_t_val) inner join (select * from u force index (_u_id) where right(text, 2) < 'zz') x on t.fk = x.id")
                 self.row_sl=self.cursor.fetchone()
-                self.assertEqual(self.row_sl[0],repr(5)) 
+                self.assertEqual(self.row_sl[0],5) 
 
         def test_update(self):
                 print("index update!")
@@ -87,7 +87,7 @@ class ExecuteIndexTest(unittest.TestCase):
                    print (self.value[0],self.value[1],self.value[2])
                 self.cursor.execute("select count(*) from t where val=1000")      
                 self.row_sl=self.cursor.fetchone()         
-                self.assertEqual(self.row_sl[0], repr(3))
+                self.assertEqual(self.row_sl[0], 3)
 
         def test_delete(self):
                 print("index  delete!")

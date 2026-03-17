@@ -29,7 +29,7 @@ class SetTest(unittest.TestCase):
     def test_escape_string(self):
         '''test escape string'''
         try:
-print(pyodbc.escape_string('',1,1))
+            print(pyodbc.escape_string('',1,1))
         except Exception as e:
             errorValue=str(e)
             print("errorValue: ",errorValue)
@@ -37,7 +37,7 @@ print(pyodbc.escape_string('',1,1))
         self.assertEqual(pyodbc.escape_string("cubrid \ Laptop",0),"cubrid \\\\ Laptop")
 
         try:
-print(self.con.escape_string('',1,1))
+            print(self.con.escape_string('',1,1))
         except Exception as e:
             errorValue=str(e)
             print("errorValue: ",errorValue)
@@ -60,7 +60,7 @@ print(self.con.escape_string('',1,1))
 
         row = c.fetch_row(1)
         print('\nrow:\n')
-print(row)
+        print(row)
     def test_set_prepare_int(self):
         self.cur = self.con.cursor()
         self.con.autocommit = True

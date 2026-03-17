@@ -18,7 +18,7 @@ class RollbackTest(unittest.TestCase):
 
         def setUp(self):
                 conStr = self.getConStr()                
-                self.con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
+                self.con = pyodbc.connect(conStr)
                 self.cur = self.con.cursor()
                 self.con.autocommit = False
                 self.assertEqual(self.con.autocommit, False, "autocommit is off")

@@ -38,7 +38,7 @@ class Enum02Test(unittest.TestCase):
                 self.cursor.execute("SELECT VERSION()")
                 self.row=self.cursor.fetchone ()
                 c=self.row[0]
-print(c)
+                print(c)
                 #self.assertEqual(c,'8.4.1.559')
                 
         def test_update01(self):

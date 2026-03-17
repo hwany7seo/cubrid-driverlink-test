@@ -41,7 +41,7 @@ class ExecuteManyPrimaryTest(unittest.TestCase):
                 self.cursor.execute(nsql4)
                 self.row_sl=self.cursor.fetchone ()
                 print("count primary_tb",self.row_sl[0])
-                self.assertEqual(self.row_sl[0],repr(5))
+                self.assertEqual(self.row_sl[0],5)
 
                 print("foreign table insert!")
                 self.cursor.executemany("insert into foreign_tb values(?,?,?,?)",( ( '001' , 1,1,'1212'),( '001' , 2,2,'2323'),( '002' , 3,3,'3434'),( '002' , 4,4,'4545'), ( '003' , 5,5,'5656'), ( '003' , 6,6,'6767')))
@@ -49,7 +49,7 @@ class ExecuteManyPrimaryTest(unittest.TestCase):
                 self.cursor.execute(nsql4)
                 self.row_sl=self.cursor.fetchone ()
                 print("count foreign_tb",self.row_sl[0])
-                self.assertEqual(self.row_sl[0],repr(6))
+                self.assertEqual(self.row_sl[0],6)
 
 
         def test_update(self):
@@ -66,7 +66,7 @@ class ExecuteManyPrimaryTest(unittest.TestCase):
                 self.cursor.execute( "select count(*) from primary_tb where title like 'change%'")
                 self.row_sl=self.cursor.fetchone ()
                 print("count primary_tb",self.row_sl[0])
-                self.assertEqual(self.row_sl[0],repr(2))
+                self.assertEqual(self.row_sl[0],2)
 
                 print("foreign table update!")
                 self.cursor.executemany("update foreign_tb set song=? where album like ?",( ('song1','001%'),( 'song2','002%')))
@@ -77,7 +77,7 @@ class ExecuteManyPrimaryTest(unittest.TestCase):
                 self.cursor.execute( "select count(*) from foreign_tb where song like 'song%'")
                 self.row_sl=self.cursor.fetchone ()
                 print("count primary_tb",self.row_sl[0])
-                self.assertEqual(self.row_sl[0],repr(4))
+                self.assertEqual(self.row_sl[0],4)
 
         def test_delete(self):
                 print("primary table delete!")
@@ -86,11 +86,11 @@ class ExecuteManyPrimaryTest(unittest.TestCase):
 
                 print("primary table delete!")
                 try:
-                   self.cursor.executemany("delete from primary_tb where id like ?",(('001%'),('002%'),('003%')))
+                   self.cursor.executemany("delete from primary_tb where id like ?",(('001%',),('002%',),('003%',)))
                 except Exception as e:
                    value=str(e)
-print(value)
-                self.assertEqual(value[1:5],'-924')
+                   print(value)
+                   self.assertEqual(value[1:5],'-924')
                 self.cursor.execute( "select * from primary_tb ")
                 self.row_sl=self.cursor.fetchall()
                 for self.value in self.row_sl:
@@ -98,10 +98,10 @@ print(value)
                 self.cursor.execute( "select count(*) from primary_tb ")
                 self.row_sl=self.cursor.fetchone ()
                 print("count primary_tb",self.row_sl[0])
-                self.assertEqual(self.row_sl[0],repr(5))
+                self.assertEqual(self.row_sl[0],5)
 
                 print("foreign table delete!")
-                self.cursor.executemany("delete from foreign_tb where album like  ?",( ('001%'),('002%')))
+                self.cursor.executemany("delete from foreign_tb where album like  ?",( ('001%',),('002%',)))
                 self.cursor.execute( "select * from foreign_tb ")
                 self.row_sl=self.cursor.fetchall()
                 for self.value in self.row_sl:
@@ -109,7 +109,7 @@ print(value)
                 self.cursor.execute( "select count(*) from foreign_tb ")
                 self.row_sl=self.cursor.fetchone ()
                 print("count foreign_tb",self.row_sl[0])
-                self.assertEqual(self.row_sl[0],repr(2))
+                self.assertEqual(self.row_sl[0],2)
 
 
 

@@ -38,7 +38,7 @@ class ExecuteManyTest(unittest.TestCase):
                 self.cursor.execute(nsql4)
                 self.row_sl=self.cursor.fetchone ()
                 c_sl=self.row_sl[0]
-                self.assertEqual(c_sl,repr(2))
+                self.assertEqual(c_sl,2)
 
         def test_select(self):
                 print("executemany select !")
@@ -51,7 +51,7 @@ class ExecuteManyTest(unittest.TestCase):
                 self.row_sl=self.cursor.fetchall ()
                 self.conn.commit()
                 for self.result in self.row_sl:
-                    print("%s, %s") % (self.result[0], self.result[1])
+                    print("%s, %s" % (self.result[0], self.result[1]))
 
         def test_update(self):
                 print("executemany update!")
@@ -66,7 +66,7 @@ class ExecuteManyTest(unittest.TestCase):
                 self.row_sl=self.cursor.fetchall ()
                 self.conn.commit()
                 for self.result in self.row_sl:
-                    print("%s, %s") % (self.result[0], self.result[1])
+                    print("%s, %s" % (self.result[0], self.result[1]))
 
         def test_delete(self):
                 print("executemany delete!")
