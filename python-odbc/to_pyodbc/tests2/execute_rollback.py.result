@@ -1,0 +1,11 @@
+test_01rollback (__main__.RollbackTest.test_01rollback) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.020s
+
+OK
+
+statement is right
+before rollback:  6 66 forrollback
+
+rollback

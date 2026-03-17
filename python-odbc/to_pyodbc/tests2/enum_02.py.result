@@ -1,0 +1,3 @@
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests2/enum_02.py", line 44
+    def test_02insert(self):
+IndentationError: unexpected indent

@@ -1,0 +1,14 @@
+test_date (__main__.InvalidDataTypeTest.test_date) ... ok
+test_datetime (__main__.InvalidDataTypeTest.test_datetime) ... ok
+test_int (__main__.InvalidDataTypeTest.test_int) ... ok
+test_nchar (__main__.InvalidDataTypeTest.test_nchar) ... ok
+test_short (__main__.InvalidDataTypeTest.test_short) ... ok
+test_string (__main__.InvalidDataTypeTest.test_string) ... ok
+test_time (__main__.InvalidDataTypeTest.test_time) ... ok
+test_timestamp (__main__.InvalidDataTypeTest.test_timestamp) ... ok
+test_varnchar (__main__.InvalidDataTypeTest.test_varnchar) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.357s
+
+OK

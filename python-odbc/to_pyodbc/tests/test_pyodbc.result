@@ -1,0 +1,151 @@
+test_BINARY (__main__.DBAPI20Test.test_BINARY) ... ok
+test_DATETIME (__main__.DBAPI20Test.test_DATETIME) ... ok
+test_Date (__main__.DBAPI20Test.test_Date) ... ok
+test_Exceptions (__main__.DBAPI20Test.test_Exceptions) ... ERROR
+test_NUMBER (__main__.DBAPI20Test.test_NUMBER) ... ok
+test_ROWID (__main__.DBAPI20Test.test_ROWID) ... ok
+test_STRING (__main__.DBAPI20Test.test_STRING) ... ok
+test_Time (__main__.DBAPI20Test.test_Time) ... ERROR
+test_Timestamp (__main__.DBAPI20Test.test_Timestamp) ... ok
+test_apilevel (__main__.DBAPI20Test.test_apilevel) ... ok
+test_autocommit (__main__.DBAPI20Test.test_autocommit) ... FAIL
+test_close (__main__.DBAPI20Test.test_close) ... ok
+test_commit (__main__.DBAPI20Test.test_commit) ... ok
+test_connect (__main__.DBAPI20Test.test_connect) ... ok
+test_connect1 (__main__.DBAPI20Test.test_connect1) ... ok
+test_connect2 (__main__.DBAPI20Test.test_connect2) ... ERROR
+test_cursor (__main__.DBAPI20Test.test_cursor) ... ok
+test_cursor_isolation (__main__.DBAPI20Test.test_cursor_isolation) ... ok
+test_datatype (__main__.DBAPI20Test.test_datatype) ... ok
+test_description (__main__.DBAPI20Test.test_description) ... ok
+test_execute (__main__.DBAPI20Test.test_execute) ... FAIL
+test_execute_args (__main__.DBAPI20Test.test_execute_args) ... ok
+test_executemany (__main__.DBAPI20Test.test_executemany) ... ok
+test_fetchall (__main__.DBAPI20Test.test_fetchall) ... ERROR
+test_fetchmany (__main__.DBAPI20Test.test_fetchmany) ... ERROR
+test_fetchone (__main__.DBAPI20Test.test_fetchone) ... ok
+test_mixdfetch (__main__.DBAPI20Test.test_mixdfetch) ... ERROR
+test_paramstyle (__main__.DBAPI20Test.test_paramstyle) ... ok
+test_rollback (__main__.DBAPI20Test.test_rollback) ... ok
+test_rowcount (__main__.DBAPI20Test.test_rowcount) ... FAIL
+test_set_type_binding (__main__.DBAPI20Test.test_set_type_binding) ... ERROR
+test_set_type_binding_set_type (__main__.DBAPI20Test.test_set_type_binding_set_type) ... ERROR
+test_set_type_binding_set_type_fail (__main__.DBAPI20Test.test_set_type_binding_set_type_fail) ... ERROR
+test_threadsafety (__main__.DBAPI20Test.test_threadsafety) ... ok
+
+======================================================================
+ERROR: test_Exceptions (__main__.DBAPI20Test.test_Exceptions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 125, in test_Exceptions
+    cur.execute("insert into %sbooze values error_sql ('Hello') " % (self.table_prefix))
+pyodbc.Error: ('HY000', 'The driver did not supply an error!')
+
+======================================================================
+ERROR: test_Time (__main__.DBAPI20Test.test_Time)
+----------------------------------------------------------------------
+TypeError: 'float' object cannot be interpreted as an integer
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 714, in test_Time
+    t2 = self.driver.TimeFromTicks(
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+SystemError: <built-in function TimeFromTicks> returned a result with an exception set
+
+======================================================================
+ERROR: test_connect2 (__main__.DBAPI20Test.test_connect2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 779, in test_connect2
+    self.assertEqual(con.charset, self.charset)
+                     ^^^^^^^^^^^
+AttributeError: 'pyodbc.Connection' object has no attribute 'charset'
+
+======================================================================
+ERROR: test_fetchall (__main__.DBAPI20Test.test_fetchall)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 643, in test_fetchall
+    self._populate(cur)
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 539, in _populate
+    cur.executemany('insert into %sbooze values (?)' % (
+TypeError: ('Params must be in a list, tuple, or Row', 'HY000')
+
+======================================================================
+ERROR: test_fetchmany (__main__.DBAPI20Test.test_fetchmany)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 576, in test_fetchmany
+    self._populate(cur)
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 539, in _populate
+    cur.executemany('insert into %sbooze values (?)' % (
+TypeError: ('Params must be in a list, tuple, or Row', 'HY000')
+
+======================================================================
+ERROR: test_mixdfetch (__main__.DBAPI20Test.test_mixdfetch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 676, in test_mixdfetch
+    self._populate(cur)
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 539, in _populate
+    cur.executemany('insert into %sbooze values (?)' % (
+TypeError: ('Params must be in a list, tuple, or Row', 'HY000')
+
+======================================================================
+ERROR: test_set_type_binding (__main__.DBAPI20Test.test_set_type_binding)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 366, in test_set_type_binding
+    cur.execute("insert into %sset_table values (?,?)" % self.table_prefix,
+pyodbc.Error: ('HY000', 'The driver did not supply an error!')
+
+======================================================================
+ERROR: test_set_type_binding_set_type (__main__.DBAPI20Test.test_set_type_binding_set_type)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 390, in test_set_type_binding_set_type
+    (1, ('a', 'b')), set_type=self.driver.FIELD_TYPE.VARCHAR)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'pyodbc' has no attribute 'FIELD_TYPE'
+
+======================================================================
+ERROR: test_set_type_binding_set_type_fail (__main__.DBAPI20Test.test_set_type_binding_set_type_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 414, in test_set_type_binding_set_type_fail
+    (4, ('g', 'h')), set_type=[self.driver.FIELD_TYPE.INT])
+                               ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'pyodbc' has no attribute 'FIELD_TYPE'
+
+======================================================================
+FAIL: test_autocommit (__main__.DBAPI20Test.test_autocommit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 438, in test_autocommit
+    self.assertEqual(con.autocommit, True, "autocommit is on by default")
+AssertionError: False != True : autocommit is on by default
+
+======================================================================
+FAIL: test_execute (__main__.DBAPI20Test.test_execute)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 257, in test_execute
+    self._paraminsert(cur)
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 265, in _paraminsert
+    self.assertEqual(res, 0,
+AssertionError: <pyodbc.Cursor object at 0x7f9011ae7230> != 0 : cur.execute should return 0 if a query retrieves no rows
+
+======================================================================
+FAIL: test_rowcount (__main__.DBAPI20Test.test_rowcount)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_CUBRIDdb.py", line 217, in test_rowcount
+    self.assertEqual(cur.rowcount, -1,
+AssertionError: 0 != -1 : cursor.rowcount should be -1 after executing no-result statements
+
+----------------------------------------------------------------------
+Ran 34 tests in 0.216s
+
+FAILED (failures=3, errors=9)

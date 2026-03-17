@@ -1,0 +1,344 @@
+test_Exceptions (__main__.DatabaseTest.test_Exceptions) ... ok
+test_affected_rows (__main__.DatabaseTest.test_affected_rows) ... ERROR
+test_autocommit (__main__.DatabaseTest.test_autocommit) ... ERROR
+test_bind_date (__main__.DatabaseTest.test_bind_date) ... ERROR
+test_bind_date_e (__main__.DatabaseTest.test_bind_date_e) ... ERROR
+test_bind_float (__main__.DatabaseTest.test_bind_float) ... ERROR
+test_bind_int (__main__.DatabaseTest.test_bind_int) ... ERROR
+test_bind_time (__main__.DatabaseTest.test_bind_time) ... ERROR
+test_bind_timestamp (__main__.DatabaseTest.test_bind_timestamp) ... ERROR
+test_client_version (__main__.DatabaseTest.test_client_version) ... ERROR
+test_commit (__main__.DatabaseTest.test_commit) ... ERROR
+test_connect (__main__.DatabaseTest.test_connect) ... ERROR
+test_cursor (__main__.DatabaseTest.test_cursor) ... ERROR
+test_cursor_isolation (__main__.DatabaseTest.test_cursor_isolation) ... ERROR
+test_data_seek (__main__.DatabaseTest.test_data_seek) ... ERROR
+test_description (__main__.DatabaseTest.test_description) ... ERROR
+test_insert_id (__main__.DatabaseTest.test_insert_id) ... ERROR
+test_isolation_level (__main__.DatabaseTest.test_isolation_level) ... ERROR
+test_lob_file (__main__.DatabaseTest.test_lob_file) ... ERROR
+test_lob_string (__main__.DatabaseTest.test_lob_string) ... ERROR
+test_ping (__main__.DatabaseTest.test_ping) ... ERROR
+test_result_info (__main__.DatabaseTest.test_result_info) ... ERROR
+test_rollback (__main__.DatabaseTest.test_rollback) ... ERROR
+test_row_seek (__main__.DatabaseTest.test_row_seek) ... ERROR
+test_rowcount (__main__.DatabaseTest.test_rowcount) ... ERROR
+test_schema_info (__main__.DatabaseTest.test_schema_info) ... ERROR
+test_server_version (__main__.DatabaseTest.test_server_version) ... ERROR
+
+======================================================================
+ERROR: test_affected_rows (__main__.DatabaseTest.test_affected_rows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 241, in test_affected_rows
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_autocommit (__main__.DatabaseTest.test_autocommit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 172, in test_autocommit
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_bind_date (__main__.DatabaseTest.test_bind_date)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 353, in test_bind_date
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_bind_date_e (__main__.DatabaseTest.test_bind_date_e)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 334, in test_bind_date_e
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_bind_float (__main__.DatabaseTest.test_bind_float)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 319, in test_bind_float
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_bind_int (__main__.DatabaseTest.test_bind_int)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 303, in test_bind_int
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_bind_time (__main__.DatabaseTest.test_bind_time)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 367, in test_bind_time
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_bind_timestamp (__main__.DatabaseTest.test_bind_timestamp)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 381, in test_bind_timestamp
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_client_version (__main__.DatabaseTest.test_client_version)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 57, in test_client_version
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_commit (__main__.DatabaseTest.test_commit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 77, in test_commit
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_connect (__main__.DatabaseTest.test_connect)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 46, in test_connect
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_cursor (__main__.DatabaseTest.test_cursor)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 92, in test_cursor
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_cursor_isolation (__main__.DatabaseTest.test_cursor_isolation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 100, in test_cursor_isolation
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_data_seek (__main__.DatabaseTest.test_data_seek)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 258, in test_data_seek
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_description (__main__.DatabaseTest.test_description)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 118, in test_description
+    con = self._connect();
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_insert_id (__main__.DatabaseTest.test_insert_id)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 206, in test_insert_id
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_isolation_level (__main__.DatabaseTest.test_isolation_level)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 163, in test_isolation_level
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_lob_file (__main__.DatabaseTest.test_lob_file)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 395, in test_lob_file
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_lob_string (__main__.DatabaseTest.test_lob_string)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 419, in test_lob_string
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_ping (__main__.DatabaseTest.test_ping)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 186, in test_ping
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_result_info (__main__.DatabaseTest.test_result_info)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 445, in test_result_info
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_rollback (__main__.DatabaseTest.test_rollback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 85, in test_rollback
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_row_seek (__main__.DatabaseTest.test_row_seek)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 282, in test_row_seek
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_rowcount (__main__.DatabaseTest.test_rowcount)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 140, in test_rowcount
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_schema_info (__main__.DatabaseTest.test_schema_info)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 194, in test_schema_info
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+======================================================================
+ERROR: test_server_version (__main__.DatabaseTest.test_server_version)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 50, in test_server_version
+    con = self._connect()
+          ^^^^^^^^^^^^^^^
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests/test_cubrid.py", line 39, in _connect
+    con = pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DATABASE=demodb')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.Error: ('HY000', '[HY000] [CUBRID][ODBC CUBRID Driver][-20030]Invalid url string (-20030) (SQLDriverConnect)')
+
+----------------------------------------------------------------------
+Ran 27 tests in 0.015s
+
+FAILED (errors=26)

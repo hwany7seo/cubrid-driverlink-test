@@ -1,0 +1,19 @@
+test_ValidConn (__main__.FetchoneTest.test_ValidConn) ... ERROR
+test_fetchone_largeData (__main__.FetchoneTest.test_fetchone_largeData) ... ok
+test_fetchone_multi (__main__.FetchoneTest.test_fetchone_multi) ... ok
+test_fetchone_norecord (__main__.FetchoneTest.test_fetchone_norecord) ... ok
+test_fetchone_overflow (__main__.FetchoneTest.test_fetchone_overflow) ... ok
+
+======================================================================
+ERROR: test_ValidConn (__main__.FetchoneTest.test_ValidConn)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests2/FetchoneTest.py", line 86, in test_ValidConn
+    fail("connection should not be established")
+    ^^^^
+NameError: name 'fail' is not defined
+
+----------------------------------------------------------------------
+Ran 5 tests in 10.077s
+
+FAILED (errors=1)

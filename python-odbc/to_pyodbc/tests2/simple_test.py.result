@@ -1,0 +1,7 @@
+Starting simple test...
+Connecting to DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb
+Connected!
+Cursor created.
+Executed select 1
+Result: (1,)
+Closed.

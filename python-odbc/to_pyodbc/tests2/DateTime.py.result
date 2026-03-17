@@ -1,0 +1,4 @@
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests2/DateTime.py", line 51
+    print(str(e))
+    ^
+IndentationError: expected an indented block after 'except' statement on line 50

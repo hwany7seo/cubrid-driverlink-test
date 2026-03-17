@@ -1,0 +1,20 @@
+test_select (__main__.ExecuteSelectCalculateTest.test_select) ... FAIL
+
+======================================================================
+FAIL: test_select (__main__.ExecuteSelectCalculateTest.test_select)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hwanyseo/source/fork/test/cubrid-driverlink-test/python-odbc/to_pyodbc/tests2/execute_select_calculate.py", line 55, in test_select
+    self.assertEqual(value,'86400000')
+AssertionError: 86400000 != '86400000'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.018s
+
+FAILED (failures=1)
+ Name in 'John'  select: 
+2 John
+SELECT 4 + '5.2': 
+9.2
+select date'2001-2-3' - datetime'2001-2-2 12:00:00 am' 
+86400000
