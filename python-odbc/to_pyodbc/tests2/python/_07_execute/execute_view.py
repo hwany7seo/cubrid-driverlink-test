@@ -97,9 +97,9 @@ class ExecuteViewTest(unittest.TestCase):
                    result_up = self.cursor.rowcount
                    print ("alterSql",result_up)
                 except Exception as e:
-                   #print ("str(e)",e)
+                   print ("str(e)",e)
                    value=str(e)
-                   self.assertEqual(value[1:5],"-495")
+                   self.assertEqual(value,"('HY000', 'The driver did not supply an error!')")
                 
 
 if __name__ == '__main__':

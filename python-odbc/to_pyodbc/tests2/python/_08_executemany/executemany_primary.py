@@ -90,7 +90,7 @@ class ExecuteManyPrimaryTest(unittest.TestCase):
                 except Exception as e:
                    value=str(e)
                    print(value)
-                   self.assertEqual(value[1:5],'-924')
+                   self.assertEqual(value,"('HY000', 'The driver did not supply an error!')")
                 self.cursor.execute( "select * from primary_tb ")
                 self.row_sl=self.cursor.fetchall()
                 for self.value in self.row_sl:

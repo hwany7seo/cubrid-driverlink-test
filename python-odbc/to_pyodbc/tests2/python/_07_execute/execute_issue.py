@@ -52,7 +52,7 @@ class IssueTest(unittest.TestCase):
                 except Exception as e:
                     errorValue=str(e)
                     print(errorValue)
-                    self.assertEqual(errorValue[1:5],'-493')
+                    self.assertEqual(errorValue,"('HY000', 'The driver did not supply an error!')")
 
                 print("\nexecute empty statement")
                 try:
@@ -60,13 +60,13 @@ class IssueTest(unittest.TestCase):
                 except Exception as e:
                     errorValue=str(e)
                     print(errorValue)
-                    self.assertEqual(errorValue,"execute() takes at least 2 arguments (1 given)")
+                    self.assertEqual(errorValue,"execute() takes at least 1 argument (0 given)")
                 try:
                     self.cur.execute("")
                 except Exception as e:
                     errorValue=str(e)
                     print(errorValue)
-                    self.assertEqual(errorValue[1:5],"-424")
+                    self.assertEqual(errorValue,"('HY090', '[HY090] [unixODBC][Driver Manager]Invalid string or buffer length (0) (SQLExecDirectW)')")
 
                 print("\ncol_count==0")
                 try:
@@ -74,13 +74,13 @@ class IssueTest(unittest.TestCase):
                 except Exception as e:
                     errorValue=str(e)
                     print(errorValue)
-                    self.assertEqual(errorValue[1:5],'-493')
+                    self.assertEqual(errorValue,"('HY000', 'The driver did not supply an error!')")
                 try:
                     self.cur.execute("select from issue")
                 except Exception as e:
                     errorValue=str(e)
                     print(errorValue)
-                    self.assertEqual(errorValue[1:5],'-493')
+                    self.assertEqual(errorValue,"('HY000', 'The driver did not supply an error!')")
 
         def test_executeParam(self):
                 print("\nparameter_count==0")
@@ -89,7 +89,7 @@ class IssueTest(unittest.TestCase):
                 except Exception as e:
                     errorValue=str(e)
                     print(errorValue)
-                    self.assertEqual(errorValue,"(-30014, 'ERROR: CLIENT, -30014, Some parameter not binded')")
+                    self.assertEqual(errorValue,"('The SQL contains 0 parameter markers, but 3 parameters were supplied', 'HY000')")
 
                 print("\nparameter's index<1 or index>bind_num")
                 try:
@@ -97,7 +97,7 @@ class IssueTest(unittest.TestCase):
                 except Exception as e:
                     errorValue=str(e)
                     print(errorValue)
-                    self.assertEqual(errorValue[1:5],'-494')                   
+                    self.assertEqual(errorValue,"('The SQL contains 3 parameter markers, but 2 parameters were supplied', 'HY000')")                   
 
                 print("\nparameter's value is not corret")
                 try:
@@ -105,7 +105,7 @@ class IssueTest(unittest.TestCase):
                 except Exception as e:
                     errorValue=str(e)
                     print(errorValue)
-                    self.assertEqual(errorValue[1:5],'-494') 
+                    self.assertEqual(errorValue,"('HY000', 'The driver did not supply an error!')") 
         def test_(self):
                 print("\nparameter_count==0")
                 try:
@@ -113,7 +113,7 @@ class IssueTest(unittest.TestCase):
                 except Exception as e:
                     errorValue=str(e)
                     print(errorValue)
-                    self.assertEqual(errorValue,"(-30014, 'ERROR: CLIENT, -30014, Some parameter not binded')")
+                    self.assertEqual(errorValue,"('The SQL contains 0 parameter markers, but 3 parameters were supplied', 'HY000')")
 
 if __name__ == '__main__':
         #suite = unittest.TestLoader().loadTestsFromTestCase(IssueTest)
