@@ -7,21 +7,16 @@ database interactions within test cases.
 # pylint: disable=missing-function-docstring
 
 import pytest
-
-
 import pyodbc
-
 
 from xml.dom import minidom
 
 def _get_connect_args():
-    xmlt = minidom.parse('configuration/python_config.xml')
-    ips = xmlt.childNodes[0].getElementsByTagName('ip')
-    ip = ips[0].childNodes[0].toxml()
-    ports = xmlt.childNodes[0].getElementsByTagName('port')
-    port = ports[0].childNodes[0].toxml()
-    dbnames = xmlt.childNodes[0].getElementsByTagName('dbname')
-    dbname = dbnames[0].childNodes[0].toxml()
+    ip = "test-db-server"
+    port = "33000"
+    dbname = "demodb"
+    user = "dba"
+    password = ""
     return "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
 
 @pytest.fixture

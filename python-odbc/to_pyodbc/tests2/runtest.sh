@@ -1,5 +1,7 @@
 #!/bin/bash
 . ./init.sh
+SCRIPT_DIR=$(dirname $(readlink -f $0))
+TEST_LOB_DIR=$SCRIPT_DIR/lob
 
 db=pydb
 CUBRID_LANG=ko_KR.utf8
@@ -34,6 +36,7 @@ fi
 
 echo "Python DBI Test Begin... ($python), test_mode = $test_mode, test_case = $test_case"
 
+rm -rf $TEST_LOB_DIR
 cubrid server stop $db
 cubrid deletedb $db
 cubrid server stop $db
@@ -79,6 +82,5 @@ if [ "$test_case" != "functional_only" ];then
 fi
 
 rm -f $testcases
-rm -rf lob
 
 echo "Python DBI Test End"

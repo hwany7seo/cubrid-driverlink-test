@@ -7,18 +7,12 @@ import sys
 import decimal
 import datetime
 from xml.dom import minidom
+from conftest import _get_connect_args
 
 class DBAPI20Test(unittest.TestCase):
     driver = pyodbc
 
-    xmlt = minidom.parse('python_config.xml')
-    ips = xmlt.childNodes[0].getElementsByTagName('ip')
-    ip = ips[0].childNodes[0].toxml()
-    ports = xmlt.childNodes[0].getElementsByTagName('port')
-    port = ports[0].childNodes[0].toxml()
-    dbnames = xmlt.childNodes[0].getElementsByTagName('dbname')
-    dbname = dbnames[0].childNodes[0].toxml()
-    conStr = "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
+    conStr = _get_connect_args()
     user = 'dba'
     password = ''
     charset = 'utf8'

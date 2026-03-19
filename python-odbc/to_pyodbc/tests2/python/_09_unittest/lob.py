@@ -27,25 +27,41 @@ class CubridTest(unittest.TestCase):
         dbname = dbnames[0].childNodes[0].toxml()
         conStr = "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
         con = pyodbc.connect(conStr)
-        cur=con.cursor()
-        lob=con.lob()
+        cur = con.cursor()
+        
         try:
-           cur.prepare("drop table if exists lob_tb")
-           cur.execute()
-           cur.prepare("create table lob_tb(image_id int PRIMARY KEY AUTO_INCREMENT, image BLOB)")
-           cur.execute()
-           cur.prepare("insert into lob_tb values(NULL,?)")
-           #lob=con.lob()
-           lob.imports('cubrid_logo.png')
-           cur.bind_lob(1,lob)
-           cur.execute()
+            cur.execute("drop table if exists lob_tb")
+            cur.execute("create table lob_tb(image_id int PRIMARY KEY AUTO_INCREMENT, image BLOB)")
+           
+            try:
+                with open('cubrid_logo.png', 'rb') as f:
+                    img_data = f.read()
+            except FileNotFoundError:
+                img_data = b'dummy image data for testing'
+
+            try:
+            #    SQL_BLOB = -107
+            #    cur.setinputsizes([(SQL_BLOB, len(img_data), 0)]) // not supported in cubrid odbc driver
+                cur.execute("insert into lob_tb (image) values (?)", (pyodbc.Binary(img_data),))
+                con.commit()
+                
+                cur.execute("select image from lob_tb")
+                row = cur.fetchone()
+                self.assertIsNotNone(row)
+                self.assertEqual(row[0], img_data)
+                print("img_data: ", img_data)
+                print("row[0]: ", row[0])
+            except pyodbc.Error as pe:
+                print("LOB binding not supported or failed:", pe)
+                self.fail(f"Test failed with exception: {pe}")
+           
         except Exception as e:
-              errorValue=str(e)
-              print("errorValue: ",errorValue)
+              errorValue = str(e)
+              print("errorValue: ", errorValue)
+              self.fail(f"Test failed with exception: {errorValue}")
         finally:
-           lob.close()
            cur.close()
-           con.close()   
+           con.close()
 
 if __name__ == '__main__':
     #unittest.main(defaultTest = 'suite')
