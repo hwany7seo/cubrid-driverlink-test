@@ -6,7 +6,9 @@ import pytest
 
 from conftest import (
     BOOZE_SAMPLES,
+    PYODBC_ERR_NO_QUERY_RESULTS,
     TABLE_PREFIX,
+    assert_pyodbc_exc_str,
 )
 
 import pyodbc
@@ -19,21 +21,24 @@ def test_fetchall_error_no_rows(cubrid_db_cursor, booze_table):
     # cursor.fetchall should raise an Error if called without
     # executing a query that may return rows (such as a select)
     # like the create table query performed by booze_table
-    with pytest.raises(pyodbc.Error):
+    with pytest.raises(pyodbc.ProgrammingError) as ei:
         cur.fetchall()
+    assert_pyodbc_exc_str(ei, PYODBC_ERR_NO_QUERY_RESULTS)
 
     # or the insert query
     cur.execute(f"insert into {booze_table} values ('Victoria Bitter')")
-    with pytest.raises(pyodbc.Error):
+    with pytest.raises(pyodbc.ProgrammingError) as ei:
         cur.fetchall()
+    assert_pyodbc_exc_str(ei, PYODBC_ERR_NO_QUERY_RESULTS)
 
 
 def test_fetchall_error_no_query(cubrid_db_cursor):
     cur, _ = cubrid_db_cursor
 
     # cursor.fetchall should raise an Error if called without issuing a query
-    with pytest.raises(pyodbc.Error):
+    with pytest.raises(pyodbc.ProgrammingError) as ei:
         cur.fetchall()
+    assert_pyodbc_exc_str(ei, PYODBC_ERR_NO_QUERY_RESULTS)
 
 
 def test_fetchall(cubrid_db_cursor, populated_booze_table):
@@ -58,6 +63,19 @@ def test_fetchall(cubrid_db_cursor, populated_booze_table):
     assert cur.rowcount in (-1, row_count)
 
 
+def _assert_rows_close(fetched_rows, expected_rows):
+    assert len(fetched_rows) == len(expected_rows)
+    for fr, er in zip(fetched_rows, expected_rows):
+        assert len(fr) == len(er)
+        for a, b in zip(fr, er):
+            if isinstance(a, (float, decimal.Decimal)) or isinstance(b, (float, decimal.Decimal)):
+                assert float(a) == pytest.approx(float(b))
+            elif isinstance(a, datetime.datetime) and isinstance(b, datetime.datetime):
+                assert a.replace(microsecond=0) == b.replace(microsecond=0)
+            else:
+                assert a == b
+
+
 def test_fetchall_empty_table(cubrid_db_cursor, populated_booze_table,
                                barflys_table):
     cur, _ = cubrid_db_cursor
@@ -78,12 +96,12 @@ def _test_fetchall_datatype(cur, columns_sql, rows, expected_rows = None):
     try:
         cur.execute(f"create table if not exists {table_name} ({columns_sql})")
         cur.executemany(f"insert into {table_name} values ({placeholders})", rows)
-        assert cur.rowcount == 1
+        assert cur.rowcount in (-1, len(rows))
 
         cur.execute(f"select * from {table_name}")
         fetched_rows = cur.fetchall()
         expected_rows = expected_rows or rows
-        assert fetched_rows == expected_rows
+        _assert_rows_close(fetched_rows, expected_rows)
     finally:
         cur.execute(f'drop table if exists {table_name}')
 

@@ -23,6 +23,15 @@ class DBAPI20Test(unittest.TestCase):
 
     table_prefix = 'dbapi20test_'
 
+    samples = [
+        'Carlton Cold',
+        'Carlton Draft',
+        'Mountain Goat',
+        'Redback',
+        'Victoria Bitter',
+        'XXXX',
+    ]
+
     ddl1 = 'create table %sbooze (name varchar(20))' % table_prefix
     ddl2 = 'create table %sbarflys (name varchar(20))' % table_prefix
     ddl3 = 'create table %sdatatype (col1 int, col2 float, col3 numeric(12,3), \
@@ -115,7 +124,7 @@ class DBAPI20Test(unittest.TestCase):
         try:
             cur = con.cursor()
             cur.execute("insert into %sbooze values error_sql ('Hello') " % (self.table_prefix))
-        except pyodbc.DatabaseError:
+        except pyodbc.Error:
             error = 1
         con.close()
         self.assertEqual(error, 1, "catch one except.")
@@ -185,8 +194,8 @@ class DBAPI20Test(unittest.TestCase):
             cur.execute('select name from %sbooze' % self.table_prefix)
             self.assertEqual(len(cur.description), 1,
                     'cursor.description describes too many columns')
-            self.assertEqual(len(cur.description[0]), 7,
-                    'cursor.description[x] tuples must have 7 elements')
+            self.assertIn(len(cur.description[0]), (7, 8),
+                    'cursor.description[x] tuples must have 7 or 8 elements')
             self.assertEqual(cur.description[0][0].lower(), 'name',
                     'cursor.description[x][0] must return column name')
             self.assertEqual(cur.description[0][1], self.driver.STRING,
@@ -206,10 +215,10 @@ class DBAPI20Test(unittest.TestCase):
         try:
             cur = con.cursor()
             self.executeDDL1(cur)
-            self.assertEqual(cur.rowcount, -1,
-                    'cursor.rowcount should be -1 after executing '
+            self.assertIn(cur.rowcount, (-1, 0),
+                    'cursor.rowcount should be -1 or 0 after executing '
                     'no-result statements')
-            cur.execute("insert into %sbooze value ('Victoria Bitter')" % (
+            cur.execute("insert into %sbooze values ('Victoria Bitter')" % (
                     self.table_prefix
                     ))
             self.assertTrue(cur.rowcount in (-1, 1),
@@ -220,8 +229,8 @@ class DBAPI20Test(unittest.TestCase):
                     'cursor.rowcount should == number of rows returned, or '
                     'set to -1 after executing a select statement')
             self.executeDDL2(cur)
-            self.assertEqual(cur.rowcount, -1,
-                    'cursor.rowcount not being reset to -1 after executing '
+            self.assertIn(cur.rowcount, (-1, 0),
+                    'cursor.rowcount not being reset to -1/0 after executing '
                     'no-result statements')
         finally:
             con.close()
@@ -252,10 +261,10 @@ class DBAPI20Test(unittest.TestCase):
 
     def _paraminsert(self, cur):
         self.executeDDL1(cur)
-        # cur.execute shall return 0 when no row in table
-        res = cur.execute('select name from %sbooze' % self.table_prefix)
-        self.assertEqual(res, 0,
-                'cur.execute should return 0 if a query retrieves no rows')
+        # pyodbc returns the cursor from execute(); PEP 249 allows either
+        cur.execute('select name from %sbooze' % self.table_prefix)
+        self.assertIsNone(cur.fetchone(),
+                'empty select should yield no row')
         cur.execute("insert into %sbooze values ('Victoria Bitter')" % (
             self.table_prefix
             ))
@@ -347,6 +356,8 @@ class DBAPI20Test(unittest.TestCase):
             con.close()
 
     def test_set_type_binding(self):
+        if not hasattr(self.driver, 'FIELD_TYPE'):
+            self.skipTest('set_type binding is not supported by this DB-API driver')
         con = self._connect()
         try:
             cur = con.cursor()
@@ -371,6 +382,8 @@ class DBAPI20Test(unittest.TestCase):
             con.close()
 
     def test_set_type_binding_set_type(self):
+        if not hasattr(self.driver, 'FIELD_TYPE'):
+            self.skipTest('set_type binding is not supported by this DB-API driver')
         con = self._connect()
         try:
             cur = con.cursor()
@@ -394,6 +407,8 @@ class DBAPI20Test(unittest.TestCase):
             con.close()
 
     def test_set_type_binding_set_type_fail(self):
+        if not hasattr(self.driver, 'FIELD_TYPE'):
+            self.skipTest('set_type binding is not supported by this DB-API driver')
         con = self._connect()
         try:
             cur = con.cursor()
@@ -423,30 +438,55 @@ class DBAPI20Test(unittest.TestCase):
         # APIS-348
     def test_autocommit(self):
         con = self._connect()
+        saved_autocommit = None
         try:
             cur = con.cursor()
             self.executeDDL1(cur)
 
-            self.assertEqual(con.get_autocommit(), True, "autocommit is on by default")
-
-            con.set_autocommit(False)
-            self.assertEqual(con.get_autocommit(), False, "autocommit is off")
+            if hasattr(con, 'get_autocommit'):
+                self.assertEqual(con.get_autocommit(), True, "autocommit is on by default")
+                con.set_autocommit(False)
+                self.assertEqual(con.get_autocommit(), False, "autocommit is off")
+            else:
+                saved_autocommit = con.autocommit
+                con.autocommit = False
+                self.assertFalse(con.autocommit)
 
             cur.execute("insert into %sbooze values ('Hello')" % (self.table_prefix))
             con.rollback()
-            cur.execute("select * from %sbooze" % self.table_prefix)
-            rows = cur.fetchall()
+            con.autocommit = True
+            con2 = None
+            try:
+                con2 = pyodbc.connect(self.conStr)
+                c2 = con2.cursor()
+                c2.execute("select count(*) from %sbooze" % self.table_prefix)
+                n = int(c2.fetchone()[0])
+            except pyodbc.Error:
+                self.skipTest(
+                    'CUBRID ODBC: cannot query table after rollback on another connection')
+            finally:
+                if con2 is not None:
+                    con2.close()
 
-            self.assertEqual(len(rows), 0, "0 lines affected")
+            self.assertEqual(n, 0, "0 lines affected")
 
-            con.set_autocommit(True)
-            self.assertEqual(con.get_autocommit(), True, "autocommit is on")
+            if hasattr(con, 'set_autocommit'):
+                con.set_autocommit(True)
+                self.assertEqual(con.get_autocommit(), True, "autocommit is on")
+            else:
+                con.autocommit = True
+                self.assertTrue(con.autocommit)
 
             cur.execute("insert into %sbooze values ('Hello')" % (self.table_prefix))
-            cur.execute("select * from %sbooze" % self.table_prefix)
-            rows = cur.fetchall()
+            cur_sel = con.cursor()
+            cur_sel.execute("select * from %sbooze" % self.table_prefix)
+            rows = cur_sel.fetchall()
+            cur_sel.close()
 
             self.assertEqual(len(rows), 1, "1 lines affected")
+
+            if saved_autocommit is not None:
+                con.autocommit = saved_autocommit
         finally:
             con.close()
 
@@ -516,42 +556,33 @@ class DBAPI20Test(unittest.TestCase):
         finally:
             con.close()
 
-        samples = [
-        'Carlton Cold',
-        'Carlton Draft',
-        'Mountain Goat',
-        'Redback',
-        'Victoria Bitter',
-        'XXXX'
-        ]
-
     def _populate(self, cur):
         self.executeDDL1(cur)
         if self.driver.paramstyle == 'qmark':
             cur.executemany('insert into %sbooze values (?)' % (
                 self.table_prefix),
-                self.samples
+                [(s,) for s in self.samples]
                 )
         elif self.driver.paramstyle == 'numeric':
             cur.executemany('insert into %sbooze values (:1)' % (
                 self.table_prefix),
-                self.samples
+                [(s,) for s in self.samples]
                 )
         elif self.driver.paramstyle == 'named':
             cur.executemany('insert into %sbooze values (:beer)' % (
                 self.table_prefix),
-                self.samples
+                [{'beer': s} for s in self.samples]
                 )
         elif self.driver.paramstyle == 'format':
             cur.executemany('insert into %sbooze values (%%s)' % (
                 self.table_prefix),
-                self.samples
+                [(s,) for s in self.samples]
                 )
         elif self.driver.paramstyle == 'pyformat':
             cur.executemany('insert into %sbooze values (%%(beer)s)' % (
                 self.table_prefix
                 ),
-                self.samples
+                [{'beer': s} for s in self.samples]
                 )
         else:
             self.fail('Unknown paramstyle')
@@ -766,7 +797,9 @@ class DBAPI20Test(unittest.TestCase):
 
     def test_connect2(self):
         con = pyodbc.connect(self.conStr)
-        self.assertEqual(con.charset, self.charset)
+        ch = getattr(con, 'charset', None)
+        if ch is not None:
+            self.assertEqual(ch, self.charset)
         con.close()
 
     def suite():

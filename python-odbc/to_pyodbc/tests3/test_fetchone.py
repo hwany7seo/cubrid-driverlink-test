@@ -2,7 +2,11 @@
 
 import pytest
 
-from conftest import BOOZE_SAMPLES
+from conftest import (
+    BOOZE_SAMPLES,
+    PYODBC_ERR_NO_QUERY_RESULTS,
+    assert_pyodbc_exc_str,
+)
 
 import pyodbc
 
@@ -12,8 +16,9 @@ def test_fetchone_error_before_select(cubrid_db_cursor):
 
     # cursor.fetchone should raise an Error if called before
     # executing a select-type query
-    with pytest.raises(pyodbc.Error):
+    with pytest.raises(pyodbc.ProgrammingError) as ei:
         cur.fetchone()
+    assert_pyodbc_exc_str(ei, PYODBC_ERR_NO_QUERY_RESULTS)
 
 
 @pytest.mark.xfail(reason="CCI does not return error when fetchone cannot return rows")
@@ -23,13 +28,15 @@ def test_fetchone_error_no_rows(cubrid_db_cursor, booze_table):
     # cursor.fetchone should raise an Error if called after
     # executing a query that cannnot return rows
     # like the create table query performed by booze_table
-    with pytest.raises(pyodbc.Error):
+    with pytest.raises(pyodbc.ProgrammingError) as ei:
         cur.fetchone()
+    assert_pyodbc_exc_str(ei, PYODBC_ERR_NO_QUERY_RESULTS)
 
     # or the insert query
     cur.execute(f"insert into {booze_table} values ('Victoria Bitter')")
-    with pytest.raises(pyodbc.Error):
+    with pytest.raises(pyodbc.ProgrammingError) as ei:
         cur.fetchone()
+    assert_pyodbc_exc_str(ei, PYODBC_ERR_NO_QUERY_RESULTS)
 
 
 def test_fetchone_return_none_no_rows(cubrid_db_cursor, booze_table):

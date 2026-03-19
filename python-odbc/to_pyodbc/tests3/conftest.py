@@ -43,7 +43,10 @@ def cubrid_db_connection():
     conStr = _get_connect_args()
     conn = pyodbc.connect(conStr)
     yield conn
-    conn.close()
+    try:
+        conn.close()
+    except pyodbc.ProgrammingError:
+        pass
 
 
 @pytest.fixture
@@ -57,6 +60,20 @@ def cubrid_db_cursor(cubrid_db_connection):
 
 
 TABLE_PREFIX = 'dbapi20test_'
+
+PYODBC_ERR_HY000_GENERIC = "('HY000', 'The driver did not supply an error!')"
+PYODBC_ERR_CONNECT_EMPTY_DSN = (
+    "('IM002', '[IM002] [unixODBC][Driver Manager]Data source name not found and no default "
+    "driver specified (0) (SQLDriverConnect)')"
+)
+PYODBC_TYPE_CONNECT_NO_ARGS = "no connection information was passed"
+PYODBC_ERR_CURSOR_CLOSED = "The cursor's connection has been closed."
+PYODBC_ERR_CONN_CLOSED_COMMIT = "Attempt to use a closed connection."
+PYODBC_ERR_NO_QUERY_RESULTS = "No results.  Previous SQL was not a query."
+
+
+def assert_pyodbc_exc_str(exc_info, expected: str):
+    assert str(exc_info.value) == expected
 
 
 def _create_table(cdb_cur, name_suffix, columns_sql):
@@ -109,7 +126,8 @@ BOOZE_SAMPLES = [
 @pytest.fixture
 def populated_booze_table(cubrid_db_cursor, booze_table):
     cur, _ = cubrid_db_cursor
-    cur.executemany(f'insert into {booze_table} values (?)', BOOZE_SAMPLES)
+    cur.executemany(f'insert into {booze_table} values (?)',
+                    [(s,) for s in BOOZE_SAMPLES])
     yield booze_table
 
 
@@ -204,15 +222,13 @@ def exc_primary_tables(cubrid_db_cursor):
 
     # Insert data
     cur, _ = cubrid_db_cursor
-    rc = cur.execute(f"insert into {ptb} values ('001','aaaa', 'aaaa'), "
+    cur.execute(f"insert into {ptb} values ('001','aaaa', 'aaaa'), "
         "('002','bbbb', 'bbbb'),('003','cccc', 'cccc'),('004','dddd', 'dddd'),"
         "('005','eeee', 'eeee')")
-    assert rc == 5
 
-    rc = cur.execute(f"insert into {ftb} values ( '001' , 1,1,'1212'),"
+    cur.execute(f"insert into {ftb} values ( '001' , 1,1,'1212'),"
         "( '001' , 2,2,'2323'), ( '002' , 3,3,'3434'),( '002' , 4,4,'4545'), "
         "( '003' , 5,5,'5656'), ( '003' , 6,6,'6767')")
-    assert rc == 6
 
     yield ptb, ftb
 
@@ -258,8 +274,7 @@ def exc_view_table(cubrid_db_cursor):
     table_name = _create_table(cubrid_db_cursor, 'viewtbl', "qty INT, price INT")
 
     cur, _ = cubrid_db_cursor
-    rc = cur.execute(f"INSERT INTO {table_name} VALUES (3,50)")
-    assert rc == 1
+    cur.execute(f"INSERT INTO {table_name} VALUES (3,50)")
 
     yield table_name
     _drop_table(cubrid_db_cursor, table_name)
@@ -271,9 +286,8 @@ def exc_view_a_table(cubrid_db_cursor):
         "id INT NOT NULL,phone VARCHAR(10)")
 
     cur, _ = cubrid_db_cursor
-    rc = cur.execute(f"INSERT INTO {table_name} VALUES(1,'111-1111'), (2,'222-2222'), "
+    cur.execute(f"INSERT INTO {table_name} VALUES(1,'111-1111'), (2,'222-2222'), "
         "(3, '333-3333'), (4, NULL), (5, NULL)")
-    assert rc == 5
 
     yield table_name
     _drop_table(cubrid_db_cursor, table_name)

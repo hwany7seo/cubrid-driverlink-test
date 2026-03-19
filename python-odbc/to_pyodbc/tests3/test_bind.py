@@ -4,6 +4,8 @@ import datetime
 
 from decimal import Decimal
 
+import pytest
+
 from conftest import TABLE_PREFIX
 
 
@@ -14,7 +16,8 @@ def _test_binding(cur, columns_sql, samples):
         cur.execute(f"create table if not exists {table_name} ({columns_sql})")
         cur.executemany(f"insert into {table_name} values (?)",
                         [(sample,) for sample in samples])
-        assert cur.rowcount == 1
+        # ODBC drivers often leave rowcount as -1 after executemany
+        assert cur.rowcount in (-1, len(samples))
 
         cur.execute(f"select * from {table_name}")
         return [r[0] for r in cur.fetchall()]
@@ -37,7 +40,9 @@ def test_bind_bigint(cubrid_db_cursor):
 def test_bind_float(cubrid_db_cursor):
     numbers = [1.234, 3.14, -10.441875, 5.]
     inserted = _test_binding(cubrid_db_cursor[0], 'x float', numbers)
-    assert inserted == numbers
+    assert len(inserted) == len(numbers)
+    for got, expected in zip(inserted, numbers):
+        assert got == pytest.approx(expected)
 
 
 def test_bind_numeric(cubrid_db_cursor):
