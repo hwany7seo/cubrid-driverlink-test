@@ -8,19 +8,24 @@ import decimal
 import datetime
 from xml.dom import minidom
 
+
+def _cfg_text(doc, tag):
+    nodes = doc.getElementsByTagName(tag)
+    if not nodes or nodes[0].firstChild is None:
+        return ''
+    return nodes[0].firstChild.data.strip()
+
+
 class pyodbc_crud_test(unittest.TestCase):
     driver = pyodbc
     
     xmlt = minidom.parse('python_config.xml')
-    ips = xmlt.childNodes[0].getElementsByTagName('ip')
-    ip = ips[0].childNodes[0].toxml()
-    ports = xmlt.childNodes[0].getElementsByTagName('port')
-    port = ports[0].childNodes[0].toxml()
-    dbnames = xmlt.childNodes[0].getElementsByTagName('dbname')
-    dbname = dbnames[0].childNodes[0].toxml()
+    ip = _cfg_text(xmlt, 'ip')
+    port = _cfg_text(xmlt, 'port')
+    dbname = _cfg_text(xmlt, 'dbname')
     conStr = "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
-    
-    connect_args = (conStr, 'dba', '')
+
+    connect_args = (conStr,)
     connect_kw_args = {}
     connect_kw_args2 = {'charset': 'utf8'}
 

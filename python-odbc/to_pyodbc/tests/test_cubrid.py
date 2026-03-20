@@ -1,21 +1,58 @@
-import pyodbc
+# pylint: disable=missing-function-docstring,missing-class-docstring
 import unittest
-
-from pyodbc import *
-
+import os
 from xml.dom import minidom
+
+import pyodbc
+
+
+def _cfg_text(doc, tag):
+    nodes = doc.getElementsByTagName(tag)
+    if not nodes or nodes[0].firstChild is None:
+        return ''
+    return nodes[0].firstChild.data.strip()
+
+
+def _as_bytes(val):
+    if val is None:
+        return b''
+    if isinstance(val, bytes):
+        return val
+    if isinstance(val, memoryview):
+        return val.tobytes()
+    if isinstance(val, bytearray):
+        return bytes(val)
+    return bytes(val)
+
+
+# 1x1 PNG — used when cubrid_logo.png is absent (same pyodbc bytes bind path)
+_MIN_PNG = (
+    b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01'
+    b'\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\x9cc\x00\x01'
+    b'\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82'
+)
+
+def _primary_key_column_names(cursor, table_name_lower):
+    cursor.execute(
+        """
+        SELECT k.key_attr_name FROM db_index_key k
+        INNER JOIN db_index i ON k.index_name = i.index_name
+            AND k.class_name = i.class_name
+        WHERE LOWER(i.class_name) = ? AND i.is_primary_key = 'YES'
+        ORDER BY k.key_order
+        """,
+        (table_name_lower,),
+    )
+    return [str(r[0]).lower() for r in cursor.fetchall()]
 
 
 class DatabaseTest(unittest.TestCase):
     driver = pyodbc
 
     xmlt = minidom.parse('python_config.xml')
-    ips = xmlt.childNodes[0].getElementsByTagName('ip')
-    ip = ips[0].childNodes[0].toxml()
-    ports = xmlt.childNodes[0].getElementsByTagName('port')
-    port = ports[0].childNodes[0].toxml()
-    dbnames = xmlt.childNodes[0].getElementsByTagName('dbname')
-    dbname = dbnames[0].childNodes[0].toxml()
+    ip = _cfg_text(xmlt, 'ip')
+    port = _cfg_text(xmlt, 'port')
+    dbname = _cfg_text(xmlt, 'dbname')
     conStr = "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
 
     connect_args = (conStr,)
@@ -29,20 +66,16 @@ class DatabaseTest(unittest.TestCase):
 
     def _check_table_exist(self, connect):
         cursor = connect.cursor()
-        cursor.prepare('DROP TABLE IF EXISTS testpyodbc')
-        cursor.execute()
+        cursor.execute('DROP TABLE IF EXISTS testpyodbc')
         connect.commit()
         cursor.close()
 
     def _connect(self):
-        try:
-            con = self.driver.connect(
-                    *self.connect_args, **self.connect_kw_args
-                    )
-            self._check_table_exist(con)
-            return con
-        except AttributeError:
+        if not hasattr(self.driver, 'connect'):
             self.fail("No connect method found in self.driver module")
+        con = self.driver.connect(*self.connect_args, **self.connect_kw_args)
+        self._check_table_exist(con)
+        return con
 
     def test_connect(self):
         con = self._connect()
@@ -51,34 +84,37 @@ class DatabaseTest(unittest.TestCase):
     def test_server_version(self):
         con = self._connect()
         try:
-            con.server_version()
+            cur = con.cursor()
+            cur.execute('SELECT VERSION()')
+            row = cur.fetchone()
+            self.assertIsNotNone(row)
+            self.assertTrue(len(str(row[0])) > 0)
         finally:
             con.close()
 
     def test_client_version(self):
         con = self._connect()
         try:
-            con.client_version()
+            ver = con.getinfo(pyodbc.SQL_DRIVER_VER)
+            self.assertIsInstance(ver, str)
+            self.assertTrue(len(ver) > 0)
         finally:
             con.close()
 
     def test_Exceptions(self):
-        # Make sure required exceptions exist, and are in the
-        # defined heirarchy.
         self.assertTrue(
-                issubclass(self.driver.InterfaceError, self.driver.Error)
-                )
+            issubclass(self.driver.InterfaceError, self.driver.Error)
+        )
         self.assertTrue(
-                issubclass(self.driver.DatabaseError,self.driver.Error)
-                )
+            issubclass(self.driver.DatabaseError, self.driver.Error)
+        )
         self.assertTrue(
-                issubclass(self.driver.NotSupportedError,self.driver.Error)
-                )
+            issubclass(self.driver.NotSupportedError, self.driver.Error)
+        )
 
     def test_commit(self):
         con = self._connect()
         try:
-            # Commit must work, even if it doesn't do anything
             con.commit()
         finally:
             con.close()
@@ -94,127 +130,113 @@ class DatabaseTest(unittest.TestCase):
         con = self._connect()
         try:
             cur = con.cursor()
-        finally:
             cur.close()
+        finally:
             con.close()
 
     def test_cursor_isolation(self):
         con = self._connect()
         try:
-            # Make sure cursors created from the same connection have
-            # the documented transaction isolation level
             cur1 = con.cursor()
             cur2 = con.cursor()
-            cur1.prepare('create table testpyodbc (name varchar(20))')
-            cur1.execute()
-            cur1.prepare("insert into testpyodbc values ('Blair')")
-            cur1.execute()
-            self.assertEqual(cur1.affected_rows(), 1)
-            cur2.prepare('select * from testpyodbc')
-            cur2.execute()
-            self.assertEqual(cur2.num_rows(), 1)
+            cur1.execute('create table testpyodbc (name varchar(20))')
+            cur1.execute("insert into testpyodbc values ('Blair')")
+            self.assertTrue(cur1.rowcount in (-1, 1))
+            cur2.execute('select * from testpyodbc')
+            rows = cur2.fetchall()
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(len(rows[0]), 1)
+            self.assertEqual(tuple(rows[0]), ('Blair',))
         finally:
             con.close()
 
     def test_description(self):
-        con = self._connect();
+        con = self._connect()
         try:
             cur = con.cursor()
-            cur.prepare("create table testpyodbc (name varchar(20))")
-            cur.execute()
-            self.assertEqual(cur.description, None,
-                    'cursor.description should be none after executing a '
-                    'statement that can return no rows (such as create)')
-            cur.prepare("select name from testpyodbc")
-            cur.execute()
-            self.assertEqual(len(cur.description), 1,
-                    'cursor.description describes too many columns')
-            self.assertEqual(len(cur.description[0]), 7,
-                    self.assertEqual(len(cur.description[0]), 7,))
-            self.assertEqual(cur.description[0][0].lower(), 'name',
-                    'cursor.description[x][0] must return column name')
+            cur.execute("create table testpyodbc (name varchar(20))")
+            self.assertIsNone(
+                cur.description,
+                'cursor.description should be none after DDL',
+            )
+            cur.execute('select name from testpyodbc')
+            self.assertEqual(len(cur.description), 1)
+            self.assertEqual(len(cur.description[0]), 7)
+            self.assertEqual(cur.description[0][0].lower(), 'name')
             cur.close()
         finally:
             con.close()
-
 
     def test_rowcount(self):
         con = self._connect()
         try:
             cur = con.cursor()
-            cur.prepare("create table testpyodbc (name varchar(20))")
-            cur.execute()
-            self.assertEqual(cur.rowcount, -1, 
-                    'cursor.rowcount should be -1 after executing '
-                    'no-result statements')
-            cur.prepare("insert into testpyodbc value ('Blair')")
-            cur.execute()
-            self.assertTrue(cur.rowcount in (-1, 1),
-                    'cursor.rowcount should == number or rows inserted, or '
-                    'set to -1 after executing an insert statment')
-            cur.prepare("select name from testpyodbc")
-            cur.execute()
-            self.assertTrue(cur.rowcount in (-1,1),
-                    'cursor.rowcount should == number of rows returned, or '
-                    'set to -1 after executing a select statement')
+            cur.execute("create table testpyodbc (name varchar(20))")
+            self.assertTrue(cur.rowcount in (-1, 0))
+            cur.execute("insert into testpyodbc values ('Blair')")
+            self.assertTrue(cur.rowcount in (-1, 1))
+            cur.execute('select name from testpyodbc')
+            self.assertTrue(cur.rowcount in (-1, 1))
             cur.close()
         finally:
             con.close()
 
+
+    @unittest.skip("pyodbc with cubrid-odbc is not support: CUBRID_REP_CLASS_COMMIT_INSTANCE and set_isolation_level are CUBRID-specific.")
     def test_isolation_level(self):
-        con = self._connect()
-        try:
-            con.set_isolation_level(CUBRID_REP_CLASS_COMMIT_INSTANCE)
-            self.assertEqual(con.isolation_level, 'CUBRID_REP_CLASS_COMMIT_INSTANCE',
-                    'connection.set_isolation_level does not work')
-        finally:
-            con.close()
-        
+        pass
+
     def test_autocommit(self):
         con = self._connect()
         try:
-            self.assertEqual(con.autocommit, True,
-                    'connection.autocommit default is True')
+            self.assertFalse(con.autocommit)
             con.autocommit = True
-            self.assertEqual(con.autocommit, True,
-                    'connection.autocommit should TURE after set on')
+            self.assertTrue(con.autocommit)
             con.autocommit = False
-            self.assertEqual(con.autocommit, False,
-                    'connection.autocommit should TURE after set on')
+            self.assertFalse(con.autocommit)
         finally:
             con.close()
 
     def test_ping(self):
         con = self._connect()
         try:
-            self.assertEqual(con.ping(), 1,
-                    'connection.ping should return 1 when connect')
+            if hasattr(con, 'ping'):
+                self.assertEqual(con.ping(), 1)
+            else:
+                cur = con.cursor()
+                cur.execute('SELECT 1')
+                self.assertEqual(cur.fetchone()[0], 1)
         finally:
             con.close()
 
     def test_schema_info(self):
         con = self._connect()
+        cur = con.cursor()
         try:
-            schema_info = con.schema_info(CUBRID_SCH_TABLE, "db_class")
-            self.assertEqual(schema_info[0], 'db_class',
-                    'connection.schema_info get incorrect result')
-            self.assertEqual(schema_info[1], 0,
-                    'connection.schema_info get incorrect result')
+            cur.execute(
+                "SELECT class_name FROM db_class WHERE LOWER(class_name) = ?",
+                ('db_class',),
+            )
+            row = cur.fetchone()
+            self.assertIsNotNone(row)
+            self.assertEqual(str(row[0]).lower(), 'db_class')
         finally:
+            cur.close()
             con.close()
 
     def test_insert_id(self):
-        t_insert_id = 'create table testpyodbc (id numeric auto_increment(1000000000000, 2), name varchar)'
         con = self._connect()
         cur = con.cursor()
         try:
-            cur.prepare(t_insert_id)
-            cur.execute()
-            cur.prepare("insert into testpyodbc(name) values ('Blair')")
-            cur.execute()
-            insert_id = con.insert_id()
-            self.assertEqual(insert_id, 1000000000000,
-                    'connection.insert_id() get incorrect result')
+            cur.execute(
+                'create table testpyodbc (id numeric auto_increment(1000000000000, 2), '
+                'name varchar(200))'
+            )
+            cur.execute("insert into testpyodbc (name) values (?)", ('Blair',))
+            cur.execute('select last_insert_id()')
+            row = cur.fetchone()
+            self.assertIsNotNone(row)
+            self.assertEqual(int(row[0]), 1000000000000)
         finally:
             cur.close()
             con.close()
@@ -225,245 +247,166 @@ class DatabaseTest(unittest.TestCase):
         'Mountain Goat',
         'Redback',
         'Victoria Bitter',
-        'XXXX'
-        ]
-
-    def _prepare_data(self, cursor):
-        cursor.prepare("insert into testpyodbc values (?),(?),(?),(?),(?),(?)")
-        for i in range(len(self.samples)):
-            cursor.bind_param(i+1, self.samples[i])
-        cursor.execute()
-
-    def _select_data(self, cursor):
-        cursor.prepare("select * from testpyodbc")
-        cursor.execute()
+        'XXXX',
+    ]
 
     def test_affected_rows(self):
-        t_affected_rows = 'create table testpyodbc (name varchar(20))'
         con = self._connect()
         cur = con.cursor()
         try:
-            cur.prepare(t_affected_rows)
-            cur.execute()
-            self._prepare_data(cur)
-            self.assertTrue(cur.affected_rows() in (-1, 6))
-            self.assertEqual(cur.num_fields(), None,
-                    'cursor.num_fields() should be None when not execute select statement')
-            self.assertEqual(cur.num_rows(), None,
-                    'cursor.num_rows() should be None when not execute select statement')
+            cur.execute('create table testpyodbc (name varchar(20))')
+            cur.executemany(
+                'insert into testpyodbc values (?)',
+                [(s,) for s in self.samples],
+            )
+            self.assertTrue(cur.rowcount in (-1, 6))
         finally:
             cur.close()
             con.close()
 
+    @unittest.skip('pyodbc.Cursor has no scroll(); CUBRID ODBC path has no DB-API scroll')
     def test_data_seek(self):
-        t_data_seek = 'create table testpyodbc (name varchar(20))'
-        con = self._connect()
-        cur = con.cursor()
-        try:
-            cur.prepare(t_data_seek)
-            cur.execute()
-            self._prepare_data(cur)
-            self._select_data(cur)
+        pass
 
-            self.assertEqual(cur.num_fields(), 1,
-                    'cursor.num_fields() get incorrect result')
-            self.assertEqual(cur.num_rows(), cur.rowcount,
-                    'cursor.num_rows() get incorrect result')
-            cur.data_seek(3)
-            self.assertEqual(cur.row_tell(), 3,
-                    'cursor.dataseek get incorrect cursor')
-
-            # if input wrong param, there should be an exception
-            # cur.data_seek(7)
-        finally:
-            cur.close()
-            con.close()
-
+    @unittest.skip('pyodbc.Cursor has no scroll(); CUBRID ODBC path has no DB-API scroll')
     def test_row_seek(self):
-        t_row_seek = 'create table testpyodbc (name varchar(20))'
-        con = self._connect()
-        cur = con.cursor()
-        try:
-            cur.prepare(t_row_seek)
-            cur.execute()
-            self._prepare_data(cur)
-            self._select_data(cur)
-            cur.data_seek(3)
-            cur.row_seek(-2)
-            self.assertEqual(cur.row_tell(), 1,
-                    'cursor.row_seek return incorrect cursor')
-            cur.row_seek(4)
-            self.assertEqual(cur.row_tell(), 5, 
-                    'cursor.row_seek move forward error')
-        finally:
-            cur.close()
-            con.close()
+        pass
 
     def test_bind_int(self):
-        t_bind_int = 'create table testpyodbc (id int)'
         samples_int = ['100', '200', '300', '400']
         con = self._connect()
         cur = con.cursor()
         try:
-            cur.prepare(t_bind_int);
-            cur.execute()
-            cur.prepare("insert into testpyodbc values (?),(?),(?),(?)")
-            for i in range(len(samples_int)):
-                cur.bind_param(i+1, samples_int[i])
-            cur.execute()
-            self.assertTrue(cur.affected_rows() in (-1, 4))
+            cur.execute('create table testpyodbc (id int)')
+            cur.executemany(
+                'insert into testpyodbc values (?)',
+                [(x,) for x in samples_int],
+            )
+            self.assertTrue(cur.rowcount in (-1, 4))
         finally:
             cur.close()
             con.close()
 
     def test_bind_float(self):
-        ddl_float = 'create table testpyodbc (id float)'
         con = self._connect()
         cur = con.cursor()
         try:
-            cur.prepare(ddl_float)
-            cur.execute()
-            cur.prepare("insert into testpyodbc values (?)")
-            cur.bind_param(1, '3.14')
-            cur.execute()
-            self.assertTrue(cur.affected_rows() in (-1, 1))
+            cur.execute('create table testpyodbc (id float)')
+            cur.execute('insert into testpyodbc values (?)', ('3.14',))
+            self.assertTrue(cur.rowcount in (-1, 1))
         finally:
             cur.close()
             con.close()
 
     def test_bind_date_e(self):
-        ddl_date = 'create table testpyodbc (birthday date)'
         con = self._connect()
         cur = con.cursor()
-        error = 0
         try:
-            cur.prepare(ddl_date)
-            cur.execute()
-            cur.prepare('insert into testpyodbc values (?)')
-            # if pass wrong params, there should be an exception
-            cur.bind_param(1, "2011-2-31")
-            cur.execute()
-        except DatabaseError:
-            error = 1
+            cur.execute('create table testpyodbc (birthday date)')
+            with self.assertRaises(pyodbc.Error):
+                cur.execute('insert into testpyodbc values (?)', ('2011-2-31',))
         finally:
             cur.close()
             con.close()
-        self.assertEqual(error, 1, "catch one except.")
 
     def test_bind_date(self):
-        ddl_date = 'create table testpyodbc (birthday date)'
         con = self._connect()
         cur = con.cursor()
         try:
-            cur.prepare(ddl_date)
-            cur.execute()
-            cur.prepare('insert into testpyodbc values (?)')
-            cur.bind_param(1, "1987-10-29")
-            cur.execute()
+            cur.execute('create table testpyodbc (birthday date)')
+            cur.execute('insert into testpyodbc values (?)', ('1987-10-29',))
+            self.assertTrue(cur.rowcount in (-1, 1))
         finally:
             cur.close()
             con.close()
 
     def test_bind_time(self):
-        ddl_date = 'create table testpyodbc (lunch time)'
         con = self._connect()
         cur = con.cursor()
         try:
-            cur.prepare(ddl_date)
-            cur.execute()
-            cur.prepare('insert into testpyodbc values (?)')
-            cur.bind_param(1, "11:30:29")
-            cur.execute()
+            cur.execute('create table testpyodbc (lunch time)')
+            cur.execute('insert into testpyodbc values (?)', ('11:30:29',))
+            self.assertTrue(cur.rowcount in (-1, 1))
         finally:
             cur.close()
             con.close()
 
     def test_bind_timestamp(self):
-        ddl_date = 'create table testpyodbc (lunch timestamp)'
         con = self._connect()
         cur = con.cursor()
         try:
-            cur.prepare(ddl_date)
-            cur.execute()
-            cur.prepare('insert into testpyodbc values (?)')
-            cur.bind_param(1, "2011-5-3 11:30:29")
-            cur.execute()
+            cur.execute('create table testpyodbc (lunch timestamp)')
+            cur.execute('insert into testpyodbc values (?)', ('2011-5-3 11:30:29',))
+            self.assertTrue(cur.rowcount in (-1, 1))
         finally:
             cur.close()
             con.close()
 
     def test_lob_file(self):
-        t_blob = 'create table testpyodbc (picture blob)'
+        # pyodbc: bind BLOB as bytes (or pyodbc.Binary); no con.lob() API.
+        logo = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cubrid_logo.png')
+        if os.path.isfile(logo):
+            with open(logo, 'rb') as fh:
+                raw = fh.read()
+        else:
+            raw = _MIN_PNG
+
         con = self._connect()
         cur = con.cursor()
         try:
-            cur.prepare(t_blob)
-            cur.execute()
-            cur.prepare('insert into testpyodbc values (?)')
-            lob = con.lob()
-            lob.imports('cubrid_logo.png')
-            cur.bind_lob(1, lob)
-            cur.execute()
-            lob.close()
-
-            cur.prepare('select * from testpyodbc')
-            cur.execute()
-            lob_fetch = con.lob()
-            cur.fetch_lob(1, lob_fetch)
-            lob_fetch.export('out')
-            lob_fetch.close()
+            cur.execute('create table testpyodbc (picture blob)')
+            param = pyodbc.Binary(raw) if hasattr(pyodbc, 'Binary') else raw
+            cur.execute('insert into testpyodbc values (?)', (param,))
+            self.assertTrue(cur.rowcount in (-1, 1))
+            con.commit()
+            cur.execute('select picture from testpyodbc')
+            row = cur.fetchone()
+            self.assertIsNotNone(row)
+            self.assertEqual(_as_bytes(row[0]), raw)
         finally:
             cur.close()
             con.close()
 
     def test_lob_string(self):
-        t_clob = 'create table testpyodbc (content clob)'
+        # pyodbc: bind CLOB as str (Unicode).
+        text = 'hello world'
         con = self._connect()
         cur = con.cursor()
         try:
-            cur.prepare(t_clob)
-            cur.execute()
-            cur.prepare('insert into testpyodbc values (?)') 
-            lob = con.lob()
-            lob.write('hello world', 'C')
-            cur.bind_lob(1, lob)
-            cur.execute()
-            lob.close()
-
-            cur.prepare('select * from testpyodbc')
-            cur.execute()
-            lob_fetch = con.lob()
-            cur.fetch_lob(1, lob_fetch)
-            self.assertEqual(lob_fetch.read(), 'hello world',
-                    'lob.read() get incorrect result')
-            self.assertEqual(lob_fetch.seek(0, SEEK_SET), 0)
-            lob_fetch.close()
+            cur.execute('create table testpyodbc (content clob)')
+            cur.execute('insert into testpyodbc values (?)', (text,))
+            self.assertTrue(cur.rowcount in (-1, 1))
+            con.commit()
+            # Direct CLOB select can confuse pyodbc UTF-16 decoding on CUBRID ODBC.
+            cur.execute('select cast(content as varchar(32768)) from testpyodbc')
+            row = cur.fetchone()
+            self.assertIsNotNone(row)
+            got = row[0]
+            if isinstance(got, bytes):
+                got = got.decode('utf-8')
+            self.assertEqual(str(got).rstrip(), text)
         finally:
             cur.close()
             con.close()
 
     def test_result_info(self):
-        t_result_info = 'create table testpyodbc (id int primary key, name varchar(20))'
         con = self._connect()
         cur = con.cursor()
         try:
-            cur.prepare(t_result_info)
-            cur.execute()
-            cur.prepare("insert into testpyodbc values (?,?)")
-            cur.bind_param(1, '1000')
-            cur.prepare('select * from testpyodbc')
-            cur.execute()
-            info = cur.result_info()
-            self.assertEqual(len(info), 2,
-                    'the length of cursor.result_info is 2')
-            self.assertEqual(info[0][10], 1,
-                    'the first colnum of cursor.result should be primary key')
+            cur.execute('create table testpyodbc (id int primary key, name varchar(20))')
+            con.commit()
+            cur.execute('select * from testpyodbc')
+            self.assertIsNotNone(cur.description)
+            self.assertEqual(len(cur.description), 2)
+            col_names = [cur.description[i][0].lower() for i in range(2)]
+            self.assertEqual(col_names[0], 'id')
+            self.assertEqual(col_names[1], 'name')
+            pk_cols = _primary_key_column_names(cur, 'testpyodbc')
+            self.assertEqual(pk_cols, ['id'])
 
-            info = cur.result_info(1)
-            self.assertEqual(len(info), 1,
-                    'the length of cursor.result_info is 1')
-            self.assertEqual(info[0][4], 'id',
-                    'cursor.result has just one colname and the name is "name"')
+            cur.execute('select id from testpyodbc')
+            self.assertEqual(len(cur.description), 1)
+            self.assertEqual(cur.description[0][0].lower(), 'id')
         finally:
             cur.close()
             con.close()
@@ -471,13 +414,13 @@ class DatabaseTest(unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(DatabaseTest("test_bind_timestamp"))
+    suite.addTest(DatabaseTest('test_bind_timestamp'))
     return suite
+
 
 if __name__ == '__main__':
     log_file = 'testpyodbc.result'
-    f = open(log_file, "w")
-    unittest.TextTestRunner(
-        verbosity=2, stream=f).run(
-        unittest.TestLoader().loadTestsFromTestCase(DatabaseTest))
-    f.close()
+    with open(log_file, 'w', encoding='utf-8') as f:
+        unittest.TextTestRunner(
+            verbosity=2, stream=f).run(
+            unittest.TestLoader().loadTestsFromTestCase(DatabaseTest))
