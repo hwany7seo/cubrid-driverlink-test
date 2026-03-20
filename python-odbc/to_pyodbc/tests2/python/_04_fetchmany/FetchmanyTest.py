@@ -32,9 +32,9 @@ class FetchmanyTest(unittest.TestCase):
                         self.cur.execute(sqlInsert)
 
         def tearDown(self):
-                # sqlDrop = "drop table if exists tdb"
-                # self.cur.execute(sqlDrop)
-                # self.cur.close()
+                sqlDrop = "drop table if exists tdb"
+                self.cur.execute(sqlDrop)
+                self.cur.close()
                 self.con.close()
 
         def test_fetchmany_nosize(self):

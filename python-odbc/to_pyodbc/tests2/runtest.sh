@@ -1,6 +1,9 @@
 #!/bin/bash
-. ./init.sh
-SCRIPT_DIR=$(dirname $(readlink -f $0))
+SCRIPT_DIR=$(dirname $(readlink -f "$0"))
+cd "$SCRIPT_DIR" || exit 1
+# init.sh must be sourced from this directory (not the caller's cwd)
+. "$SCRIPT_DIR/init.sh"
+
 TEST_LOB_DIR=$SCRIPT_DIR/lob
 
 db=pydb
@@ -14,14 +17,14 @@ FUNC_LOG=function_result
 VALGRIND="valgrind --leak-check=full"
 python="python3"
 test_mode="normal"
-test_case="functional_only"
+test_case=""
 all_test_result_file=tests2.result
 
 rm -rf memoryLeaklog
 mkdir  memoryLeaklog
 rm -rf function_result
 mkdir  function_result
-rm $all_test_result_file
+rm -f "$all_test_result_file"
 
 get_options "$@"
 
@@ -47,12 +50,6 @@ cubrid broker restart
 brokerPort=`cubrid broker status -b|grep broker1|awk '{print $4}'`
 ipaddress=$(hostname -i)
 
-echo "<PythonConfig>"            >  $PYTHON_CON
-echo "  <ip>test-db-server</ip>"        >> $PYTHON_CON
-echo "  <port>$brokerPort</port>"    >> $PYTHON_CON
-echo "  <dbname>$db</dbname>"        >> $PYTHON_CON
-echo "  <remoteIP>$ipaddress</remoteIP>">> $PYTHON_CON
-echo "</PythonConfig>"            >> $PYTHON_CON
 # Generate test cases from directories
 rm -f $testcases
 for dir in $TC_DIR

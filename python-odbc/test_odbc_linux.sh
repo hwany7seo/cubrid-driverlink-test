@@ -3,7 +3,9 @@
 # Python ODBC Test Runner
 echo "Running Python ODBC tests..."
 
-TEST_DIR="./to_pyodbc"
+# Resolve paths relative to this script so it works from any cwd
+SCRIPT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+TEST_DIR="$SCRIPT_ROOT/to_pyodbc"
 
 if [ ! -d "$TEST_DIR" ]; then
     echo "Error: Directory $TEST_DIR does not exist."
