@@ -64,6 +64,7 @@ rm -f "$RESULT_FILE"
 cd t
 for test_file in *.t; do
     echo "Running $test_file..."
+    echo "-------------- $test_file -------------- $test_file" >> "$RESULT_FILE"
     perl "$test_file" >> "$RESULT_FILE" 2>&1
     echo "-------------------------------------"
 done
