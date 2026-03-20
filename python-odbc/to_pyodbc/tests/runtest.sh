@@ -3,7 +3,7 @@
 SCRIPT_DIR=$(dirname $(readlink -f "$0"))
 cd "$SCRIPT_DIR" || exit 1
 
-PYTHON=$(which python3)
+PYTHON=$(which python3.12)
 TEST_RESULT_DIR=$SCRIPT_DIR/test_result
 
 mkdir -p $TEST_RESULT_DIR

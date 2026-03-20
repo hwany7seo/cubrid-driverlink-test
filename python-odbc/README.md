@@ -2,20 +2,21 @@
 본 테스트는 pyodbc(https://github.com/mkleehammer/pyodbc) 인터페이스를 통해 cubrid jdbc를 호출하는 형태로 사용됨.
 
 본 테스트는 아래와 같은 환경에서 테스트 됨
-- Python 3.13.2 (https://www.python.org/)
-- pyodbc 5.2.0
+- Python 3.12.2 (https://www.python.org/)
+- pyodbc 5.3.0
 
 
 테스트 방법
+python3.12 -m pip install pyodbc (최초 실행)
 -Windows
 ```
-pip install pyodbc==5.2.0 (최초 실행) 
-run_tests.bat 실행 (환경설정 포함)
+run_tests.bat 실행 (기본 테스트)
 ```
 
 -Linux
 ```
-
+./test_linux.sh (기본 테스트)
+./test_odbc_linux.sh (cubrid-python unitest를 pyodbc로 변환 테스트)
 ```
 
 

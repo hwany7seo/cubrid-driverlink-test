@@ -2,6 +2,8 @@
 
 echo "start"
 
+SCRIPT_DIR=$(dirname $(readlink -f "$0"))
+RESULT_FILE="$SCRIPT_DIR/result.txt"
 modules="LWP::Protocol::https Test::More DBI DBD::ODBC Time::HiRes JSON threads Config::Simple"
 ITERATION=$1
 
@@ -12,10 +14,34 @@ fi
 echo Checking required Perl modules...
 if ! which cpanm &> /dev/null; then
     echo cpanm is not installed. Installing cpanminus...
-    sudo dnf install perl-App-cpanminus
+    if command -v dnf &> /dev/null; then
+        sudo dnf install -y perl-App-cpanminus
+    elif command -v yum &> /dev/null; then
+        sudo yum install -y perl-App-cpanminus
+    fi
 else
     echo cpanm is installed.
 fi
+
+if ! perl -MLWP::Protocol::https -e "exit" &> /dev/null; then
+    echo "Bootstrapping HTTPS for cpanm (perl-LWP-Protocol-https)..."
+    if command -v dnf &> /dev/null; then
+        sudo dnf install -y perl-LWP-Protocol-https perl-Net-SSLeay openssl-devel
+    elif command -v yum &> /dev/null; then
+        sudo yum install -y perl-LWP-Protocol-https perl-Net-SSLeay openssl-devel
+    fi
+fi
+
+RPM_PERL_PKGS="perl-DBI perl-DBD-ODBC perl-JSON perl-Config-Simple"
+for package in $RPM_PERL_PKGS; do
+    if ! dnf list installed | grep -q "$package"; then
+        echo "Installing $package..."
+        sudo dnf install -y $package
+    else
+        echo "$package is already installed."
+    fi
+done
+
 
 for module in $modules; do
     echo -n "Checking $module... "
@@ -33,11 +59,12 @@ for module in $modules; do
     echo "-------------------------------------"
 done
 
-
 echo Running ODBC test 
+rm -f "$RESULT_FILE"
+cd t
 for test_file in *.t; do
     echo "Running $test_file..."
-    perl "$test_file"
+    perl "$test_file" >> "$RESULT_FILE" 2>&1
     echo "-------------------------------------"
 done
 echo

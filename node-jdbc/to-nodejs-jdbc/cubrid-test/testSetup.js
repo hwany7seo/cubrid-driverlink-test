@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
-const ErrorMessages = require('../../node-cubrid/src/constants/ErrorMessages');
+const ErrorMessages = require('./ErrorMessages.cjs');
 
 // Try to require java from nodejs-jdbc dependency or relative path
 let java;
@@ -24,7 +24,7 @@ const __dirname = path.dirname(__filename);
 if (!isJvmCreated()) {
     addOption("-Djava.awt.headless=true");
     addOption("-Xmx512m");
-    setupClasspath([path.resolve(__dirname, '../../lib/cubrid-jdbc-11.3.0.0047.jar')]);
+    setupClasspath([path.resolve(__dirname, '../../lib/JDBC-11.3.2.0053-cubrid.jar')]);
 }
 
 const config = {

@@ -1,6 +1,6 @@
 #! /bin/bash
 
-PYTHON_VERSION=3.10
+PYTHON_VERSION=3.12
 PYTHON_VERSION_MINOR=$(echo $PYTHON_VERSION | cut -d '.' -f 2)
 PYTHON_PATH=$(which python$PYTHON_VERSION)
 PIP_PATH=$(which pip$PYTHON_VERSION)
@@ -13,6 +13,7 @@ fi
 
 PYTHON_INSTALLED_LIST=$($PIP_PATH list | grep pyodbc)
 
+echo "PYTHON_INSTALLED_LIST: $PYTHON_INSTALLED_LIST"
 if [[ $PYTHON_INSTALLED_LIST == *"pyodbc"* ]]; then
     echo "pyodbc already installed" > /dev/null 2>&1
 else 
@@ -21,4 +22,5 @@ else
 fi
 
 $PYTHON_PATH odbc_hangle.py
-#$PYTHON_PATH odbc.py
+$PYTHON_PATH odbc.py
+$PYTHON_PATH odbc_anci.py

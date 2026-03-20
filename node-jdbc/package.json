@@ -10,13 +10,24 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "chai": "^4.3.7",
-    "java": "^0.12.1",
+    "java": "0.18.0",
     "jdbc": "^0.7.6",
     "nodejs-jdbc": "^0.1.5",
     "mocha": "^11.1.0",
     "winston": "^3.11.0"
+  },
+  "overrides": {
+    "jdbc": {
+      "java": "0.18.0"
+    },
+    "nodejs-jdbc": {
+      "java": "0.18.0"
+    }
   },
   "java": {
     "dependencies": [
@@ -24,7 +35,7 @@
         "groupId": "cubrid",
         "artifactId": "cubrid-jdbc",
         "version": "11.3.0.0047",
-        "jar": "./lib/cubrid-jdbc-11.3.0.0047.jar"
+        "jar": "./lib/JDBC-11.3.2.0053-cubrid.jar"
       }
     ],
     "repositories": [

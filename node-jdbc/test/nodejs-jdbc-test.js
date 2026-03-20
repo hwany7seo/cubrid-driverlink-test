@@ -23,16 +23,14 @@ const logger = winston.createLogger({
 global.logger = logger;
 global.winston = winston;
 
-// JVM 초기화 수정
 if (!isJvmCreated()) {
     addOption("-Djava.awt.headless=true");
     addOption("-Xmx512m");
-    // 라이브러리 경로 확인 필요 (상대 경로 조정)
-    setupClasspath([path.resolve(__dirname, '../lib/cubrid-jdbc-11.3.0.0047.jar')]);
+    setupClasspath([path.resolve(__dirname, '../lib/JDBC-11.3.2.0053-cubrid.jar')]);
 }
 
 const config = {
-    url: 'jdbc:cubrid:192.168.2.32:33000:demodb:dba::?charSet=utf-8&connectTimeout=30&queryTimeout=30',
+    url: 'jdbc:cubrid:test-db-server:33000:demodb:dba::?charSet=utf-8&connectTimeout=30&queryTimeout=30',
     drivername: 'cubrid.jdbc.driver.CUBRIDDriver',
     // user/password can be here or in properties
     minpoolsize: 1,

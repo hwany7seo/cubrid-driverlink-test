@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(dirname $(readlink -f $0))
-PYTHON=$(which python3)
+PYTHON=$(which python3.12)
 TEST_RESULT_DIR=$SCRIPT_DIR/test_result
 
 # Parse pytest final summary line from $1 (result file). Prints: failed passed skipped

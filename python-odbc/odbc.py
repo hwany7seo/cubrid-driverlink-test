@@ -4,12 +4,8 @@ import time
 class ODBC:
 
     insert_count = 5
-    # mysql_dsn = "MYSQL Driver"
-    # mysql_uid = "hwanyseo"
-    # mysql_pwd = "Cubrid123!@#"
-    dsn = "CUBRID Driver"
-    driver = "CUBRID Driver Unicode"
-    server = "192.168.2.32"
+    driver = "CUBRID ODBC Driver Unicode"
+    server = "test-db-server"
     port = 33000
     uid = "dba"
     pwd = ""
@@ -21,15 +17,7 @@ class ODBC:
         self.report = {}
         self.test_insert_count = self.insert_count
         print("Connecting to database...", flush=True)
-        # self.conn = pyodbc.connect(f"driver={self.driver};server={self.server};port={self.port};uid={self.uid};pwd={self.pwd};db_name={self.db_name};")
-        self.conn = pyodbc.connect(
-        
-        # self.conn = pyodbc.connect(
-        #     DSN=self.dsn, 
-        #     UID=self.uid, 
-        #     PWD=self.pwd,
-        #     charset="utf-8"
-        # )
+        self.conn = pyodbc.connect(f"driver={self.driver};server={self.server};port={self.port};uid={self.uid};pwd={self.pwd};db_name={self.db_name};charset=utf-8;")
         self.conn.autocommit = False
         print("Database connected successfully", flush=True)
         self.cur = self.conn.cursor()

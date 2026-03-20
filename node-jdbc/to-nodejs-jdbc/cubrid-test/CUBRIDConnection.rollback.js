@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import testSetup from './testSetup.js';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const ErrorMessages = require('../../node-cubrid/src/constants/ErrorMessages');
+const ErrorMessages = require('./ErrorMessages.cjs');
 
 describe('CUBRIDConnection', function () {
   describe('rollback', function () {

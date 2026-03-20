@@ -15,9 +15,9 @@ testcases=python_testcase_list
 MEM_LOG=memoryLeaklog
 FUNC_LOG=function_result
 VALGRIND="valgrind --leak-check=full"
-python="python3"
+python="python3.12"
 test_mode="normal"
-test_case=""
+test_case="functional_only"
 all_test_result_file=tests2.result
 
 rm -rf memoryLeaklog
@@ -39,9 +39,6 @@ fi
 
 echo "Python DBI Test Begin... ($python), test_mode = $test_mode, test_case = $test_case"
 
-rm -rf $TEST_LOB_DIR
-cubrid server stop $db
-cubrid deletedb $db
 cubrid server stop $db
 cubrid createdb $db $CUBRID_LANG
 cubrid server restart $db
@@ -72,12 +69,16 @@ done
 
 if [ "$test_case" != "functional_only" ];then
     echo "Run Performance Test"
-    for tc in $TC_DIR_PERFORMANCE/*
+    for tc in "$TC_DIR_PERFORMANCE"/*.py
     do
-        $python $tc
+        [ -f "$tc" ] || continue
+        $python "$tc"
     done
 fi
 
+cubrid server stop $db
+cubrid deletedb $db
 rm -f $testcases
+rm -rf $TEST_LOB_DIR
 
 echo "Python DBI Test End"

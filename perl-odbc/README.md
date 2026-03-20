@@ -18,11 +18,17 @@ sudo dnf reinstall gcc-toolset-9*
 sudo dnf install perl-App-cpanminus openssl-devel perl-LWP-Protocol-https
 ```
 
-#### DBI 설치 실패 시 
+#### cpanm / XS 빌드 시 annobin 플러그인 오류가 날 때
+`gcc-toolset-9-annobin` 패키지는 플러그인 파일명이 **`annobin.so`** 이지 `gcc-annobin.so` 가 아닙니다.  
+시스템 GCC 8용 `gcc-annobin.so`로 링크하면 *“plugin built for 8.x but run with 9.x”* 가 납니다.
+
+**같은 `9/plugin` 디렉터리 안에서** 아래처럼 연결합니다 (`annobin.so` → `gcc-annobin.so`).
+
+```bash
+sudo ln -sf annobin.so /opt/rh/gcc-toolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9/plugin/gcc-annobin.so
 ```
-/opt/rh/gcc-toolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9/plugin 폴더에
- annobin.so.0.0.0파일을 gcc-annobin.so 심볼릭 링크파일을 생성해야합니다.
- ```
+
+이미 잘못된 대상(예: `/usr/lib/gcc/.../8/plugin/...`)으로 링크돼 있으면 위 경로의 `gcc-annobin.so`를 지운 뒤 다시 실행합니다.
 
 #### 테스트 실행
 ```

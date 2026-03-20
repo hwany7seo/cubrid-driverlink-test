@@ -7,9 +7,18 @@
   "scripts": {
     "test": "mocha 'cubrid-test/*.js' --reporter spec --timeout 15000 --exit"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "chai": "^4.3.7",
+    "java": "0.18.0",
     "nodejs-jdbc": "^0.1.5",
     "mocha": "^10.2.0"
+  },
+  "overrides": {
+    "nodejs-jdbc": {
+      "java": "0.18.0"
+    }
   }
 }
