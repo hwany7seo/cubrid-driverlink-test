@@ -58,7 +58,7 @@ def getConStr():
     root = xmlt.documentElement
     ip = _xml_text(root.getElementsByTagName("ip")[0])
     port = _xml_text(root.getElementsByTagName("port")[0])
-    dbname = _xml_text(root.getElementsByTagName("dbname")[0])
+    dbname = _xml_text(root.getElementsByTagName("perfdb")[0])
     return (
         "DRIVER={CUBRID ODBC Driver};SERVER="
         + ip
