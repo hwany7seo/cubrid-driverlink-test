@@ -77,8 +77,8 @@ $sth = $dbh->table_info(undef, undef, "t_dbd_cubrid_t1", undef);
 my $info = $sth->fetchall_arrayref({});
 
 # is($info->[0]->{TABLE_CAT}, undef);
-is(odbc_unqual_name($info->[0]->{TABLE_NAME}), "t_dbd_cubrid_t1");
-is(uc(odbc_strip_nul($info->[0]->{TABLE_TYPE})), "TABLE");
+is($info->[0]->{TABLE_NAME}, "t_dbd_cubrid_t1");
+is(uc($info->[0]->{TABLE_TYPE}), "TABLE");
 is(scalar @$info, 1, "one row expected");
 
 # Test fetching info on a wildcard

@@ -59,32 +59,39 @@ if ($sth) {
 }
 
 # Pattern "a'b": native DBD::cubrid uses SHOW COLUMNS + quote; ODBC may hit CAS -493.
-{
-    local $dbh->{RaiseError} = 0;
-    local $dbh->{PrintError} = 0;
-    $sth = $dbh->column_info(undef, undef, "t1", "a'b");
-}
-my $ab_ok;
+# {
+#     local $dbh->{RaiseError} = 0;
+#     local $dbh->{PrintError} = 0;
+#     $sth = $dbh->column_info(undef, undef, "t1", "a'b");
+# }
+# my $ab_ok;
+# if ($sth) {
+#     my ($info) = $sth->fetchall_arrayref({});
+#     $ab_ok = (defined $info && scalar @$info == 1);
+# }
+# if ($ab_ok) {
+#     pass("column_info pattern a'b returned one row");
+# } else {
+#     $sth = $dbh->column_info(undef, undef, "t1", "%")
+#         or die "column_info(..., '%'): " . ($dbh->errstr // '');
+#     my ($all) = $sth->fetchall_arrayref({});
+#     my $found = 0;
+#     for my $r (@$all) {
+#         my $n = $r->{COLUMN_NAME} // $r->{column_name};
+#         if ($n eq "a'b") {
+#             $found = 1;
+#             last;
+#         }
+#     }
+#     ok($found,
+#         "column [a'b] via column_info(..., '%') (ODBC/CAS pattern workaround)");
+# }
+
 if ($sth) {
     my ($info) = $sth->fetchall_arrayref({});
-    $ab_ok = (defined $info && scalar @$info == 1);
-}
-if ($ab_ok) {
-    pass("column_info pattern a'b returned one row");
+    is(scalar @$info, 1, "column_info a'b count");
 } else {
-    $sth = $dbh->column_info(undef, undef, "t1", "%")
-        or die "column_info(..., '%'): " . ($dbh->errstr // '');
-    my ($all) = $sth->fetchall_arrayref({});
-    my $found = 0;
-    for my $r (@$all) {
-        my $n = odbc_strip_nul($r->{COLUMN_NAME} // $r->{column_name});
-        if ($n eq "a'b") {
-            $found = 1;
-            last;
-        }
-    }
-    ok($found,
-        "column [a'b] via column_info(..., '%') (ODBC/CAS pattern workaround)");
+    fail("column_info failed");
 }
 
 ok($dbh->do(qq{DROP TABLE IF EXISTS t1}), "cleaning up");

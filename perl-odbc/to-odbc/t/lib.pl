@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use vars qw($table $mdriver $dbdriver $test_dsn $test_user $test_passwd);
-$table= 'test_cubrid';
+$table= 'dba.test_cubrid';
 
 $| = 1; # flush stdout asap to keep in sync with stderr
 
@@ -55,5 +55,3 @@ sub odbc_unqual_name {
     $s =~ s/^[^.]+\.//;
     return $s;
 }
-
-1;
