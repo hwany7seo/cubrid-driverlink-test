@@ -37,8 +37,8 @@ $stmt = $db->query("SELECT * FROM cubrid_test");
 print_r($stmt->fetchAll(PDO::FETCH_CLASS|PDO::FETCH_SERIALIZE, "bug44409"));
 
 ?>
---EXPECT--
-Method called: bug44409::unserialize('Data from DB')
+--EXPECTF--
+%r(?:Deprecated:.*\n)*%rMethod called: bug44409::unserialize('Data from DB')
 Array
 (
     [0] => bug44409 Object

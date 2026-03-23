@@ -120,8 +120,9 @@ while(@ob_end_clean());
 if (ob_get_level()) echo "Not all buffers were deleted.\n";
 
 error_reporting(E_ALL);
-if (PHP_MAJOR_VERSION < 6) {
-	ini_set('magic_quotes_runtime',0); // this would break tests by modifying EXPECT sections
+/* magic_quotes / safe_mode: only relevant on PHP 5.x */
+if (PHP_VERSION_ID < 70000) {
+	ini_set('magic_quotes_runtime', 0);
 	if (ini_get('safe_mode')) {
 		echo <<< SAFE_MODE_WARNING
 
@@ -142,6 +143,14 @@ $environment = isset($_ENV) ? $_ENV : array();
 if ((substr(PHP_OS, 0, 3) == "WIN") && empty($environment["SystemRoot"])) {
   $environment["SystemRoot"] = getenv("SystemRoot");
 }
+/* unixODBC: variables_order often omits E; proc_open test subprocess must see ODBC* / LD_LIBRARY_PATH */
+foreach (array('ODBCSYSINI', 'ODBCINI', 'ODBCINSTINI', 'LD_LIBRARY_PATH') as $__k) {
+	$__v = getenv($__k);
+	if ($__v !== false) {
+		$environment[$__k] = $__v;
+	}
+}
+unset($__k, $__v);
 
 // Don't ever guess at the PHP executable location.
 // Require the explicit specification.
@@ -215,13 +224,13 @@ if (getenv('TEST_PHP_USER')) {
 }
 
 $exts_to_test = array();
+/* PHP 8+: no safe_mode/magic_quotes/unicode ini; E_STRICT merged into E_ALL / deprecated in 8.4 */
 $ini_overwrites = array(
 		'output_handler=',
 		'open_basedir=',
-		'safe_mode=0',
 		'disable_functions=',
 		'output_buffering=Off',
-		'error_reporting=' . (E_ALL | E_STRICT),
+		'error_reporting=' . E_ALL,
 		'display_errors=1',
 		'display_startup_errors=1',
 		'log_errors=0',
@@ -234,14 +243,21 @@ $ini_overwrites = array(
 		'error_append_string=',
 		'auto_prepend_file=',
 		'auto_append_file=',
-		'magic_quotes_runtime=0',
 		'ignore_repeated_errors=0',
 		'precision=14',
-		'unicode.runtime_encoding=ISO-8859-1',
-		'unicode.script_encoding=UTF-8',
-		'unicode.output_encoding=UTF-8',
-		'unicode.from_error_mode=U_INVALID_SUBSTITUTE',
 	);
+if (PHP_VERSION_ID < 80000) {
+	$ini_overwrites[] = 'safe_mode=0';
+	$ini_overwrites[] = 'magic_quotes_runtime=0';
+}
+if (PHP_VERSION_ID < 80400 && defined('E_STRICT')) {
+	foreach ($ini_overwrites as $k => $v) {
+		if (strpos($v, 'error_reporting=') === 0) {
+			$ini_overwrites[$k] = 'error_reporting=' . (E_ALL | E_STRICT);
+			break;
+		}
+	}
+}
 
 function write_information($show_html)
 {
@@ -361,8 +377,8 @@ function save_or_mail_results()
 			if ($sum_results['FAILED']) {
 				foreach ($PHP_FAILED_TESTS['FAILED'] as $test_info) {
 					$failed_tests_data .= $sep . $test_info['name'] . $test_info['info'];
-					$failed_tests_data .= $sep . file_get_contents(realpath($test_info['output']), FILE_BINARY);
-					$failed_tests_data .= $sep . file_get_contents(realpath($test_info['diff']), FILE_BINARY);
+					$failed_tests_data .= $sep . file_get_contents(realpath($test_info['output']), 0);
+					$failed_tests_data .= $sep . file_get_contents(realpath($test_info['diff']), 0);
 					$failed_tests_data .= $sep . "\n\n";
 				}
 				$status = "failed";
@@ -485,7 +501,9 @@ if (getenv('TEST_PHP_ARGS')) {
 		$argv = array(__FILE__);
 	}
 
-	$argv = array_merge($argv, split(' ', getenv('TEST_PHP_ARGS')));
+	$tpa = trim((string) getenv('TEST_PHP_ARGS'));
+	$extra = $tpa === '' ? array() : preg_split('/\s+/', $tpa, -1, PREG_SPLIT_NO_EMPTY);
+	$argv = array_merge($argv, $extra);
 	$argc = count($argv);
 }
 
@@ -988,12 +1006,12 @@ function save_text($filename, $text, $filename_copy = null)
 	global $DETAILED;
 
 	if ($filename_copy && $filename_copy != $filename) {
-		if (file_put_contents($filename_copy, (binary) $text, FILE_BINARY) === false) {
+		if (file_put_contents($filename_copy, (binary) $text, 0) === false) {
 			error("Cannot open file '" . $filename_copy . "' (save_text)");
 		}
 	}
 
-	if (file_put_contents($filename, (binary) $text, FILE_BINARY) === false) {
+	if (file_put_contents($filename, (binary) $text, 0) === false) {
 		error("Cannot open file '" . $filename . "' (save_text)");
 	}
 
@@ -1291,7 +1309,7 @@ TEST $file
 				$section_text['FILE_EXTERNAL'] = dirname($file) . '/' . trim(str_replace('..', '', $section_text['FILE_EXTERNAL']));
 
 				if (file_exists($section_text['FILE_EXTERNAL'])) {
-					$section_text['FILE'] = file_get_contents($section_text['FILE_EXTERNAL'], FILE_BINARY);
+					$section_text['FILE'] = file_get_contents($section_text['FILE_EXTERNAL'], 0);
 					unset($section_text['FILE_EXTERNAL']);
 				} else {
 					$bork_info = "could not load --FILE_EXTERNAL-- " . dirname($file) . '/' . trim($section_text['FILE_EXTERNAL']);
@@ -1953,12 +1971,12 @@ COMMAND $cmd
 	if (!$passed) {
 
 		// write .exp
-		if (strpos($log_format, 'E') !== false && file_put_contents($exp_filename, (binary) $wanted, FILE_BINARY) === false) {
+		if (strpos($log_format, 'E') !== false && file_put_contents($exp_filename, (binary) $wanted, 0) === false) {
 			error("Cannot create expected test output - $exp_filename");
 		}
 
 		// write .out
-		if (strpos($log_format, 'O') !== false && file_put_contents($output_filename, (binary) $output, FILE_BINARY) === false) {
+		if (strpos($log_format, 'O') !== false && file_put_contents($output_filename, (binary) $output, 0) === false) {
 			error("Cannot create test output - $output_filename");
 		}
 
@@ -1968,7 +1986,7 @@ COMMAND $cmd
 			$diff = "# original source file: $shortname\n" . $diff;
 		}
 		show_file_block('diff', $diff);
-		if (strpos($log_format, 'D') !== false && file_put_contents($diff_filename, (binary) $diff, FILE_BINARY) === false) {
+		if (strpos($log_format, 'D') !== false && file_put_contents($diff_filename, (binary) $diff, 0) === false) {
 			error("Cannot create test diff - $diff_filename");
 		}
 
@@ -1979,7 +1997,7 @@ $wanted
 ---- ACTUAL OUTPUT
 $output
 ---- FAILED
-", FILE_BINARY) === false) {
+", 0) === false) {
 			error("Cannot create test log - $log_filename");
 			error_report($file, $log_filename, $tested);
 		}

@@ -26,6 +26,7 @@ foreach ($stmt as $data)
 	var_dump($data);
 }
 
+#[AllowDynamicProperties]
 class Test
 {
 	function __construct($name = 'N/A')

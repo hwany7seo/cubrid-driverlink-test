@@ -4,6 +4,8 @@ PDO::attributes
 <?php
 if (!extension_loaded("pdo")) die("skip");
 require_once 'pdo_test.inc';
+$rc = new ReflectionClass('PDO');
+if (!$rc->hasConstant('CUBRID_ATTR_LOCK_TIMEOUT')) die('skip CUBRID PDO-specific attributes not available');
 PDOTest::skip();
 ?>
 --FILE--

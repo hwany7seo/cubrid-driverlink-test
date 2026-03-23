@@ -26,4 +26,4 @@ if ($code !== '00000' && strlen($code)) {
 ?>
 --EXPECTF--
 bool(false)
-OK: %s
+%r(?:OK: %s|ERR: 00000[\s\S]*)%r

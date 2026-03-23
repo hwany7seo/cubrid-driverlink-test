@@ -20,10 +20,11 @@ class test extends PDO
 		echo "this is a private method.\n";
 	}
     
-    public function quote($str, $paramtype = NULL) {
+    public function quote(string $str, int $paramtype = PDO::PARAM_STR): string|false {
     	$this->isProtected();
     	$this->isPrivate();
     	print $str ."\n";
+    	return parent::quote($str, $paramtype);
 	}
 }
 
@@ -37,7 +38,7 @@ this is a protected method.
 this is a private method.
 foo
 
-Fatal error: Uncaught Error: Call to protected method test::isProtected() from context '' in %s
+Fatal error: Uncaught Error: Call to protected method test::isProtected() from global scope in %s
 Stack trace:
 #0 {main}
   thrown in %s on line %d

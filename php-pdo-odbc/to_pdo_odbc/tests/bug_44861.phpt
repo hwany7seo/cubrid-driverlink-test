@@ -4,7 +4,14 @@ PDO Common: Bug #44861 (scrollable cursor don't work with pgsql)
 <?php # vim:ft=php
 if (!extension_loaded('pdo')) die('skip');
 require_once 'pdo_test.inc';
-PDOTest::skip();
+try {
+	$db = PDOTest::factory();
+	if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'pgsql') {
+		die('skip not PostgreSQL (scrollable cursor test)');
+	}
+} catch (PDOException $e) {
+	die('skip '.$e->getMessage());
+}
 ?>
 --FILE--
 <?php

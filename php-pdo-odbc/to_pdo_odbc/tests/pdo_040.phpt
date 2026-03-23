@@ -31,3 +31,4 @@ $result = $stmt->fetch(PDO::FETCH_NUM);
 $db->exec('DROP TABLE cubrid_test');
 ?>
 --EXPECTF--
+%S

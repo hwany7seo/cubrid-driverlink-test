@@ -17,6 +17,7 @@ $db->exec('INSERT INTO cubrid_test VALUES(2, \'B\', \'Group1\')');
 $db->exec('INSERT INTO cubrid_test VALUES(3, \'C\', \'Group2\')'); 
 $db->exec('INSERT INTO cubrid_test VALUES(4, \'D\', \'Group2\')'); 
 
+#[AllowDynamicProperties]
 class DerivedStatement extends PDOStatement
 {
 	private function __construct($name, $db)
@@ -35,6 +36,7 @@ $select1 = $db->prepare('SELECT grp, id FROM cubrid_test');
 $select2 = $db->prepare('SELECT id, val FROM cubrid_test');
 $derived = $db->prepare('SELECT id, val FROM cubrid_test', array(PDO::ATTR_STATEMENT_CLASS=>array('DerivedStatement', array('Overloaded', $db))));
 
+#[AllowDynamicProperties]
 class Test1
 {
 	public function __construct($id, $val)

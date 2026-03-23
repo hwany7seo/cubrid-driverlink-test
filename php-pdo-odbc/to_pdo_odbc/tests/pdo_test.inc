@@ -5,19 +5,19 @@ class PDOTest {
 	// create an instance of the PDO driver, based on
 	// the current environment
 	//
-	// PDO_ODBC_TEST_DSN: full DSN override (e.g. same as isql: odbc.ini DSN name).
-	//   export PDO_ODBC_TEST_DSN='odbc:DSN=CUBRID_ODBC_Unicode'
-	// PDO_ODBC_DRIVER: driver name inside Driver={...} (default: CUBRID_ODBC_Unicode)
+	// PDO_ODBC_TEST_DSN: 전체 DSN (최우선). 예: odbc:DSN=CUBRID_Unicode
+	// PDO_ODBC_TEST_DSN_NAME: ~/.odbc.ini 의 섹션 이름 (기본: CUBRID_Unicode → Driver=CUBRID_ODBC_Unicode)
+	// Driver={...} 직접 연결은 odbcinst.ini 경로가 잡힌 뒤에만 동작하므로, DSN 방식을 기본으로 둔다.
 	static function dsn_default() {
 		$override = getenv('PDO_ODBC_TEST_DSN');
 		if ($override !== false && $override !== '') {
 			return $override;
 		}
-		$drv = getenv('PDO_ODBC_DRIVER');
-		if ($drv === false || $drv === '') {
-			$drv = 'CUBRID_ODBC_Unicode';
+		$name = getenv('PDO_ODBC_TEST_DSN_NAME');
+		if ($name === false || $name === '') {
+			$name = 'CUBRID_Unicode';
 		}
-		return "odbc:Driver={{$drv}};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb";
+		return 'odbc:DSN=' . $name;
 	}
 
 	// user_factory DSN (PDO_ODBC_TEST_USER_DSN, else same rules as dsn_default)
@@ -26,15 +26,7 @@ class PDOTest {
 		if ($override !== false && $override !== '') {
 			return $override;
 		}
-		$override = getenv('PDO_ODBC_TEST_DSN');
-		if ($override !== false && $override !== '') {
-			return $override;
-		}
-		$drv = getenv('PDO_ODBC_DRIVER');
-		if ($drv === false || $drv === '') {
-			$drv = 'CUBRID_ODBC_Unicode';
-		}
-		return "odbc:Driver={{$drv}};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb";
+		return self::dsn_default();
 	}
 
 	static function factory($classname = 'PDO', $drop_test_tables = true) {

@@ -23,6 +23,7 @@ $db->exec('INSERT INTO cubrid_test VALUES(4, 3, \'D\')');
 
 $stmt = $db->prepare('SELECT classtypes.name, cubrid_test.id AS id, cubrid_test.val AS val FROM cubrid_test LEFT JOIN classtypes ON cubrid_test.classtype=classtypes.id');
 
+#[AllowDynamicProperties]
 class Test1
 {
 	public function __construct()
@@ -31,6 +32,7 @@ class Test1
 	}
 }
 
+#[AllowDynamicProperties]
 class Test2
 {
 	public function __construct()
@@ -39,6 +41,7 @@ class Test2
 	}
 }
 
+#[AllowDynamicProperties]
 class Test3
 {
 	public function __construct()

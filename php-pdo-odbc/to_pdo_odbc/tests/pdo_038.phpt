@@ -3,6 +3,7 @@ PDO::cubrid_schema
 --SKIPIF--
 <?php #vim:ft=php
 if (!extension_loaded("pdo")) die("skip");
+if (!method_exists('PDO', 'cubrid_schema')) die('skip PDO::cubrid_schema() requires native CUBRID PDO');
 require_once 'pdo_test.inc';
 PDOTest::skip();
 ?>

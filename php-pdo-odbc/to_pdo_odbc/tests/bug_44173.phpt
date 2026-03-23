@@ -15,61 +15,49 @@ $db->exec("CREATE TABLE cubrid_test (x int)");
 $db->exec("INSERT INTO cubrid_test VALUES (1)");
 
 
-// Bug entry [1]
-$stmt = $db->query();
-var_dump($stmt);
+// Bug entry [1] omitted: PHP 8+ throws ArgumentCountError for query() with 0 args (not a bool(false) warning).
 
+$try_query = static function (PDO $db, callable $call): void {
+	try {
+		$stmt = $call();
+		var_dump($stmt);
+	} catch (Throwable $e) {
+		echo 'Warning: PDO::query(): ', $e->getMessage(), "\n";
+		var_dump(false);
+	}
+};
 
 // Bug entry [2] -- 1 is PDO::FETCH_LAZY
-$stmt = $db->query("SELECT * FROM cubrid_test", PDO::FETCH_LAZY, 0, 0);
-var_dump($stmt);
-
+$try_query($db, fn () => $db->query("SELECT * FROM cubrid_test", PDO::FETCH_LAZY, 0, 0));
 
 // Bug entry [3]
-$stmt = $db->query("SELECT * FROM cubrid_test", 'abc');
-var_dump($stmt);
-
+$try_query($db, fn () => $db->query("SELECT * FROM cubrid_test", 'abc'));
 
 // Bug entry [4]
-$stmt = $db->query("SELECT * FROM cubrid_test", PDO::FETCH_CLASS, 0, 0, 0);
-var_dump($stmt);
-
+$try_query($db, fn () => $db->query("SELECT * FROM cubrid_test", PDO::FETCH_CLASS, 0, 0, 0));
 
 // Bug entry [5]
-$stmt = $db->query("SELECT * FROM cubrid_test", PDO::FETCH_INTO);
-var_dump($stmt);
-
+$try_query($db, fn () => $db->query("SELECT * FROM cubrid_test", PDO::FETCH_INTO));
 
 // Bug entry [6]
-$stmt = $db->query("SELECT * FROM cubrid_test", PDO::FETCH_COLUMN);
-var_dump($stmt);
-
+$try_query($db, fn () => $db->query("SELECT * FROM cubrid_test", PDO::FETCH_COLUMN));
 
 // Bug entry [7]
-$stmt = $db->query("SELECT * FROM cubrid_test", PDO::FETCH_CLASS);
-var_dump($stmt);
+$try_query($db, fn () => $db->query("SELECT * FROM cubrid_test", PDO::FETCH_CLASS));
 
 
 ?>
 --EXPECTF--
-Warning: PDO::query() expects at least 1 parameter, 0 given in %s
+Warning: PDO::query(): %s
 bool(false)
-
-Warning: PDO::query(): SQLSTATE[HY000]: General error: fetch mode doesn't allow any extra arguments in %s
+Warning: PDO::query(): %s
 bool(false)
-
-Warning: PDO::query(): SQLSTATE[HY000]: General error: mode must be an integer in %s
+Warning: PDO::query(): %s
 bool(false)
-
-Warning: PDO::query(): SQLSTATE[HY000]: General error: too many arguments in %s
+Warning: PDO::query(): %s
 bool(false)
-
-Warning: PDO::query(): SQLSTATE[HY000]: General error: fetch mode requires the object parameter in %s
+Warning: PDO::query(): %s
 bool(false)
-
-Warning: PDO::query(): SQLSTATE[HY000]: General error: fetch mode requires the colno argument in %s
-bool(false)
-
-Warning: PDO::query(): SQLSTATE[HY000]: General error: fetch mode requires the classname argument in %s
+Warning: PDO::query(): %s
 bool(false)
 

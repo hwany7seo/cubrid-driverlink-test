@@ -20,6 +20,7 @@ $SELECT = 'SELECT val, grp FROM cubrid_test';
 $stmt = $db->query($SELECT, PDO::FETCH_NUM);
 var_dump($stmt->fetchAll());
 
+#[AllowDynamicProperties]
 class Test
 {
 	function __construct($name = 'N/A')

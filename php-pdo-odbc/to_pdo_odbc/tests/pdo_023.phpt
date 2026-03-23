@@ -10,6 +10,7 @@ PDOTest::skip();
 <?php
 require_once 'pdo_test.inc';
 
+#[AllowDynamicProperties]
 class PDOStatementX extends PDOStatement
 {
     public $test1 = 1;
@@ -27,6 +28,7 @@ class PDOStatementX extends PDOStatement
     }
 }
 
+#[AllowDynamicProperties]
 class PDODatabaseX extends PDO
 {
     public $test1 = 1;
@@ -44,7 +46,7 @@ class PDODatabaseX extends PDO
     	$this->test2 = 22;
     }
     
-    function query($sql)
+    public function query(string $sql, ?int $fetchMode = null, mixed ...$fetchModeArgs): PDOStatement|false
     {
     	echo __METHOD__ . "()\n";
     	$stmt = parent::prepare($sql, array(PDO::ATTR_STATEMENT_CLASS=>array('PDOStatementx')));
@@ -92,10 +94,10 @@ PDOStatementX::__destruct()
 PDODatabaseX::query()
 PDOStatementX::__construct()
 object(PDOStatementX)#%d (3) {
-  ["test1"]=>
-  int(1)
   ["queryString"]=>
   string(31) "SELECT val, id FROM cubrid_test"
+  ["test1"]=>
+  int(1)
   ["test2"]=>
   int(22)
 }

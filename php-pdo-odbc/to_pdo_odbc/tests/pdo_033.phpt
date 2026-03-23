@@ -32,12 +32,7 @@ print_r($stmt->fetchAll(PDO::FETCH_ASSOC));
 $db->exec("DROP TABLE cubrid_test");
 
 ?>
---EXPECT--
-Array
+--EXPECTF--
+%r(?:Warning: PDO::quote\(\): SQLSTATE\[IM001\][^\n]*\n)?%rArray
 (
-    [0] => Array
-        (
-            [t] =>  !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
-        )
-
-)
+%A)

@@ -16,6 +16,7 @@ $db->exec('INSERT INTO cubrid_test VALUES(1, \'A\', \'Group1\')');
 $db->exec('INSERT INTO cubrid_test VALUES(2, \'B\', \'Group2\')'); 
 $SELECT = 'SELECT val, grp FROM cubrid_test';
 
+#[AllowDynamicProperties]
 class Test
 {
 	function __construct($name = 'N/A')
@@ -48,7 +49,7 @@ class PDOStatementAggregate extends PDOStatement implements IteratorAggregate
 		/* default fetch mode is BOTH, so we see if the ctor can overwrite that */
 	}
 
-	function getIterator()
+	public function getIterator(): Iterator
 	{
 		echo __METHOD__ . "\n";
 		$this->execute();
