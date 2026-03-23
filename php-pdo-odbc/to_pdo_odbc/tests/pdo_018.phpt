@@ -4,7 +4,15 @@ PDO Common: serializing
 <?php # vim:ft=php
 if (!extension_loaded('pdo')) die('skip');
 require_once 'pdo_test.inc';
-PDOTest::skip();
+try {
+	$db = PDOTest::factory();
+} catch (PDOException $e) {
+	die('skip ' . $e->getMessage());
+}
+if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'odbc') {
+	die('skip not supported: serializing / FETCH_SERIALIZE — baseline is native CUBRID PDO (PHP 8 deprecations + ODBC output differ)');
+}
+unset($db);
 ?>
 --FILE--
 <?php

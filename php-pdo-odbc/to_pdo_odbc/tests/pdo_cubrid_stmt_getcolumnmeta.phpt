@@ -5,6 +5,11 @@ PDO CUBRID: PDOStatement::getColumnMeta
 if (!extension_loaded('pdo')) die('skip');
 require_once 'pdo_test.inc';
 PDOTest::skip();
+
+/*
+ * PDO_ODBC: getColumnMeta() returns pdo_type, name, len, precision only (see EXPECT).
+ * Native cubrid-pdo fills 16 keys; upstream differs.
+ */
 ?>
 --FILE--
 <?php
@@ -23,173 +28,53 @@ var_dump($result->getColumnMeta(4));
 var_dump($result->getColumnMeta(6));
 ?>
 --EXPECT--
-array(16) {
-  ["type"]=>
-  string(7) "integer"
+array(4) {
+  ["pdo_type"]=>
+  int(2)
   ["name"]=>
   string(1) "1"
-  ["table"]=>
-  string(0) ""
-  ["def"]=>
-  string(0) ""
-  ["precision"]=>
-  int(10)
-  ["scale"]=>
-  int(0)
-  ["not_null"]=>
-  int(0)
-  ["auto_increment"]=>
-  int(0)
-  ["unique_key"]=>
-  int(0)
-  ["multiple_key"]=>
-  int(1)
-  ["primary_key"]=>
-  int(0)
-  ["foreign_key"]=>
-  int(0)
-  ["reverse_index"]=>
-  int(0)
-  ["reverse_unique"]=>
-  int(0)
   ["len"]=>
   int(11)
+  ["precision"]=>
+  int(0)
+}
+array(4) {
   ["pdo_type"]=>
   int(2)
-}
-array(16) {
-  ["type"]=>
-  string(7) "integer"
   ["name"]=>
   string(9) "host_year"
-  ["table"]=>
-  string(11) "public.game"
-  ["def"]=>
-  string(4) "NULL"
-  ["precision"]=>
-  int(10)
-  ["scale"]=>
-  int(0)
-  ["not_null"]=>
-  int(1)
-  ["auto_increment"]=>
-  int(0)
-  ["unique_key"]=>
-  int(1)
-  ["multiple_key"]=>
-  int(0)
-  ["primary_key"]=>
-  int(1)
-  ["foreign_key"]=>
-  int(0)
-  ["reverse_index"]=>
-  int(0)
-  ["reverse_unique"]=>
-  int(0)
   ["len"]=>
   int(11)
+  ["precision"]=>
+  int(0)
+}
+array(4) {
   ["pdo_type"]=>
   int(2)
-}
-array(16) {
-  ["type"]=>
-  string(7) "integer"
   ["name"]=>
   string(10) "event_code"
-  ["table"]=>
-  string(11) "public.game"
-  ["def"]=>
-  string(4) "NULL"
-  ["precision"]=>
-  int(10)
-  ["scale"]=>
-  int(0)
-  ["not_null"]=>
-  int(1)
-  ["auto_increment"]=>
-  int(0)
-  ["unique_key"]=>
-  int(1)
-  ["multiple_key"]=>
-  int(0)
-  ["primary_key"]=>
-  int(1)
-  ["foreign_key"]=>
-  int(1)
-  ["reverse_index"]=>
-  int(0)
-  ["reverse_unique"]=>
-  int(0)
   ["len"]=>
   int(11)
+  ["precision"]=>
+  int(0)
+}
+array(4) {
   ["pdo_type"]=>
   int(2)
-}
-array(16) {
-  ["type"]=>
-  string(7) "char(3)"
   ["name"]=>
   string(11) "nation_code"
-  ["table"]=>
-  string(11) "public.game"
-  ["def"]=>
-  string(4) "NULL"
-  ["precision"]=>
-  int(3)
-  ["scale"]=>
-  int(0)
-  ["not_null"]=>
-  int(0)
-  ["auto_increment"]=>
-  int(0)
-  ["unique_key"]=>
-  int(0)
-  ["multiple_key"]=>
-  int(1)
-  ["primary_key"]=>
-  int(0)
-  ["foreign_key"]=>
-  int(0)
-  ["reverse_index"]=>
-  int(0)
-  ["reverse_unique"]=>
-  int(0)
   ["len"]=>
   int(3)
+  ["precision"]=>
+  int(0)
+}
+array(4) {
   ["pdo_type"]=>
   int(2)
-}
-array(16) {
-  ["type"]=>
-  string(4) "date"
   ["name"]=>
   string(9) "game_date"
-  ["table"]=>
-  string(11) "public.game"
-  ["def"]=>
-  string(4) "NULL"
-  ["precision"]=>
-  int(10)
-  ["scale"]=>
-  int(0)
-  ["not_null"]=>
-  int(0)
-  ["auto_increment"]=>
-  int(0)
-  ["unique_key"]=>
-  int(0)
-  ["multiple_key"]=>
-  int(1)
-  ["primary_key"]=>
-  int(0)
-  ["foreign_key"]=>
-  int(0)
-  ["reverse_index"]=>
-  int(0)
-  ["reverse_unique"]=>
-  int(0)
   ["len"]=>
   int(10)
-  ["pdo_type"]=>
-  int(2)
+  ["precision"]=>
+  int(0)
 }

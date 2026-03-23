@@ -8,12 +8,8 @@ PDOTest::skip();
 
 /*
  * Note well: meta information is a nightmare to handle portably.
- * it's not really PDOs job.
- * We've not yet defined exactly what makes sense for getColumnMeta,
- * so no tests make any sense to anyone.  When they do, we can enable
- * this test file.
- * TODO: filter out driver dependent components from this common core
- * test file.
+ * PDO_ODBC (unixODBC + CUBRID ODBC) exposes a small subset via getColumnMeta()
+ * (pdo_type, name, len, precision). Native cubrid-pdo fills many more keys; see upstream tests_74.
  */
 ?>
 --FILE--
@@ -56,140 +52,44 @@ var_dump($meta);
 
 ?>
 --EXPECT--
-array(16) {
-  ["type"]=>
-  string(7) "integer"
+array(4) {
+  ["pdo_type"]=>
+  int(2)
   ["name"]=>
   string(2) "id"
-  ["table"]=>
-  string(15) "dba.cubrid_test"
-  ["def"]=>
-  string(4) "NULL"
-  ["precision"]=>
-  int(10)
-  ["scale"]=>
-  int(0)
-  ["not_null"]=>
-  int(1)
-  ["auto_increment"]=>
-  int(0)
-  ["unique_key"]=>
-  int(1)
-  ["multiple_key"]=>
-  int(0)
-  ["primary_key"]=>
-  int(1)
-  ["foreign_key"]=>
-  int(0)
-  ["reverse_index"]=>
-  int(0)
-  ["reverse_unique"]=>
-  int(0)
   ["len"]=>
   int(11)
+  ["precision"]=>
+  int(0)
+}
+array(4) {
   ["pdo_type"]=>
   int(2)
-}
-array(16) {
-  ["type"]=>
-  string(11) "varchar(10)"
   ["name"]=>
   string(3) "val"
-  ["table"]=>
-  string(15) "dba.cubrid_test"
-  ["def"]=>
-  string(4) "NULL"
-  ["precision"]=>
-  int(10)
-  ["scale"]=>
-  int(0)
-  ["not_null"]=>
-  int(0)
-  ["auto_increment"]=>
-  int(0)
-  ["unique_key"]=>
-  int(0)
-  ["multiple_key"]=>
-  int(1)
-  ["primary_key"]=>
-  int(0)
-  ["foreign_key"]=>
-  int(0)
-  ["reverse_index"]=>
-  int(0)
-  ["reverse_unique"]=>
-  int(0)
   ["len"]=>
   int(10)
+  ["precision"]=>
+  int(0)
+}
+array(4) {
   ["pdo_type"]=>
   int(2)
-}
-array(16) {
-  ["type"]=>
-  string(11) "varchar(16)"
   ["name"]=>
   string(4) "val2"
-  ["table"]=>
-  string(15) "dba.cubrid_test"
-  ["def"]=>
-  string(4) "NULL"
-  ["precision"]=>
-  int(16)
-  ["scale"]=>
-  int(0)
-  ["not_null"]=>
-  int(0)
-  ["auto_increment"]=>
-  int(0)
-  ["unique_key"]=>
-  int(0)
-  ["multiple_key"]=>
-  int(1)
-  ["primary_key"]=>
-  int(0)
-  ["foreign_key"]=>
-  int(0)
-  ["reverse_index"]=>
-  int(0)
-  ["reverse_unique"]=>
-  int(0)
   ["len"]=>
   int(16)
+  ["precision"]=>
+  int(0)
+}
+array(4) {
   ["pdo_type"]=>
   int(2)
-}
-array(16) {
-  ["type"]=>
-  string(6) "bigint"
   ["name"]=>
   string(8) "count(*)"
-  ["table"]=>
-  string(0) ""
-  ["def"]=>
-  string(0) ""
-  ["precision"]=>
-  int(19)
-  ["scale"]=>
-  int(0)
-  ["not_null"]=>
-  int(0)
-  ["auto_increment"]=>
-  int(0)
-  ["unique_key"]=>
-  int(0)
-  ["multiple_key"]=>
-  int(1)
-  ["primary_key"]=>
-  int(0)
-  ["foreign_key"]=>
-  int(0)
-  ["reverse_index"]=>
-  int(0)
-  ["reverse_unique"]=>
-  int(0)
   ["len"]=>
   int(20)
-  ["pdo_type"]=>
-  int(2)
+  ["precision"]=>
+  int(0)
 }
 

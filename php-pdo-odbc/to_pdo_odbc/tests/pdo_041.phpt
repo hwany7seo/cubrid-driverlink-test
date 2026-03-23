@@ -4,7 +4,15 @@ PDO::lastInsertId
 <?php
 if (!extension_loaded("pdo")) die("skip");
 require_once 'pdo_test.inc';
-PDOTest::skip();
+try {
+	$db = PDOTest::factory();
+} catch (PDOException $e) {
+	die('skip ' . $e->getMessage());
+}
+if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'odbc') {
+	die('skip not supported: PDO::lastInsertId() — CUBRID ODBC does not support this API (SQLGetStmtAttr/SQL_LAST_INSERT_ID / IM001)');
+}
+unset($db);
 ?>
 --FILE--
 <?php

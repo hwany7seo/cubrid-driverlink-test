@@ -14,16 +14,16 @@ $db = PDOTest::factory();
 $db->exec("drop table if exists cubrid_test");
 $db->exec("create table cubrid_test (a enum('enum_a', 'enum_b', 'enum_c'))");
 
-# Insert
+# Insert (PDO_ODBC: use ENUM member strings — native PDO may map PARAM_INT ordinal; ODBC does not.)
 $stmt = $db->prepare('insert into cubrid_test values(:a)');
-$stmt->bindParam(':a', $name, PDO::PARAM_STR, 0, 'ENUM');
+$stmt->bindParam(':a', $name, PDO::PARAM_STR);
 $name = 'enum_a';
 $stmt->execute();
 
 $stmt->bindValue(':a', 'enum_b', PDO::PARAM_STR);
 $stmt->execute();
 
-$stmt->bindValue(':a', 3, PDO::PARAM_INT);
+$stmt->bindValue(':a', 'enum_c', PDO::PARAM_STR);
 $stmt->execute();
 
 
@@ -39,7 +39,7 @@ var_dump($stmt->fetchAll());
 
 $stmt = $db->prepare('select a FROM cubrid_test where a=:val');
 $val = '';
-$stmt->bindParam(':val', $val, PDO::PARAM_STR, 0, 'ENUM');
+$stmt->bindParam(':val', $val, PDO::PARAM_STR);
 $val = 'enum_c';
 var_dump($stmt->execute());
 var_dump($stmt->fetchAll());
@@ -95,38 +95,14 @@ array(1) {
     string(6) "enum_c"
   }
 }
-array(16) {
-  ["type"]=>
-  string(4) "enum"
-  ["name"]=>
-  string(1) "a"
-  ["table"]=>
-  string(15) "dba.cubrid_test"
-  ["def"]=>
-  string(4) "NULL"
-  ["precision"]=>
-  int(0)
-  ["scale"]=>
-  int(0)
-  ["not_null"]=>
-  int(0)
-  ["auto_increment"]=>
-  int(0)
-  ["unique_key"]=>
-  int(0)
-  ["multiple_key"]=>
-  int(1)
-  ["primary_key"]=>
-  int(0)
-  ["foreign_key"]=>
-  int(0)
-  ["reverse_index"]=>
-  int(0)
-  ["reverse_unique"]=>
-  int(0)
-  ["len"]=>
-  int(0)
+array(4) {
   ["pdo_type"]=>
   int(2)
+  ["name"]=>
+  string(1) "a"
+  ["len"]=>
+  int(1073741823)
+  ["precision"]=>
+  int(0)
 }
 
