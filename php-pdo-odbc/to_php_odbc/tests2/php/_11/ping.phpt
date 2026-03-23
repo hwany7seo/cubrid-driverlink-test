@@ -1,0 +1,47 @@
+--TEST--
+cubrid_ping
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
+?>
+--FILE--
+<?php
+include_once "connect.inc";
+
+$tmp    = NULL;
+$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+
+if (!is_null($tmp = @cubrid_ping($conn, $conn)))
+	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+
+var_dump(cubrid_ping($conn));
+
+// provoke an error to check if cubrid_ping resets it
+$res = cubrid_query('SELECT * FROM unknown_table', $conn);
+if (!($errno = odbc_error($conn)))
+	printf("[002] Statement should have caused an error\n");
+
+var_dump(cubrid_ping($conn));
+
+if ($errno === odbc_error($conn))
+	printf("[003] Error codes should have been reset\n");
+
+var_dump(cubrid_ping());
+odbc_close($conn);
+
+if (false !== ($tmp = cubrid_ping($conn)))
+	printf("[004] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+
+print "done!";
+?>
+--CLEAN--
+--EXPECTF--
+bool(true)
+
+Warning: Error: DBMS, -493, Syntax: Unknown class "dba.unknown_table". select * from [dba.unknown_table]%s in %s on line %d
+bool(true)
+bool(true)
+
+Warning: cubrid_ping(): supplied resource is not a valid CUBRID Connect resource in %s on line %d
+done!

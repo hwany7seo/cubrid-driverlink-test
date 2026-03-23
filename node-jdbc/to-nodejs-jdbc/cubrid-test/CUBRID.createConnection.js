@@ -12,7 +12,7 @@ describe('CUBRID', function () {
       // default config: localhost, 33000, dba, ''
       
       const config = {
-          hosts: ['192.168.2.32'],
+          hosts: ['test-db-server'],
           port: 33000,
           user: 'dba',
           password: '',
@@ -113,7 +113,7 @@ describe('CUBRID', function () {
 
     it('should auto connect to the second host when the first host is down', function () {
       const config = {
-          hosts: ['192.168.2.32'],
+          hosts: ['test-db-server'],
           port: 33000,
           user: 'dba',
           password: '',
@@ -167,7 +167,7 @@ describe('CUBRID', function () {
 
     it('should auto connect to the second host when custom port is contained in hosts and first host is down', function () {
       const config = {
-          hosts: ['192.168.2.32'],
+          hosts: ['test-db-server'],
           port: 33000,
           user: 'dba',
           password: '',
@@ -175,7 +175,7 @@ describe('CUBRID', function () {
       };
 
       const client = CUBRID.createConnection({
-        hosts: ['192.168.2.254'].concat('192.168.2.32:33000'),
+        hosts: ['192.168.2.254'].concat('test-db-server:33000'),
         port: config.port, // This is fallback/default port
         user: config.user,
         password: config.password,

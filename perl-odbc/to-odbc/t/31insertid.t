@@ -51,7 +51,7 @@ sub internal_last_insert_id {
 
 # last_insert_id is driver dependent. 
 # ODBC might support it if the driver does. 
-# CUBRID ODBC driver support for SQLGetInfo(SQL_LAST_INSERT_ID_SQL) or similar needs check
+# CUBRID_ODBC_Unicode support for SQLGetInfo(SQL_LAST_INSERT_ID_SQL) or similar needs check
 # Or explicit query "SELECT LAST_INSERT_ID()"
 # Standard DBI way:
 # my $insert_id = $dbh->last_insert_id(undef, undef, $table, undef);

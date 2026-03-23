@@ -28,7 +28,7 @@ if (!isJvmCreated()) {
 }
 
 const config = {
-    url: 'jdbc:cubrid:192.168.2.32:33000:demodb:dba::?charSet=utf-8',
+    url: 'jdbc:cubrid:test-db-server:33000:demodb:dba::?charSet=utf-8',
     drivername: 'cubrid.jdbc.driver.CUBRIDDriver',
     minpoolsize: 1,
     maxpoolsize: 5,
@@ -481,7 +481,7 @@ export function createCUBRIDConnection(hosts, port, user, password, database) {
     if (typeof hosts === 'object' && !Array.isArray(hosts)) {
         const options = hosts;
         cfg = {
-            hosts: Array.isArray(options.hosts) ? options.hosts : (options.host ? (Array.isArray(options.host) ? options.host : [options.host]) : ['192.168.2.32']),
+            hosts: Array.isArray(options.hosts) ? options.hosts : (options.host ? (Array.isArray(options.host) ? options.host : [options.host]) : ['test-db-server']),
             port: options.port || 33000,
             user: options.user || 'public',
             password: options.password || '',
@@ -491,7 +491,7 @@ export function createCUBRIDConnection(hosts, port, user, password, database) {
         };
     } else {
         cfg = {
-            hosts: Array.isArray(hosts) ? hosts : [hosts || '192.168.2.32'],
+            hosts: Array.isArray(hosts) ? hosts : [hosts || 'test-db-server'],
             port: port || 33000,
             user: user || 'public',
             password: password || '',

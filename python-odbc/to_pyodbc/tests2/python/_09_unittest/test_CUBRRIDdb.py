@@ -1,4 +1,4 @@
-"""DB-API 2.0 compliance tests for pyodbc with CUBRID ODBC driver.
+"""DB-API 2.0 compliance tests for pyodbc with CUBRID_ODBC_Unicode.
 
 Unsupported features: use pass with docstring for description to show in output.
 Example:
@@ -21,7 +21,7 @@ class DBAPI20Test(unittest.TestCase):
     port = ports[0].childNodes[0].toxml()
     dbnames = xmlt.childNodes[0].getElementsByTagName('dbname')
     dbname = dbnames[0].childNodes[0].toxml()
-    conStr = "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
+    conStr = "DRIVER={CUBRID_ODBC_Unicode};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
     connect_args = (conStr,)
     connect_kw_args = {}
     table_prefix = 'dbapi20test_'

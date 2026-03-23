@@ -1,0 +1,24 @@
+
+---- EXPECTED OUTPUT
+object(PDOStatement)#%d (1) {
+  ["queryString"]=>
+  NULL
+}
+
+Fatal error: Uncaught PDOException: You may not create a PDORow manually in %s
+Stack trace:
+#0 %s ReflectionClass->newInstance()
+#1 {main}
+  thrown in %s on line %d
+---- ACTUAL OUTPUT
+object(PDOStatement)#2 (0) {
+  ["queryString"]=>
+  uninitialized(string)
+}
+
+Fatal error: Uncaught PDOException: You may not create a PDORow manually in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_pdo_odbc/tests/pdo_036.php:6
+Stack trace:
+#0 /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_pdo_odbc/tests/pdo_036.php(6): ReflectionClass->newInstance()
+#1 {main}
+  thrown in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_pdo_odbc/tests/pdo_036.php on line 6
+---- FAILED

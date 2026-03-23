@@ -18,7 +18,7 @@ class CUBRIDPythonDBITest(unittest.TestCase):
                 port = ports[0].childNodes[0].toxml()
                 dbnames = xmlt.childNodes[0].getElementsByTagName('dbname')
                 dbname = dbnames[0].childNodes[0].toxml()
-                conStr = "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
+                conStr = "DRIVER={CUBRID_ODBC_Unicode};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
                 return conStr
         def test_connect(self):
                 print("01. Common connection")
@@ -34,7 +34,6 @@ class CUBRIDPythonDBITest(unittest.TestCase):
                 print("\n02. Connection with autocommit property")
                 conStr = self.getConStr()
                 self.con=pyodbc.connect(conStr)
-                #self.con=pyodbc.connect('DRIVER={CUBRID ODBC Driver};SERVER=192.168.2.32;PORT=33000;UID=dba;PWD=;DB_NAME=demodb')
                 self.c=self.con.cursor()
                 self.c.execute("select * from db_class limit 5;")
                 row=self.c.fetchone()

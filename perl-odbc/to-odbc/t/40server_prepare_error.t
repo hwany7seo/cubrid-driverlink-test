@@ -16,7 +16,7 @@ use vars qw($test_dsn $test_user $test_passwd);
 
 # ODBC might not support mysql_server_prepare param. 
 # This test seems MySQL specific (mysql_server_prepare).
-# CUBRID ODBC driver handles preparation.
+# CUBRID_ODBC_Unicode handles preparation.
 # $test_dsn .= ";mysql_server_prepare=1";
 
 my $dbh;

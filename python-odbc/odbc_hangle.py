@@ -4,7 +4,7 @@ import time
 class ODBC:
 
     insert_count = 5
-    dsn = "CUBRID Driver Unicode"
+    dsn = "CUBRID_Unicode"
     uid = "dba"
     pwd = ""
 

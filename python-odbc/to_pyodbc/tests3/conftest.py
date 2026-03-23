@@ -17,7 +17,7 @@ def _get_connect_args():
     dbname = "demodb"
     user = "dba"
     password = ""
-    return "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
+    return "DRIVER={CUBRID_ODBC_Unicode};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
 
 @pytest.fixture
 def cubrid_connection():

@@ -3,7 +3,7 @@ require 'odbc'
 
 class CUBRID_Test < Test::Unit::TestCase
   def setup
-    @con = ODBC.connect('CUBRID Driver', 'dba', '')
+    @con = ODBC.connect('CUBRID_Unicode', 'dba', '')
   end
 
   def test_connect

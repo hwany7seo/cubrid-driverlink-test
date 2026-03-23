@@ -1,0 +1,5 @@
+Fatal error: Uncaught TypeError: PDO::ATTR_STATEMENT_CLASS value must be of type array, null given in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_pdo_odbc/tests/bug_44159.php:7
+Stack trace:
+#0 /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_pdo_odbc/tests/bug_44159.php(7): PDO->setAttribute()
+#1 {main}
+  thrown in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_pdo_odbc/tests/bug_44159.php on line 7

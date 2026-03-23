@@ -1,0 +1,25 @@
+
+---- EXPECTED OUTPUT
+Warning: PDO::setAttribute(): SQLSTATE[HY000]: General error: PDO::ATTR_STATEMENT_CLASS requires format array(classname, array(ctor_args)); the classname must be a string specifying an existing class in %s on line %d
+bool(false)
+
+Warning: PDO::setAttribute(): SQLSTATE[HY000]: General error: PDO::ATTR_STATEMENT_CLASS requires format array(classname, array(ctor_args)); the classname must be a string specifying an existing class in %s on line %d
+bool(false)
+
+Warning: PDO::setAttribute(): SQLSTATE[HY000]: General error: PDO::ATTR_STATEMENT_CLASS requires format array(classname, array(ctor_args)); the classname must be a string specifying an existing class in %s on line %d
+bool(false)
+
+Warning: PDO::setAttribute(): SQLSTATE[HY000]: General error: attribute value must be an integer in %s on line %d
+bool(false)
+bool(true)
+bool(true)
+bool(true)
+bool(true)
+bool(true)
+---- ACTUAL OUTPUT
+Fatal error: Uncaught TypeError: PDO::ATTR_STATEMENT_CLASS value must be of type array, null given in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_pdo_odbc/tests/bug_44159.php:7
+Stack trace:
+#0 /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_pdo_odbc/tests/bug_44159.php(7): PDO->setAttribute()
+#1 {main}
+  thrown in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_pdo_odbc/tests/bug_44159.php on line 7
+---- FAILED

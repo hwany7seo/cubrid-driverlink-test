@@ -25,7 +25,7 @@ $mysql_db           = $ENV{MYSQL_TEST_DATABASE} || 'testdb';
 $table_unqualified  = 'test_cubrid';
 $table              = "$table_unqualified";
 
-my $server = $ENV{MYSQL_TEST_SERVER} || '192.168.2.32';
+my $server = $ENV{MYSQL_TEST_SERVER} || 'test-db-server';
 my $port   = $ENV{MYSQL_TEST_PORT}   || '3306';
 
 # Full ODBC connection string (no odbc.ini DSN entry required).

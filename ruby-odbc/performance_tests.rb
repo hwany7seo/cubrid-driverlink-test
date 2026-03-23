@@ -13,8 +13,8 @@ unless defined?(Fixnum)
   Fixnum = Integer
 end 
 
-dsn = 'CUBRID Driver Unicode'
-dbi_dsn = 'DBI:ODBC:CUBRID Driver Unicode'
+dsn = 'CUBRID_Unicode'
+dbi_dsn = 'DBI:ODBC:CUBRID_Unicode'
 user = 'dba'
 password = ''
 

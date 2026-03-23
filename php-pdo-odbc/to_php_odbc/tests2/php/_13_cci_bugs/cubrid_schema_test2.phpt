@@ -1,0 +1,121 @@
+--TEST--
+cubrid_bind
+--SKIPIF--
+<?php
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
+?>
+--FILE--
+<?php
+include "connect.inc";
+$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+odbc_exec($conn,"drop table if EXISTS tb;");
+odbc_exec($conn,"CREATE TABLE tb(id int, phone VARCHAR(10),address string);");
+odbc_exec($conn,"create reverse unique index rever_unique_tb on tb(id)");
+odbc_exec($conn,"create reverse index reverse_tb on tb(phone)");
+odbc_exec($conn,"create unique index unique_tb on tb(address)");
+odbc_exec($conn,"insert into tb(id, phone, address) values(1,'1111-11-11','changping')");
+$schema = cubrid_schema($conn,CUBRID_SCH_ATTRIBUTE,"tb");
+var_dump($schema);
+
+odbc_close($conn);
+print "Finished!\n";
+?>
+--CLEAN--
+--EXPECTF--
+array(3) {
+  [0]=>
+  array(14) {
+    ["ATTR_NAME"]=>
+    string(2) "id"
+    ["DOMAIN"]=>
+    string(1) "8"
+    ["SCALE"]=>
+    string(1) "0"
+    ["PRECISION"]=>
+    string(2) "10"
+    ["INDEXED"]=>
+    string(1) "1"
+    ["NON_NULL"]=>
+    string(1) "0"
+    ["SHARED"]=>
+    string(1) "0"
+    ["UNIQUE"]=>
+    string(1) "1"
+    ["DEFAULT"]=>
+    string(4) "NULL"
+    ["ATTR_ORDER"]=>
+    string(1) "1"
+    ["CLASS_NAME"]=>
+    string(6) "dba.tb"
+    ["SOURCE_CLASS"]=>
+    string(6) "dba.tb"
+    ["IS_KEY"]=>
+    string(1) "0"
+    ["REMARKS"]=>
+    string(0) ""
+  }
+  [1]=>
+  array(14) {
+    ["ATTR_NAME"]=>
+    string(5) "phone"
+    ["DOMAIN"]=>
+    string(1) "2"
+    ["SCALE"]=>
+    string(1) "0"
+    ["PRECISION"]=>
+    string(2) "10"
+    ["INDEXED"]=>
+    string(1) "1"
+    ["NON_NULL"]=>
+    string(1) "0"
+    ["SHARED"]=>
+    string(1) "0"
+    ["UNIQUE"]=>
+    string(1) "0"
+    ["DEFAULT"]=>
+    string(4) "NULL"
+    ["ATTR_ORDER"]=>
+    string(1) "2"
+    ["CLASS_NAME"]=>
+    string(6) "dba.tb"
+    ["SOURCE_CLASS"]=>
+    string(6) "dba.tb"
+    ["IS_KEY"]=>
+    string(1) "0"
+    ["REMARKS"]=>
+    string(0) ""
+  }
+  [2]=>
+  array(14) {
+    ["ATTR_NAME"]=>
+    string(7) "address"
+    ["DOMAIN"]=>
+    string(1) "2"
+    ["SCALE"]=>
+    string(1) "0"
+    ["PRECISION"]=>
+    string(10) "1073741823"
+    ["INDEXED"]=>
+    string(1) "1"
+    ["NON_NULL"]=>
+    string(1) "0"
+    ["SHARED"]=>
+    string(1) "0"
+    ["UNIQUE"]=>
+    string(1) "1"
+    ["DEFAULT"]=>
+    string(4) "NULL"
+    ["ATTR_ORDER"]=>
+    string(1) "3"
+    ["CLASS_NAME"]=>
+    string(6) "dba.tb"
+    ["SOURCE_CLASS"]=>
+    string(6) "dba.tb"
+    ["IS_KEY"]=>
+    string(1) "0"
+    ["REMARKS"]=>
+    string(0) ""
+  }
+}
+Finished!

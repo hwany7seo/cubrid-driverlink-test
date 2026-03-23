@@ -8,8 +8,8 @@ import (
 	_ "github.com/alexbrainman/odbc"
 )
 
-const cubrid_dns = "DSN=CUBRID Driver;UID=dba;PWD=;"
-const cubrid_unicode_dns = "DSN=CUBRID Driver Unicode;UID=dba;PWD=;"
+const cubrid_dns = "DSN=CUBRID_ANCI;UID=dba;PWD=;"
+const cubrid_unicode_dns = "DSN=CUBRID_Unicode;UID=dba;PWD=;"
 
 func main() {
 	db, err := sql.Open("odbc", cubrid_unicode_dns)
@@ -83,7 +83,7 @@ func create_table_and_insert_data(db *sql.DB) {
 	}
 
 	// Insert data using literals for BIT and functions for BLOB/CLOB.
-	// Note: h_set is set to NULL because CUBRID ODBC driver interprets '{...}' literals as escape sequences,
+	// Note: h_set is set to NULL because CUBRID_ODBC_Unicode interprets '{...}' literals as escape sequences,
 	// and parameter binding for SET columns may not be fully supported in this environment.
 	insertQueries := []string{
 		"INSERT INTO tbl_go (id, a_bit, b_vbit, c_num, d_float, e_double, f_date, g_time, g_timest, h_set, i_bigint, j_datetm, k_blob, l_clob) VALUES (1, B'1', B'1', 1.0, 1.0, 1.0, '2026-01-01', '12:00:00', '2026-01-01 12:00:00', NULL, 1, '2026-01-01 12:00:00', CHAR_TO_BLOB('blob'), CHAR_TO_CLOB('clob'))",

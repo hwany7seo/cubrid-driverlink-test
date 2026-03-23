@@ -38,7 +38,7 @@ ok ($sth = $dbh->prepare("SELECT * FROM $table WHERE id = 1"));
 ok $sth->execute;
 
 # $sth->rows is not reliable for SELECT in some drivers/DBs (incl ODBC sometimes)
-# But let's check it. CUBRID ODBC driver might return correct count if cursor type allows or after fetch.
+# But let's check it. CUBRID_ODBC_Unicode might return correct count if cursor type allows or after fetch.
 # DBI spec says rows() for SELECT is unknown (-1) until fetch, or driver dependent.
 # If it fails, we might need to change test or note it.
 # is $sth->rows, 1, '$sth->rows should be 1';

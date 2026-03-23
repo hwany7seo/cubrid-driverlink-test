@@ -4,7 +4,7 @@ import time
 class ODBC:
 
     insert_count = 5
-    driver = "CUBRID ODBC Driver Unicode"
+    driver = "CUBRID_ODBC_Unicode"
     server = "test-db-server"
     port = 33000
     uid = "dba"

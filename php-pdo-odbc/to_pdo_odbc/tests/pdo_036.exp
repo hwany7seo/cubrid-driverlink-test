@@ -1,0 +1,10 @@
+object(PDOStatement)#%d (1) {
+  ["queryString"]=>
+  NULL
+}
+
+Fatal error: Uncaught PDOException: You may not create a PDORow manually in %s
+Stack trace:
+#0 %s ReflectionClass->newInstance()
+#1 {main}
+  thrown in %s on line %d

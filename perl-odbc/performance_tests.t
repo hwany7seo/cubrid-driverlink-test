@@ -13,7 +13,7 @@ use Config::Simple;
 my $test_count = 10;
 my $iteration_count = 1;
 
-my $dsn = 'DBI:ODBC:CUBRID Driver';
+my $dsn = 'DBI:ODBC:CUBRID_ANCI';
 my $user = $ENV{DB_USER} || "dba";
 my $password = $ENV{DB_PASSWORD} || "";
 

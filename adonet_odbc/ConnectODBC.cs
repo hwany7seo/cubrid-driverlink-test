@@ -28,7 +28,7 @@ namespace adonet_test
         public OdbcConnection ODBC_Connect()
         {
             Console.WriteLine("ODBC_Connect");
-            string connectionString = "Driver={CUBRID Driver};server=192.168.2.32;port=33000;uid=dba;pwd=;db_name=demodb;charset=utf-8;autocommit=0;";
+            string connectionString = "Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;db_name=demodb;charset=utf-8;autocommit=0;";
             OdbcConnection conn = new OdbcConnection(connectionString);
             conn.Open();
             Console.WriteLine("ODBC_Connect success");

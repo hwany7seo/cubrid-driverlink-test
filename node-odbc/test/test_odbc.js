@@ -7,7 +7,7 @@ import {expect} from "chai";
 const stressLoad = 5
 
 // Define your database connection details
-// const connectionString = "driver={CUBRID Driver};server=192.168.2.32;port=33000;uid=dba;pwd=;db_name=demodb;"
+// const connectionString = "driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;db_name=demodb;"
 const connectionString = "DSN=CUBRID Driver;UID=dba;PWD=;DBNAME=demodb;"
 
 let connection;

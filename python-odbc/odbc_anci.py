@@ -4,7 +4,7 @@ import time
 class ODBC:
 
     insert_count = 10
-    dsn = "CUBRID Driver"
+    dsn = "CUBRID_ANCI"
     uid = "dba"
     pwd = ""
     # dsn = "MYSQL Driver"
@@ -21,8 +21,8 @@ class ODBC:
         self.conn = pyodbc.connect(
             DSN=self.dsn, 
             UID=self.uid, 
-            PWD=self.pwd
-            # charset="utf-8"
+            PWD=self.pwd,
+            charset="utf-8"
         )
         self.conn.autocommit = False
         print("Database connected successfully", flush=True)

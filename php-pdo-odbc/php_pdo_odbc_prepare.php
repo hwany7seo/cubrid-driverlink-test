@@ -1,5 +1,5 @@
 <?php
-// $dsn = 'odbc:Driver={CUBRID_Unicode};db_name=demodb;server=192.168.2.32;port=33000';
+// $dsn = 'odbc:Driver={CUBRID_Unicode};db_name=demodb;server=test-db-server;port=33000';
 $dsn = 'odbc:CUBRID Driver';
 $username = 'dba';
 $password = '';

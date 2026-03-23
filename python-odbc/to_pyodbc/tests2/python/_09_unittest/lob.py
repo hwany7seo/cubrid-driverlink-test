@@ -25,7 +25,7 @@ class CubridTest(unittest.TestCase):
         port = ports[0].childNodes[0].toxml()
         dbnames = xmlt.childNodes[0].getElementsByTagName('dbname')
         dbname = dbnames[0].childNodes[0].toxml()
-        conStr = "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
+        conStr = "DRIVER={CUBRID_ODBC_Unicode};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
         con = pyodbc.connect(conStr)
         cur = con.cursor()
         
@@ -41,7 +41,7 @@ class CubridTest(unittest.TestCase):
 
             try:
             #    SQL_BLOB = -107
-            #    cur.setinputsizes([(SQL_BLOB, len(img_data), 0)]) // not supported in cubrid odbc driver
+            #    cur.setinputsizes([(SQL_BLOB, len(img_data), 0)]) // not supported in CUBRID_ODBC_Unicode
                 cur.execute("insert into lob_tb (image) values (?)", (pyodbc.Binary(img_data),))
                 con.commit()
                 

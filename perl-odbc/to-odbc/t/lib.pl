@@ -27,7 +27,7 @@ $dbdriver = $mdriver;
 #   DSN being used; do not edit this, edit "$dbdriver.dbtest" instead
 #
 
-$test_dsn = 'DBI:ODBC:CUBRID Driver';
+$test_dsn = 'DBI:ODBC:CUBRID_ANCI';
 $test_user = $ENV{DB_USER} || "dba";
 $test_passwd = $ENV{DB_PASSWORD} || "";
 

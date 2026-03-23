@@ -60,7 +60,7 @@ def getConStr():
     port = _xml_text(root.getElementsByTagName("port")[0])
     dbname = _xml_text(root.getElementsByTagName("perfdb")[0])
     return (
-        "DRIVER={CUBRID ODBC Driver};SERVER="
+        "DRIVER={CUBRID_ODBC_Unicode};SERVER="
         + ip
         + ";PORT="
         + port

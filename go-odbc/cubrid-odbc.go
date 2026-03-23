@@ -10,10 +10,10 @@ import (
 )
 
 const insert_count = 10
-const cubrid_dns = "DSN=CUBRID Driver;UID=dba;PWD=;"
-const cubrid_unicode_dns = "DSN=CUBRID Driver Unicode;UID=dba;PWD=;"
+const cubrid_dns = "DSN=CUBRID_ANCI;UID=dba;PWD=;"
+const cubrid_unicode_dns = "DSN=CUBRID_Unicode;UID=dba;PWD=;"
 const mysql_dns = "DSN=MYSQL Driver;UID=hwanyseo;PWD=Cubrid123!@#;"
-const cubrid_driver = "Driver={CUBRID Driver Unicode};server=localhost;port=33000;uid=dba;pwd=;db_name=demodb;charset=utf-8;autocommit=0;"
+const cubrid_driver = "Driver={CUBRID_ODBC_Unicode};server=test-db-server;port=33000;uid=dba;pwd=;db_name=demodb;charset=utf-8;autocommit=0;"
 
 func main() {
 	db, err := sql.Open("odbc", cubrid_unicode_dns)

@@ -43,7 +43,7 @@ class DBAPI20Test(unittest.TestCase):
     ip = _cfg_text(xmlt, 'ip')
     port = _cfg_text(xmlt, 'port')
     dbname = _cfg_text(xmlt, 'dbname')
-    conStr = "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
+    conStr = "DRIVER={CUBRID_ODBC_Unicode};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
     user = 'dba'
     password = ''
     charset = 'utf8'

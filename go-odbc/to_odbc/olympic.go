@@ -8,8 +8,8 @@ import (
 	_ "github.com/alexbrainman/odbc"
 )
 
-const cubrid_dns = "DSN=CUBRID Driver;UID=dba;PWD=;"
-const cubrid_unicode_dns = "DSN=CUBRID Driver Unicode;UID=dba;PWD=;"
+const cubrid_dns = "DSN=CUBRID_ANCI;UID=dba;PWD=;"
+const cubrid_unicode_dns = "DSN=CUBRID_Unicode;UID=dba;PWD=;"
 
 func main() {
 	db, err := sql.Open("odbc", cubrid_unicode_dns)

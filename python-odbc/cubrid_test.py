@@ -1,5 +1,5 @@
 """
-pytest unit tests for CUBRID.  Uses a DNS name 'CUBRID Driver Unicode' and uses UTF-8
+pytest unit tests for CUBRID.  Uses a DNS name 'CUBRID_ODBC_Unicode' and uses UTF-8
 """
 # -*- coding: utf-8 -*-
 
@@ -12,7 +12,7 @@ from typing import Iterator
 import pyodbc, pytest
 
 
-CNXNSTR = os.environ.get('PYODBC_CUBRID', 'DSN=CUBRID Driver Unicode;charset=utf-8')
+CNXNSTR = os.environ.get('PYODBC_CUBRID', 'DSN=CUBRIDUnicode;charset=utf-8')
 
 
 def connect(autocommit=False, attrs_before=None):

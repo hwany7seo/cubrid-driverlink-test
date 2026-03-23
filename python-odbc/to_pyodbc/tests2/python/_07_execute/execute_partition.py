@@ -13,7 +13,7 @@ class ExecuteNonormalTest(unittest.TestCase):
                 port = ports[0].childNodes[0].toxml()
                 dbnames = xmlt.childNodes[0].getElementsByTagName('dbname')
                 dbname = dbnames[0].childNodes[0].toxml()
-                conStr = "DRIVER={CUBRID ODBC Driver};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
+                conStr = "DRIVER={CUBRID_ODBC_Unicode};SERVER="+ip+";PORT="+port+";UID=dba;PWD=;DB_NAME="+dbname
                 return conStr 
 
 
