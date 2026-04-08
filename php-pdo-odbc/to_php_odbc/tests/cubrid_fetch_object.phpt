@@ -7,78 +7,23 @@ require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
+/**
+ * PHP 8.4 ext/odbc 의 odbc_fetch_object() 는 (statement, ?int $row) 만 지원한다.
+ * mysqli/cubrid-php 스타일의 (stmt, className, ctorArgs) 시그니처는 없다.
+ */
 include_once('connect.inc');
 
-$tmp = NULL;
-$conn = NULL;
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
+cubrid_odbc_set_last_connection($conn);
 
-if (!is_null($tmp = @odbc_fetch_object())) {
-    printf('[001] Expecting NULL, got %s/%s\n', gettype($tmp), $tmp);
-}
-
-if (!is_null($tmp = @odbc_fetch_object($conn))) {
-    printf('[002] Expecting NULL, got %s/%s\n', gettype($tmp), $tmp);
-}
-
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
-
-if (!($res = odbc_exec($conn, "SELECT * FROM code limit 5"))) {
-    printf('[003] [%d] %s\n', odbc_error(), odbc_errormsg());
-    exit(1);
+if (!($res = odbc_exec($conn, "SELECT * FROM code LIMIT 5"))) {
+	printf('[003] [%s] %s\n', odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
 }
 
 var_dump(odbc_fetch_object($res));
-
-class odbc_fetch_object_test {
-    public $s_name = NULL;
-    public $f_name = NULL;
-
-    public function toString() {
-        var_dump($this);
-    }
-}
-
-var_dump(odbc_fetch_object($res, 'odbc_fetch_object_test'));
-
-class odbc_fetch_object_test_construct extends odbc_fetch_object_test {
-	public function __construct($s, $f) {
-		try 
-		{
-			$this->s_name = $s;
-			$this->f_name = $f;
-		}
-		catch(Throwable $t) 
-		{
-		echo $t->getMessage();
-		}
-		catch(Exception $e) 
-		{
-		echo $e;
-		}
-
-	}
-}
-
-//var_dump(odbc_fetch_object($res, 'odbc_fetch_object_test_construct', null));
-//var_dump(odbc_fetch_object($res, 'odbc_fetch_object_test_construct', array('s_name')));
-var_dump(odbc_fetch_object($res, 'odbc_fetch_object_test_construct', array('s_name', 'f_name')));
-var_dump(odbc_fetch_object($res, 'odbc_fetch_object_test_construct', array('s_name', 'f_name', 'x')));
-//var_dump(odbc_fetch_object($res, 'odbc_fetch_object_test_construct', "no array and not null"));
 var_dump(odbc_fetch_object($res));
-var_dump(odbc_fetch_object($res, 'odbc_fetch_object_test_construct', array('s_name', 'f_name')));
-
-class odbc_fetch_object_private_construct {
-
-	private function __construct($s, $f) {
-		var_dump($s);
-	}
-
-}
-
-var_dump(odbc_fetch_object($res, 'odbc_fetch_object_private_construct', array('s_name', 'f_name')));
-
-// Fatal error, script execution will end
-//var_dump(odbc_fetch_object($res, 'this_class_does_not_exist'));
+var_dump(odbc_fetch_object($res));
 
 cubrid_disconnect($conn);
 
@@ -86,37 +31,22 @@ print "done!";
 ?>
 --CLEAN--
 --EXPECTF--
-object(stdClass)#1 (2) {
+object(stdClass)#%d (2) {
   ["s_name"]=>
   string(1) "X"
   ["f_name"]=>
   string(5) "Mixed"
 }
-object(odbc_fetch_object_test)#1 (2) {
+object(stdClass)#%d (2) {
   ["s_name"]=>
   string(1) "W"
   ["f_name"]=>
   string(5) "Woman"
 }
-object(odbc_fetch_object_test_construct)#1 (2) {
+object(stdClass)#%d (2) {
   ["s_name"]=>
-  string(6) "s_name"
+  string(1) "M"
   ["f_name"]=>
-  string(6) "f_name"
+  string(3) "Man"
 }
-object(odbc_fetch_object_test_construct)#1 (2) {
-  ["s_name"]=>
-  string(6) "s_name"
-  ["f_name"]=>
-  string(6) "f_name"
-}
-object(stdClass)#1 (2) {
-  ["s_name"]=>
-  string(1) "S"
-  ["f_name"]=>
-  string(6) "Silver"
-}
-bool(false)
-bool(false)
 done!
-

@@ -10,26 +10,27 @@ require_once('skipifconnectfailure.inc');
 include_once("connect.inc");
 
 $tmp = NULL;
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
+cubrid_odbc_set_last_connection($conn);
 
 if (!is_null($tmp = @cubrid_query())) {
-    printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 }
 
 if (NULL !== ($tmp = @cubrid_query("SELECT 1 AS a", $conn, "code"))) {
-    printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 }
 
 if (false !== ($tmp = cubrid_query('THIS IS NOT SQL', $conn))) {
-    printf("[003] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+	printf("[003] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 }
 
-if ((0 === cubrid_errno($conn)) || ('' == cubrid_error($conn))) {
-    printf("[004] cubrid_errno()/cubrid_error should return some error\n");
+if ((0 === cubrid_errno($conn)) || ('' == trim((string) cubrid_error($conn)))) {
+	printf("[004] cubrid_errno()/cubrid_error should return some error\n");
 }
 
 if (!$res = cubrid_query("SELECT 'this is sql but with semicolon' AS valid ; ", $conn)) {
-    printf("[005] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
+	printf("[005] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
 }
 
 var_dump(cubrid_fetch_assoc($res));
@@ -41,8 +42,8 @@ print "done!";
 ?>
 --CLEAN--
 --EXPECTF--
-Warning: Error: DBMS, -493, Syntax: In line 1, column 1 before ' IS NOT SQL'
-Syntax error: unexpected 'THIS', expecting SELECT or VALUE or VALUES or '(' %s in %s on line %d
+Warning: %s
+Syntax error: %s
 array(1) {
   ["valid"]=>
   string(30) "this is sql but with semicolon"

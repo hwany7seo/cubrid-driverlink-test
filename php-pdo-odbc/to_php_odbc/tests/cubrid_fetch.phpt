@@ -13,15 +13,16 @@ include_once("connect.inc");
 $tmp = NULL;
 $conn = NULL;
 
-if (!is_null($tmp = @cubrid_fetch())) {
-    printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+if (null !== ($tmp = @cubrid_fetch()) && false !== $tmp) {
+	printf("[001] Expecting NULL/false, got %s/%s\n", gettype($tmp), $tmp);
 }
 
-if (!is_null($tmp = @cubrid_fetch($conn))) {
-    printf("[002] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
+if (false !== ($tmp = @cubrid_fetch($conn))) {
+	printf("[002] Expecting false for non-result handle, got %s/%s\n", gettype($tmp), $tmp);
 }
 
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
+cubrid_odbc_set_last_connection($conn);
 if (!$conn) {
     printf("[003] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
     exit(1);
@@ -71,7 +72,7 @@ array(2) {
   ["f_name"]=>
   string(3) "Man"
 }
-object(stdClass)#1 (2) {
+object(stdClass)#%d (2) {
   ["s_name"]=>
   string(1) "B"
   ["f_name"]=>

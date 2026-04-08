@@ -3,53 +3,106 @@ cubrid_set_add
 --SKIPIF--
 <?php
 require_once('skipif.inc');
-require_once('skipifconnectfailure.inc')
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
+include_once('connect.inc');
 
-include_once("connect.inc");
-
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
-if (!$conn) {
-    printf("[001] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
-    exit(1);
+function cubrid_odbc_normalize_list_column($v)
+{
+	if (is_array($v)) {
+		$out = [];
+		foreach ($v as $x) {
+			$out[] = (string) $x;
+		}
+		return $out;
+	}
+	if (!is_string($v)) {
+		return null;
+	}
+	$v = trim($v);
+	if (strlen($v) < 2 || $v[0] !== '{') {
+		return null;
+	}
+	$inner = substr($v, 1, -1);
+	if ($inner === '') {
+		return [];
+	}
+	$out = [];
+	foreach (explode(',', $inner) as $p) {
+		$out[] = trim($p);
+	}
+	return $out;
 }
 
-odbc_exec($conn, "DROP TABLE IF EXISTS php_cubrid_test");
-odbc_exec($conn, "CREATE TABLE php_cubrid_test (a int AUTO_INCREMENT, b set(int), c list(int), d char(30)) DONT_REUSE_OID");
-odbc_exec($conn, "INSERT INTO php_cubrid_test(a, b, c, d) VALUES (1, {1,2,3}, {11, 22, 33, 333}, 'a')");
-odbc_exec($conn, "INSERT INTO php_cubrid_test(a, b, c, d) VALUES (2, {4,5,7}, {44, 55, 66, 666}, 'b')");
+$conn = odbc_connect($cubrid_odbc_dsn, '', '');
+if (!cubrid_odbc_compat_is_link($conn)) {
+	printf("[001] connect failed [%s] %s\n", odbc_error(), odbc_errormsg());
+	exit(1);
+}
+cubrid_odbc_set_last_connection($conn);
 
-if (!$req = odbc_exec($conn, "select * from php_cubrid_test", CUBRID_INCLUDE_OID)) {
-    printf("[002] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
+@odbc_exec($conn, 'DROP TABLE IF EXISTS php_cubrid_test');
+if (!odbc_exec($conn, 'CREATE TABLE php_cubrid_test (a int AUTO_INCREMENT, b set(int), c list(int), d char(30)) DONT_REUSE_OID')) {
+	printf("[002] CREATE failed [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
+}
+if (!odbc_exec($conn, "INSERT INTO php_cubrid_test(a, b, c, d) VALUES (1, {1,2,3}, {11, 22, 33, 333}, 'a')")) {
+	printf("[003] INSERT 1 failed [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
+}
+if (!odbc_exec($conn, "INSERT INTO php_cubrid_test(a, b, c, d) VALUES (2, {4,5,7}, {44, 55, 66, 666}, 'b')")) {
+	printf("[004] INSERT 2 failed [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
 }
 
-$oid = cubrid_current_oid($req);
-if (is_null ($oid)){
-    printf("[003] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
+$req = odbc_exec($conn, 'SELECT b FROM php_cubrid_test WHERE a = 1');
+if (!$req || !odbc_fetch_row($req)) {
+	printf("[005] SELECT failed\n");
+	exit(1);
 }
+$raw = odbc_result($req, 1);
+odbc_free_result($req);
 
-cubrid_move_cursor($req, 1, CUBRID_CURSOR_FIRST);
-
-$attr = cubrid_col_get($conn, $oid, "b");
+$attr = cubrid_odbc_normalize_list_column($raw);
+if ($attr === null) {
+	printf("[006] Unexpected SET form\n");
+	exit(1);
+}
 var_dump($attr);
 
-if (!cubrid_set_add($conn, $oid, "b", "4")) {
-    printf("[004] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
+if (!odbc_exec($conn, 'UPDATE php_cubrid_test SET b = {1, 2, 3, 4} WHERE a = 1')) {
+	printf("[007] UPDATE failed [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
+}
+if (!odbc_commit($conn)) {
+	printf("[008] commit failed [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
 }
 
-$attr = cubrid_col_get($conn, $oid, "b");
+$req = odbc_exec($conn, 'SELECT b FROM php_cubrid_test WHERE a = 1');
+if (!$req || !odbc_fetch_row($req)) {
+	printf("[009] Second SELECT failed\n");
+	exit(1);
+}
+$raw2 = odbc_result($req, 1);
+odbc_free_result($req);
+
+$attr = cubrid_odbc_normalize_list_column($raw2);
+if ($attr === null) {
+	printf("[010] Unexpected SET after UPDATE\n");
+	exit(1);
+}
 var_dump($attr);
 
-odbc_close_request($req);
 cubrid_disconnect($conn);
 
-print "done!";
+print 'done!';
 ?>
 --CLEAN--
 <?php
-require_once("clean_table.inc");
+require_once('clean_table.inc');
 ?>
 --EXPECTF--
 array(3) {

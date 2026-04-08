@@ -3,15 +3,16 @@ cubrid_query_timeout
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
-require_once('until.php')
+require_once('until.php');
 ?>
 --FILE--
 <?php
 
 include_once('connect.inc');
 
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 $req = odbc_prepare($conn, "SELECT * FROM code");
 

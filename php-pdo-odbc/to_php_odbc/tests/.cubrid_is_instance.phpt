@@ -3,6 +3,7 @@ cubrid_is_instance
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -10,9 +11,9 @@ require_once('skipifconnectfailure.inc');
 
 include_once('connect.inc');
 
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
-if (!($req = odbc_exec($conn, 'SELECT * FROM code', CUBRID_INCLUDE_OID))) {
+if (!($req = odbc_exec($conn, 'SELECT * FROM code'))) {
     printf("[001] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
 }
 

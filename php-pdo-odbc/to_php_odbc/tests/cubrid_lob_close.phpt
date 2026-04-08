@@ -3,6 +3,7 @@ cubrid_lob_close
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -15,7 +16,7 @@ $tmp = NULL;
 
 $fp = fopen('./cubrid_logo.png', 'rb');
 
-$cubrid_conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
+$cubrid_conn = odbc_connect($cubrid_odbc_dsn, "", "");
 $cubrid_req = odbc_prepare($cubrid_conn, "insert into php_cubrid_test (e) values (?)");
 if (!$cubrid_req) {
     printf("[001] Sql preparation failed. [%d] %s\n", odbc_error(), odbc_errormsg());

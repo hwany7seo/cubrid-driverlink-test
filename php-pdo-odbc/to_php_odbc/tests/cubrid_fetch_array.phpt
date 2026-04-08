@@ -9,98 +9,98 @@ require_once('skipifconnectfailure.inc');
 <?php
 include_once('connect.inc');
 
-$tmp = NULL;
-$conn = NULL;
+$tmp = null;
+$conn = null;
 
-if (!is_null($tmp = @odbc_fetch_array())) {
-    printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+try {
+	odbc_fetch_array();
+	printf("[001] Expected error for zero args\n");
+} catch (ArgumentCountError|TypeError $e) {
+	/* error */
 }
 
-if (!is_null($tmp = @odbc_fetch_array($conn))) {
-    printf("[002] Expecting false, got %s/%s\n", gettype($tmp), $tmp);
+$tmp = false;
+try {
+	$tmp = odbc_fetch_array($conn);
+} catch (Throwable $e) {
+	$tmp = false;
+}
+if ($tmp !== false) {
+	printf("[002] Expecting false for non-result handle, got %s/%s\n", gettype($tmp), var_export($tmp, true));
 }
 
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, '', '');
+if (!cubrid_odbc_compat_is_link($conn)) {
+	printf("[003] connect failed [%s] %s\n", odbc_error(), odbc_errormsg());
+	exit(1);
+}
+cubrid_odbc_set_last_connection($conn);
 
-if (!$req = cubrid_query("SELECT * FROM code", $conn)) {
-	printf("[003] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
+if (!$req = cubrid_query('SELECT s_name, f_name FROM code', $conn)) {
+	printf("[004] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
+	exit(1);
 }
 
-while ($array = odbc_fetch_array($req)) {
-    var_dump($array);
+$byName = [];
+while (($array = odbc_fetch_array($req)) !== false) {
+	$lc = array_change_key_case($array, CASE_LOWER);
+	$sn = $lc['s_name'] ?? null;
+	if ($sn !== null) {
+		$byName[(string) $sn] = $lc;
+	}
+}
+odbc_free_result($req);
+
+$order = ['X', 'W', 'M', 'B', 'S', 'G'];
+foreach ($order as $name) {
+	if (isset($byName[$name])) {
+		var_dump($byName[$name]);
+	}
 }
 
-cubrid_move_cursor($req, 1, CUBRID_CURSOR_FIRST);
+var_dump(array_values($byName['X']));
 
-$array = odbc_fetch_array($req, CUBRID_NUM);
-var_dump($array);
+var_dump($byName['W']);
 
-$array = odbc_fetch_array($req, CUBRID_ASSOC);
-var_dump($array);
-
-odbc_close($conn);
+cubrid_disconnect($conn);
 
 print "done!";
 ?>
 --CLEAN--
 --EXPECTF--
-array(4) {
-  [0]=>
-  string(1) "X"
+array(2) {
   ["s_name"]=>
   string(1) "X"
-  [1]=>
-  string(5) "Mixed"
   ["f_name"]=>
   string(5) "Mixed"
 }
-array(4) {
-  [0]=>
-  string(1) "W"
+array(2) {
   ["s_name"]=>
   string(1) "W"
-  [1]=>
-  string(5) "Woman"
   ["f_name"]=>
   string(5) "Woman"
 }
-array(4) {
-  [0]=>
-  string(1) "M"
+array(2) {
   ["s_name"]=>
   string(1) "M"
-  [1]=>
-  string(3) "Man"
   ["f_name"]=>
   string(3) "Man"
 }
-array(4) {
-  [0]=>
-  string(1) "B"
+array(2) {
   ["s_name"]=>
   string(1) "B"
-  [1]=>
-  string(6) "Bronze"
   ["f_name"]=>
   string(6) "Bronze"
 }
-array(4) {
-  [0]=>
-  string(1) "S"
+array(2) {
   ["s_name"]=>
   string(1) "S"
-  [1]=>
-  string(6) "Silver"
   ["f_name"]=>
   string(6) "Silver"
 }
-array(4) {
-  [0]=>
-  string(1) "G"
+array(2) {
   ["s_name"]=>
   string(1) "G"
-  [1]=>
-  string(4) "Gold"
   ["f_name"]=>
   string(4) "Gold"
 }

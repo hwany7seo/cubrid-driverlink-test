@@ -3,6 +3,7 @@ cubrid_get
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc')
 ?>
 --FILE--
@@ -10,7 +11,7 @@ require_once('skipifconnectfailure.inc')
 
 include_once("connect.inc");
 
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 if (!$conn) {
     printf("[001] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
     exit(1);
@@ -22,7 +23,7 @@ odbc_exec($conn, "CREATE TABLE php_cubrid_test (a int AUTO_INCREMENT, b set(int)
 
 odbc_exec($conn, "INSERT INTO php_cubrid_test(a, b, c, d) VALUES (1, {1,2,3}, {11, 22, 33, 333}, 'a')");
 
-if (!$req = odbc_exec($conn, "select * from php_cubrid_test", CUBRID_INCLUDE_OID)) {
+if (!$req = odbc_exec($conn, "select * from php_cubrid_test")) {
     printf("[002] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
 }
 

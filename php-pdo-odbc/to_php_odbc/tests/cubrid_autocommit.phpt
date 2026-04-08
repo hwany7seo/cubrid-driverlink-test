@@ -10,43 +10,47 @@ require_once('skipifconnectfailure.inc');
 include_once("connect.inc");
 
 $tmp = NULL;
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
+cubrid_odbc_set_last_connection($conn);
 
 if (cubrid_get_autocommit($conn)) {
-    printf("Autocommit is ON.\n");
+	printf("Autocommit is ON.\n");
 } else {
-    printf("Autocommit is OFF.");
+	printf("Autocommit is OFF.");
 }
 
-@odbc_exec($conn, "DROP TABLE autocommit_test");
-cubrid_query('CREATE TABLE autocommit_test(a int)');
-cubrid_query('INSERT INTO autocommit_test(a) VALUE(1)');
+@odbc_exec($conn, "DROP TABLE IF EXISTS autocommit_test");
+cubrid_query('CREATE TABLE autocommit_test(a int)', $conn);
+cubrid_query('INSERT INTO autocommit_test(a) VALUES(1)', $conn);
 
 odbc_close($conn);
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
+cubrid_odbc_set_last_connection($conn);
 
-$req = cubrid_query('SELECT * FROM autocommit_test');
-$res = odbc_fetch_array($req, CUBRID_ASSOC);
+$req = cubrid_query('SELECT * FROM autocommit_test', $conn);
+$res = cubrid_fetch_assoc($req);
 
 var_dump($res);
 
 cubrid_set_autocommit($conn, CUBRID_AUTOCOMMIT_FALSE);
-cubrid_query('UPDATE autocommit_test SET a=2');
+cubrid_query('UPDATE autocommit_test SET a=2', $conn);
 
 odbc_close($conn);
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
+cubrid_odbc_set_last_connection($conn);
 
-$req = cubrid_query('SELECT * FROM autocommit_test');
-$res = odbc_fetch_array($req, CUBRID_ASSOC);
+$req = cubrid_query('SELECT * FROM autocommit_test', $conn);
+$res = cubrid_fetch_assoc($req);
 
 var_dump($res);
 
-cubrid_query('DROP TABLE autocommit_test');
+cubrid_query('DROP TABLE IF EXISTS autocommit_test', $conn);
 
 odbc_close($conn);
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
+cubrid_odbc_set_last_connection($conn);
 
-$req = cubrid_query('SELECT * FROM autocommit_test');
+$req = cubrid_query('SELECT * FROM autocommit_test', $conn);
 
 odbc_close($conn);
 
@@ -64,5 +68,5 @@ array(1) {
   string(1) "1"
 }
 
-Warning: Error: DBMS, -493, Syntax: Unknown class "public.autocommit_test". select * from [public.autocommit_test]%s in %s on line %d
+Warning: %s
 done!

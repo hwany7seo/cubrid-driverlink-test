@@ -3,6 +3,7 @@ cubrid_lob2_new
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -11,7 +12,7 @@ require_once('skipifconnectfailure.inc');
 include_once('connect.inc');
 
 $tmp = NULL;
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 if (false !== ($tmp = @cubrid_lob2_new($conn, 'NULL'))) {
     printf('[001] Expecting boolean/false, got %s/%s\n', gettype($tmp), $tmp);

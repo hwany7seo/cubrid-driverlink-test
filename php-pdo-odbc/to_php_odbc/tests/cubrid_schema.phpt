@@ -3,6 +3,7 @@ cubrid_schema
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -20,7 +21,7 @@ if (!is_null($tmp = @cubrid_schema($conn))) {
     printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 }
 
-if (!$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "")) {
+if (!$conn = odbc_connect($cubrid_odbc_dsn, "", "")) {
     printf("[003] Cannot connect to db server using host=%s, port=%d, dbname=%s, user=%s, passwd=***\n",
     $host, $port, $db, $user);
 }
@@ -55,7 +56,7 @@ cubrid_disconnect($conn);
 
 /* =============================================== */
 /* Code for testing CUBRID_SCH_ATTR_WITH_SYNONYM   */
-if (!$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "")) {
+if (!$conn = odbc_connect($cubrid_odbc_dsn, "", "")) {
     printf("[009] Cannot connect to db server using host=%s, port=%d, dbname=%s, user=%s, passwd=***\n",
     $host, $port, $db, "dba");
 }
@@ -69,7 +70,7 @@ odbc_exec($conn,"CREATE synonym public.s1 for u1.t1;");
 cubrid_disconnect($conn);
 /* =============================================== */
 
-if (!$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "")) {
+if (!$conn = odbc_connect($cubrid_odbc_dsn, "", "")) {
     printf("[0010] Cannot connect to db server using host=%s, port=%d, dbname=%s, user=%s, passwd=***\n",
     $host, $port, $db, $user);
 }
@@ -100,7 +101,7 @@ var_dump($schema);
 
 cubrid_disconnect($conn);
 
-if (!$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "")) {
+if (!$conn = odbc_connect($cubrid_odbc_dsn, "", "")) {
     printf("[015] Cannot connect to db server using host=%s, port=%d, dbname=%s, user=%s, passwd=***\n",
     $host, $port, $db, "u1");
 }
@@ -115,7 +116,7 @@ cubrid_disconnect($conn);
 
 /* =============================================== */
 /* Code for testing CUBRID_SCH_ATTR_WITH_SYNONYM   */
-if (!$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "")) {
+if (!$conn = odbc_connect($cubrid_odbc_dsn, "", "")) {
     printf("[017] Cannot connect to db server using host=%s, port=%d, dbname=%s, user=%s, passwd=***\n",
     $host, $port, $db, "dba");
 }

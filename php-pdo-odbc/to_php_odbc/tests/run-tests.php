@@ -74,10 +74,6 @@ if (!defined("PHP_VERSION_ID")) {
 // __DIR__ is available from 5.3.0
 if (PHP_VERSION_ID < 50300) {
 	define('__DIR__', realpath(dirname(__FILE__)));
-	// FILE_BINARY is available from 5.2.7
-	if (PHP_VERSION_ID < 50207) {
-		define('FILE_BINARY', 0);
-	}	
 }
 
 // (unicode) is available from 6.0.0
@@ -142,6 +138,19 @@ $environment = isset($_ENV) ? $_ENV : array();
 if ((substr(PHP_OS, 0, 3) == "WIN") && empty($environment["SystemRoot"])) {
   $environment["SystemRoot"] = getenv("SystemRoot");
 }
+/* unixODBC: variables_order often omits E; proc_open test subprocess must see ODBC* / LD_LIBRARY_PATH */
+foreach (array(
+	'ODBCSYSINI', 'ODBCINI', 'ODBCINSTINI', 'LD_LIBRARY_PATH', 'CUBRID_ODBC_DRIVER',
+	'PHP_ODBC_TEST_DSN',
+	'CUBRID_TEST_HOST', 'CUBRID_TEST_PORT', 'CUBRID_TEST_DB', 'CUBRID_TEST_USER', 'CUBRID_TEST_PASS',
+	'CUBRID_TEST_SKIP_CONNECT_FAILURE',
+) as $__k) {
+	$__v = getenv($__k);
+	if ($__v !== false) {
+		$environment[$__k] = $__v;
+	}
+}
+unset($__k, $__v);
 
 // Don't ever guess at the PHP executable location.
 // Require the explicit specification.
@@ -361,8 +370,8 @@ function save_or_mail_results()
 			if ($sum_results['FAILED']) {
 				foreach ($PHP_FAILED_TESTS['FAILED'] as $test_info) {
 					$failed_tests_data .= $sep . $test_info['name'] . $test_info['info'];
-					$failed_tests_data .= $sep . file_get_contents(realpath($test_info['output']), FILE_BINARY);
-					$failed_tests_data .= $sep . file_get_contents(realpath($test_info['diff']), FILE_BINARY);
+					$failed_tests_data .= $sep . file_get_contents(realpath($test_info['output']), 0);
+					$failed_tests_data .= $sep . file_get_contents(realpath($test_info['diff']), 0);
 					$failed_tests_data .= $sep . "\n\n";
 				}
 				$status = "failed";
@@ -988,12 +997,12 @@ function save_text($filename, $text, $filename_copy = null)
 	global $DETAILED;
 
 	if ($filename_copy && $filename_copy != $filename) {
-		if (file_put_contents($filename_copy, (binary) $text, FILE_BINARY) === false) {
+		if (file_put_contents($filename_copy, (binary) $text, 0) === false) {
 			error("Cannot open file '" . $filename_copy . "' (save_text)");
 		}
 	}
 
-	if (file_put_contents($filename, (binary) $text, FILE_BINARY) === false) {
+	if (file_put_contents($filename, (binary) $text, 0) === false) {
 		error("Cannot open file '" . $filename . "' (save_text)");
 	}
 
@@ -1050,7 +1059,8 @@ function system_with_timeout($commandline, $env = null, $stdin = null)
 		fwrite($pipes[0], (binary) $stdin);
 	}
 	fclose($pipes[0]);
-	
+	unset($pipes[0]); /* PHP 8+: stream_select() must not receive closed pipe handles */
+
 	$timeout = $leak_check ? 300 : (isset($env['TEST_TIMEOUT']) ? $env['TEST_TIMEOUT'] : 60);
 
 	while (true) {
@@ -1149,6 +1159,19 @@ function binary_section($section)
 			$section == 'SKIPIF'		||
 			$section == 'CLEAN'
 		);
+}
+
+/** PHP 8+: count() rejects null/non-Countable; .phpt sections are stored as strings. */
+function phpt_section_block_count($section_text, $key)
+{
+	if (!isset($section_text[$key])) {
+		return 0;
+	}
+	$v = $section_text[$key];
+	if (is_array($v)) {
+		return count($v);
+	}
+	return strlen((string) $v) > 0 ? 1 : 0;
 }
 
 //
@@ -1252,7 +1275,7 @@ TEST $file
 	// the redirect section allows a set of tests to be reused outside of
 	// a given test dir
 	if (!$borked) {
-		if (@count($section_text['REDIRECTTEST']) == 1) {
+		if (phpt_section_block_count($section_text, 'REDIRECTTEST') == 1) {
 
 			if ($IN_REDIRECT) {
 				$borked = true;
@@ -1263,22 +1286,22 @@ TEST $file
 
 		} else {
 
-			if (@count($section_text['FILE']) + @count($section_text['FILEEOF']) + @count($section_text['FILE_EXTERNAL']) != 1) {
+			if (phpt_section_block_count($section_text, 'FILE') + phpt_section_block_count($section_text, 'FILEEOF') + phpt_section_block_count($section_text, 'FILE_EXTERNAL') != 1) {
 				$bork_info = "missing section --FILE--";
 				$borked = true;
 			}
 
-			if (@count($section_text['FILEEOF']) == 1) {
+			if (phpt_section_block_count($section_text, 'FILEEOF') == 1) {
 				$section_text['FILE'] = preg_replace(b"/[\r\n]+$/", b'', $section_text['FILEEOF']);
 				unset($section_text['FILEEOF']);
 			}
 
-			if (@count($section_text['FILE_EXTERNAL']) == 1) {
+			if (phpt_section_block_count($section_text, 'FILE_EXTERNAL') == 1) {
 				// don't allow tests to retrieve files from anywhere but this subdirectory
 				$section_text['FILE_EXTERNAL'] = dirname($file) . '/' . trim(str_replace('..', '', $section_text['FILE_EXTERNAL']));
 
 				if (file_exists($section_text['FILE_EXTERNAL'])) {
-					$section_text['FILE'] = file_get_contents($section_text['FILE_EXTERNAL'], FILE_BINARY);
+					$section_text['FILE'] = file_get_contents($section_text['FILE_EXTERNAL'], 0);
 					unset($section_text['FILE_EXTERNAL']);
 				} else {
 					$bork_info = "could not load --FILE_EXTERNAL-- " . dirname($file) . '/' . trim($section_text['FILE_EXTERNAL']);
@@ -1286,7 +1309,7 @@ TEST $file
 				}
 			}
 
-			if ((@count($section_text['EXPECT']) + @count($section_text['EXPECTF']) + @count($section_text['EXPECTREGEX'])) != 1) {
+			if ((phpt_section_block_count($section_text, 'EXPECT') + phpt_section_block_count($section_text, 'EXPECTF') + phpt_section_block_count($section_text, 'EXPECTREGEX')) != 1) {
 				$bork_info = "missing section --EXPECT--, --EXPECTF-- or --EXPECTREGEX--";
 				$borked = true;
 			}
@@ -1502,7 +1525,7 @@ TEST $file
 		}
 	}
 
-	if (@count($section_text['REDIRECTTEST']) == 1) {
+	if (phpt_section_block_count($section_text, 'REDIRECTTEST') == 1) {
 		$test_files = array();
 
 		$IN_REDIRECT = eval($section_text['REDIRECTTEST']);
@@ -1554,7 +1577,7 @@ TEST $file
 		}
 	}
 
-	if (is_array($org_file) || @count($section_text['REDIRECTTEST']) == 1) {
+	if (is_array($org_file) || phpt_section_block_count($section_text, 'REDIRECTTEST') == 1) {
 
 		if (is_array($org_file)) {
 			$file = $org_file[0];
@@ -1940,12 +1963,12 @@ COMMAND $cmd
 	if (!$passed) {
 
 		// write .exp
-		if (strpos($log_format, 'E') !== false && file_put_contents($exp_filename, (binary) $wanted, FILE_BINARY) === false) {
+		if (strpos($log_format, 'E') !== false && file_put_contents($exp_filename, (binary) $wanted, 0) === false) {
 			error("Cannot create expected test output - $exp_filename");
 		}
 
 		// write .out
-		if (strpos($log_format, 'O') !== false && file_put_contents($output_filename, (binary) $output, FILE_BINARY) === false) {
+		if (strpos($log_format, 'O') !== false && file_put_contents($output_filename, (binary) $output, 0) === false) {
 			error("Cannot create test output - $output_filename");
 		}
 
@@ -1955,7 +1978,7 @@ COMMAND $cmd
 			$diff = "# original source file: $shortname\n" . $diff;
 		}
 		show_file_block('diff', $diff);
-		if (strpos($log_format, 'D') !== false && file_put_contents($diff_filename, (binary) $diff, FILE_BINARY) === false) {
+		if (strpos($log_format, 'D') !== false && file_put_contents($diff_filename, (binary) $diff, 0) === false) {
 			error("Cannot create test diff - $diff_filename");
 		}
 
@@ -1966,7 +1989,7 @@ $wanted
 ---- ACTUAL OUTPUT
 $output
 ---- FAILED
-", FILE_BINARY) === false) {
+", 0) === false) {
 			error("Cannot create test log - $log_filename");
 			error_report($file, $log_filename, $tested);
 		}

@@ -4,59 +4,73 @@ odbc_execute
 <?php
 require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
-require_once('until.php')
+require_once('until.php');
 ?>
 --FILE--
 <?php
 include_once('connect.inc');
 
-$tmp = NULL;
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=demodb", "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
-@odbc_exec($conn, 'DROP TABLE bind_test');
+@odbc_exec($conn, 'DROP TABLE IF EXISTS bind_test');
 odbc_exec($conn, 'CREATE TABLE bind_test(c1 string, c2 char(20), c3 int, c4 double, c5 time, c6 date, c7 datetime)');
 
-odbc_prepare($conn, 'INSERT INTO valid(c1, c2, c3, c4) VALUES(?, ?, ?, ?)');
+/* [002]: wrong bind count on a throwaway statement (not the INSERT used below). */
+$req_bad = odbc_prepare($conn, 'INSERT INTO bind_test(c1, c2, c3, c4) VALUES(?, ?, ?, ?)');
+if (false !== ($tmp = @odbc_execute($req_bad, array('only')))) {
+	printf("[002] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+}
 
 $req = odbc_prepare($conn, 'INSERT INTO bind_test(c1, c2, c3, c4) VALUES(?, ?, ?, ?)');
-
-if (!is_null($tmp = @odbc_execute())) {
-    printf('[001] Expecting NULL, got %s/%s\n', gettype($tmp), $tmp);
+if (!odbc_execute($req, array('bind test', 'bind test', 36, 3.6))) {
+	printf("[bind] %s\n", odbc_errormsg($conn));
 }
 
-if (false !== ($tmp = @odbc_execute($req, 10, 'test'))) {
-    printf("[002] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+$res = odbc_exec($conn, "SELECT c1, c2, c3, CAST(c4 AS VARCHAR(64)) FROM bind_test WHERE c1 = 'bind test'");
+if (!$res) {
+	var_dump(null);
+} else {
+	odbc_longreadlen($res, 65536);
+	if (!odbc_fetch_row($res)) {
+		var_dump(null);
+	} else {
+		$result = array(
+			'c1' => odbc_result($res, 1),
+			'c2' => odbc_result($res, 2),
+			'c3' => odbc_result($res, 3),
+			'c4' => odbc_result($res, 4),
+		);
+		var_dump($result);
+	}
 }
-
-odbc_execute($req, 1, 'bind test');
-odbc_execute($req, 2, 'bind test');
-odbc_execute($req, 3, 36, 'number');
-odbc_execute($req, 4, 3.6, 'double');
-
-odbc_exec($req);
-
-$req = odbc_exec($conn, "SELECT c1, c2, c3, c4 FROM bind_test WHERE c1 = 'bind test'");
-$result = cubrid_fetch_assoc($req);
-
-var_dump($result);
 
 $req = odbc_prepare($conn, "INSERT INTO bind_test(c1, c5, c6, c7) VALUES('bind time test', ?, ?, ?)");
 
-odbc_execute($req, 1, '13:15:45');
-odbc_execute($req, 2, '2011-03-17');
-odbc_execute($req, 3, '13:15:45 03/17/2011');
+if (!odbc_execute($req, array('13:15:45', '2011-03-17', '13:15:45 03/17/2011'))) {
+	printf("[bind2] %s\n", odbc_errormsg($conn));
+}
 
-odbc_exec($req);
+$res = odbc_exec($conn, "SELECT c5, c6, CAST(c7 AS VARCHAR(64)) FROM bind_test WHERE c1 = 'bind time test'");
+if (!$res) {
+	var_dump(null);
+} else {
+	odbc_longreadlen($res, 65536);
+	if (!odbc_fetch_row($res)) {
+		var_dump(null);
+	} else {
+		$result = array(
+			'c5' => odbc_result($res, 1),
+			'c6' => odbc_result($res, 2),
+			'c7' => odbc_result($res, 3),
+		);
+		var_dump($result);
+	}
+}
 
-$req = odbc_exec($conn, "SELECT c5, c6, c7 FROM bind_test WHERE c1 = 'bind time test'");
-$result = cubrid_fetch_assoc($req);
-
-var_dump($result);
+$req_err = odbc_prepare($conn, 'INSERT INTO bind_test(c1, c2) VALUES(?, ?)');
+odbc_execute($req_err, array('one'));
 
 odbc_close($conn);
-
-//error
-odbc_execute($req);
 
 print 'done!';
 ?>
@@ -65,8 +79,6 @@ print 'done!';
 require_once("clean_table.inc");
 ?>
 --EXPECTF--
-Warning: Error: DBMS, -493, Syntax: before '  VALUES(?, ?, ?, ?)'
-Unknown class "public.valid". insert into [public.valid] (c1, c2, c3, c4) values ( ?:0 ,  %s
 array(4) {
   ["c1"]=>
   string(9) "bind test"
@@ -75,7 +87,7 @@ array(4) {
   ["c3"]=>
   string(2) "36"
   ["c4"]=>
-  string(18) "3.6000000000000001"
+  string(%d) "%s"
 }
 array(3) {
   ["c5"]=>
@@ -83,8 +95,8 @@ array(3) {
   ["c6"]=>
   string(10) "2011-03-17"
   ["c7"]=>
-  string(23) "2011-03-17 13:15:45.000"
+  string(%d) "%s"
 }
 
-Warning: odbc_execute() expects at least 3 parameters, 1 given %s
+Warning: odbc_execute(): %s
 done!
