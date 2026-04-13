@@ -19,7 +19,7 @@ if (!is_null($tmp = @cubrid_ping($conn, $conn)))
 var_dump(cubrid_ping($conn));
 
 // provoke an error to check if cubrid_ping resets it
-$res = cubrid_query('SELECT * FROM unknown_table', $conn);
+$res = odbc_exec($conn, 'SELECT * FROM unknown_table');
 if (!($errno = cubrid_errno($conn)))
 	printf("[002] Statement should have caused an error\n");
 

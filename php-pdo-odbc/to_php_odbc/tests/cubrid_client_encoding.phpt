@@ -14,8 +14,6 @@ if (!cubrid_odbc_compat_is_link($conn)) {
 	printf("[001] connect failed [%s] %s\n", odbc_error(), odbc_errormsg());
 	exit(1);
 }
-cubrid_odbc_set_last_connection($conn);
-
 $db_esc = str_replace("'", "''", $db);
 $charset = null;
 foreach ([

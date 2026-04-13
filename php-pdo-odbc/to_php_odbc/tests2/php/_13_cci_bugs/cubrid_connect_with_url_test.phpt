@@ -28,7 +28,7 @@ if (FALSE == $conn2) {
     printf("[002]no true and no false");
 }
 
-$conn3=odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn3=odbc_connect($cubrid_odbc_dsn, "", "");
 if (FALSE == $conn3) {
     printf("[003]No Expect: return value false. [%d] [%s]\n", odbc_error(), odbc_errormsg());
 }elseif(TRUE == $conn3){

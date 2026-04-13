@@ -31,8 +31,6 @@ if (!cubrid_odbc_compat_is_link($conn)) {
 	printf("[002] [%s] %s\n", odbc_error(), odbc_errormsg());
 	exit(1);
 }
-cubrid_odbc_set_last_connection($conn);
-
 $conn1 = odbc_connect($cubrid_odbc_dsn, '', '');
 $conn2 = odbc_connect($cubrid_odbc_dsn, '', '');
 /*

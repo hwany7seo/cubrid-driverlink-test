@@ -8,7 +8,7 @@ require_once('skipifconnectfailure.inc');
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 odbc_exec($conn,"drop table if exists fetch_arrary_tb");
 odbc_exec($conn,"CREATE TABLE fetch_arrary_tb(c1 string, c2 char(20), c3 int, c4 double, c5 time, c6 date, c7 TIMESTAMP,c8 bit, c9 numeric(13,4),c10 clob,c11 blob);");
 odbc_exec($conn,"insert into fetch_arrary_tb values('string111111','char11111',1,11.11,TIME '02:10:00',DATE '08/14/1977', TIMESTAMP '08/14/1977 5:35:00 pm',B'1',432341.4321, CHAR_TO_CLOB('This is a Dog'), BIT_TO_BLOB(X'000001'))");
@@ -37,7 +37,7 @@ if (!$req2) {
    odbc_free_result($req2);
 }
 
-$req3=cubrid_query("select c5,c6,c7,c8,c9 from fetch_arrary_tb where c9 = 513254.3144",$conn);
+$req3=odbc_exec($conn, "select c5,c6,c7,c8,c9 from fetch_arrary_tb where c9 = 513254.3144");
 if (!$req3) {
     printf("req3 [%d] %s\n", odbc_error(), odbc_errormsg());
 }else{
@@ -46,7 +46,7 @@ if (!$req3) {
    odbc_free_result($req3);
 }
 
-$req4= cubrid_query("select CLOB_TO_CHAR(c10),BLOB_TO_BIT(c11) from fetch_arrary_tb order by c1 ",$conn);
+$req4= odbc_exec($conn, "select CLOB_TO_CHAR(c10),BLOB_TO_BIT(c11) from fetch_arrary_tb order by c1 ");
 while($row4 = odbc_fetch_array($req4, CUBRID_OBJECT)){
    var_dump($row4);
 }

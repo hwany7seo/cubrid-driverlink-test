@@ -34,9 +34,7 @@ if (!cubrid_odbc_compat_is_link($conn)) {
 	printf("[003] connect failed [%s] %s\n", odbc_error(), odbc_errormsg());
 	exit(1);
 }
-cubrid_odbc_set_last_connection($conn);
-
-if (!$req = cubrid_query('SELECT s_name, f_name FROM code', $conn)) {
+if (!$req = odbc_exec($conn, 'SELECT s_name, f_name FROM code')) {
 	printf("[004] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
 	exit(1);
 }

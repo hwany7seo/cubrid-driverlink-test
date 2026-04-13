@@ -3,13 +3,14 @@ cubrid_schema CUBRID_SCH_EXPORTED_KEYS
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
 //CUBRID_SCH_EXPORTED_KEYS
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 print("#####positive example#####\n");
 printf("ssss table has two foreign keys\n"); 

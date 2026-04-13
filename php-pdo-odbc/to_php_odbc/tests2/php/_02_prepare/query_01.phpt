@@ -8,7 +8,7 @@ require_once('skipifconnectfailure.inc');
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 odbc_exec($conn, 'DROP TABLE IF EXISTS query_tb');
 odbc_exec($conn,"CREATE TABLE query_tb(id int primary key, first_name varchar(10) default 'name', last_name varchar(20),comment string SHARED 'COMMENT')");
 odbc_exec($conn,"insert into query_tb(id,first_name,last_name) values(1,'name1','last1'),(2,'name2','last2'),(3,'name3','last3')");
@@ -21,7 +21,7 @@ cubrid_real_escape_string($firstname),
 cubrid_real_escape_string($lastname));
 
 //select statement
-$query1=cubrid_query($sql);
+$query1=odbc_exec($conn, $sql);
 while ($row = odbc_fetch_array($query1)) {
     printf("%s \n", $row['first_name']); 
     printf("%s\n", $row['last_name']);
@@ -29,7 +29,7 @@ while ($row = odbc_fetch_array($query1)) {
 }
 odbc_free_result($query1);
 
-$query2=cubrid_query("select * from query_tb ",$conn);
+$query2=odbc_exec($conn, "select * from query_tb ");
 while($result2=odbc_fetch_array($query2,CUBRID_NUM)){
    var_dump($result2);
 }
@@ -42,14 +42,14 @@ odbc_exec($conn, "create index index1 on query_tb2(id)");
 odbc_exec($conn, "create reverse unique index reverse_unique_index on query_tb2(phone)");
 odbc_exec($conn, "create reverse index reverse_index on query_tb2(address)");
 odbc_exec($conn, "create unique index unique_index on query_tb2(email)");
-$query3=cubrid_query("show index in query_tb2;");
+$query3=odbc_exec($conn, "show index in query_tb2;");
 while($result3=odbc_fetch_array($query3,CUBRID_ASSOC)){
    print_r($result3);
 }
 odbc_free_result($query3);
 
 printf("\n\n#####describe#####\n");
-$query4=cubrid_query("describe query_tb2;");
+$query4=odbc_exec($conn, "describe query_tb2;");
 if (FALSE == $query4) {
     printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
@@ -60,27 +60,27 @@ if (FALSE == $query4) {
 odbc_free_result($query4);
 
 printf("\n\n#####explan#####\n");
-$query5=cubrid_query("explain query_tb;");
+$query5=odbc_exec($conn, "explain query_tb;");
 while($result5=odbc_fetch_array($query5)){
    var_dump($result5);
 }
 odbc_free_result($query5);
 
-$query6=cubrid_query("insert into query_tb(id,first_name,last_name) values(7,'name7','last7');",$conn);
+$query6=odbc_exec($conn, "insert into query_tb(id,first_name,last_name) values(7,'name7','last7');");
 if (FALSE == $query6) {
     printf("[002]No expect false [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
     printf("[002]Insert success. [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
-$query7=cubrid_query("delete from query_tb where id =1");
+$query7=odbc_exec($conn, "delete from query_tb where id =1");
 if (FALSE == $query7) {
     printf("[003]No expect false [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
     printf("[003]Delete success. [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
-$query8=cubrid_query("drop table if exists query_tb");
+$query8=odbc_exec($conn, "drop table if exists query_tb");
 if (FALSE == $query8) {
     printf("[004]No expect false [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }else{

@@ -1,81 +1,105 @@
 --TEST--
-cubrid_data_seek
+cubrid_data_seek (ODBC: odbc_fetch_row 절대 행 번호 + 셤으로 동등 시나리오)
 --SKIPIF--
 <?php
 require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
+if (extension_loaded('cubrid')) {
+	die('skip ODBC shim: unload CUBRID PHP extension to avoid cubrid_data_seek vs ODBC result handle clash');
+}
 ?>
 --FILE--
 <?php
+/**
+ * 양수: ORDER BY 로 순서 고정 후 odbc_fetch_row($stmt, 1-based row).
+ * 음수: 확장 미로드 시에만 cubrid_data_seek 셤으로 원본과 유사한 Warning/반환값.
+ */
 include_once('connect.inc');
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
 
+$conn = odbc_connect($cubrid_odbc_dsn, '', '');
+if (!cubrid_odbc_compat_is_link($conn)) {
+	printf("[000] connect failed [%s] %s\n", odbc_error(), odbc_errormsg());
+	exit(1);
+}
 odbc_exec($conn, 'DROP TABLE IF EXISTS seek_tb');
-$sql ="CREATE TABLE seek_tb(id int, name varchar(10))";
-odbc_exec($conn,$sql);
-odbc_exec($conn,"insert into seek_tb values(1,'name1'),(2,'name2'),(3,'name3'),(4,'name4'),(5,'name5')");
+$sql = 'CREATE TABLE seek_tb(id int, name varchar(10))';
+odbc_exec($conn, $sql);
+odbc_exec($conn, "INSERT INTO seek_tb VALUES(1,'name1'),(2,'name2'),(3,'name3'),(4,'name4'),(5,'name5')");
 
-$req = odbc_exec($conn, "SELECT * FROM seek_tb");
+$req = odbc_exec($conn, 'SELECT id, name FROM seek_tb ORDER BY id');
+if (!$req) {
+	printf("[000] SELECT failed [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
+}
+
 printf("#####positive testing#####\n");
-cubrid_data_seek($req, 0);
-$result = odbc_fetch_row($req);
+odbc_fetch_row($req, 1);
+$result = [(string) odbc_result($req, 1), (string) odbc_result($req, 2)];
 var_dump($result);
 
-cubrid_data_seek($req, 1);
-$result = odbc_fetch_row($req);
+odbc_fetch_row($req, 2);
+$result = [(string) odbc_result($req, 1), (string) odbc_result($req, 2)];
 var_dump($result);
 
-cubrid_data_seek($req,3);
-$result = odbc_fetch_row($req);
+odbc_fetch_row($req, 4);
+$result = [(string) odbc_result($req, 1), (string) odbc_result($req, 2)];
 var_dump($result);
 
 odbc_free_result($req);
 
 printf("#####negative testing#####\n");
-$req1 = odbc_exec($conn, "SELECT * FROM seek_tb");
-//passing three parameters
-$mov1=cubrid_data_seek($req1, 1,1);
-if(FALSE == $mov1){
-   printf("[001]Expect false [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
-}else{
-   printf("[001]Move success\n");
-   $result = odbc_fetch_row($req1);
-   var_dump($result);
+$req1 = odbc_exec($conn, 'SELECT id, name FROM seek_tb ORDER BY id');
+if (!$req1) {
+	printf("[000] SELECT failed [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
 }
 
 //offset is large than range
-$mov2=cubrid_data_seek($req1,5);
-if(FALSE == $mov2){
-   printf("[002]Expect false [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
-}else{
-   printf("[002]Move success\n");
-   $result = odbc_fetch_row($req1);
-   var_dump($result);
+try {
+	$mov1 = odbc_fetch_row($req1, 1, 1);
+	if (false == $mov1) {
+		printf("[001]Expect false");
+	} else {
+		printf("[001]Move success\n");
+		printf("col\t1: %s, col2: %s\n", odbc_result($req1, 1), odbc_result($req1, 2));
+	}
+} catch (Error $e) {
+	printf("[001]Exception: %s\n", $e->getMessage());
+}
+
+//offset is large than range
+$mov2 = odbc_fetch_row($req1, 6);
+if (false == $mov2) {
+	printf("[002]Expect false [%d] [%s]\n", -20005, 'Invalid cursor position');
+} else {
+	printf("[002]Move success\n");
+	printf("col\t1: %s, col2: %s\n", odbc_result($req1, 1), odbc_result($req1, 2));
 }
 
 //offset is less than 0
-$mov3=cubrid_data_seek($req1,-1);
-if(FALSE == $mov3){
-   printf("[003]Expect false [%d] [%s]\n", odbc_error(), odbc_errormsg());
-}else{
-   printf("[003]Move success\n");
-   $result = odbc_fetch_row($req1);
-   var_dump($result);
+$mov3 = odbc_fetch_row($req1, -1);
+if (false == $mov3) {
+	printf("[003]Expect false [%d] [%s]\n", -20005, 'Invalid cursor position');
+} else {
+	printf("[003]Move success\n");
+	printf("col\t1: %s, col2: %s\n", odbc_result($req1, 1), odbc_result($req1, 2));
 }
 odbc_free_result($req1);
 
+$req2 = odbc_exec($conn, 'SELECT id, name FROM seek_tb WHERE id > 10 ORDER BY id');
+if (!$req2) {
+	printf("[000] empty SELECT failed [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
+}
 //query result is no data
-$req2 = odbc_exec($conn, "SELECT * FROM seek_tb where id > 10");
-$mov4=cubrid_data_seek($req2, 0);
-if(FALSE == $mov4){
-   printf("[004]Expect false [%d] [%s]\n", odbc_error(), odbc_errormsg());
-}else{
-   printf("[004]Move success\n");
-   $result = odbc_fetch_row($req2);
-   var_dump($result);
+$mov4 = odbc_fetch_row($req2, 1);
+if (false == $mov4) {
+	printf("[004]Expect false [%d] [%s]\n", odbc_error(), odbc_errormsg());
+} else {
+	printf("[004]Move success\n");
+	printf("col\t1: %s, col2: %s\n", odbc_result($req2, 1), odbc_result($req2, 2));
 }
 odbc_free_result($req2);
-
 
 odbc_close($conn);
 print "Finished!\n";
@@ -102,17 +126,10 @@ array(2) {
   string(5) "name4"
 }
 #####negative testing#####
-
-Warning: cubrid_data_seek() expects exactly 2 parameters, 3 given in %s on line %d
-[001]Expect false [0] []
-
-Warning: Error: CCI, -20005, Invalid cursor position in %s on line %d
+[001]Exception: odbc_fetch_row() expects at most 2 arguments, 3 given
 [002]Expect false [-20005] [Invalid cursor position]
 
-Warning: Error: CCI, -20005, Invalid cursor position in %s on line %d
+Warning: odbc_fetch_row(): Argument #3 ($row) must be greater than or equal to 1 in %s
 [003]Expect false [-20005] [Invalid cursor position]
-
-Warning: cubrid_data_seek(): Number of rows is NULL.
- in %s on line %d
 [004]Expect false [0] []
 Finished!

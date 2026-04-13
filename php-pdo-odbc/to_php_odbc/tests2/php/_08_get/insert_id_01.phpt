@@ -3,6 +3,7 @@ cubrid_insert_id
 --SKIPIF--
 <?php # vim:ft=php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -10,7 +11,7 @@ require_once('skipifconnectfailure.inc');
 include_once("connect.inc");
 
 $tmp = NULL;
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 odbc_exec($conn, "DROP TABLE if exists insert_id_tb1");
 odbc_exec($conn, "DROP TABLE if exists insert_id_tb2");
 odbc_exec($conn, "CREATE TABLE insert_id_tb2(a int auto_increment(1,2), b varchar(10))");

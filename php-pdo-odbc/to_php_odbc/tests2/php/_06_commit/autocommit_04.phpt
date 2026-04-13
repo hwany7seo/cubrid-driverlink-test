@@ -8,7 +8,7 @@ require_once('skipifconnectfailure.inc');
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 printf("#####correct example#####\n");
 if (cubrid_get_autocommit($conn)) {
@@ -26,7 +26,7 @@ if (cubrid_get_autocommit($conn)) {
 odbc_commit($conn);
 odbc_close($conn);
 
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 if (cubrid_get_autocommit($conn)) {
     printf("[003]Expect: autocommit is ON.\n");
 } else {
@@ -36,7 +36,7 @@ if (cubrid_get_autocommit($conn)) {
 cubrid_set_autocommit($conn,CUBRID_AUTOCOMMIT_TRUE);
 odbc_close($conn);
 
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 if (cubrid_get_autocommit($conn)) {
     printf("[004]Expect: autocommit is ON.\n");
 } else {

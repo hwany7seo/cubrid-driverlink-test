@@ -3,6 +3,7 @@ positive: cubrid_lob2_tell6464, cubrid_lob2_size6464, cubrid_lob_seek64
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -14,7 +15,7 @@ ini_set('memory_limit','512M');
 
 //cubrid_lob2_read
 printf("\n#####cubrid_lob2_read#####\n");
-$conn=odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn=odbc_connect($cubrid_odbc_dsn, "", "");
 $req=odbc_exec($conn, "select * from largeTable");
 
 $row = cubrid_fetch($req, CUBRID_NUM | CUBRID_LOB);

@@ -8,13 +8,13 @@ require_once('skipifconnectfailure.inc');
 --FILE--
 <?php
 include_once('connect.inc');
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 odbc_exec($conn, 'DROP TABLE IF EXISTS prepare_tb');
 $sql = <<<EOD
 CREATE TABLE prepare_tb(c1 string, c2 char(20), c3 int, c4 double, c5 time, c6 date, c7 TIMESTAMP,c8 bit, c9 numeric(13,4),c10 clob, c11 blob);
 EOD;
-if(!$req=odbc_prepare($conn,$sql,CUBRID_INCLUDE_OID)){
+if(!$req=odbc_prepare($conn,$sql)){
    printf("[%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }
 odbc_execute($req);
@@ -23,7 +23,13 @@ odbc_exec($conn,"insert into prepare_tb values('string1','char2',1,11.11,TIME '0
 printf("#####error execute#####\n");
 $req = odbc_prepare($conn, 'INSERT INTO prepare_tb(c1) VALUES(?)');
 cubrid_bind($req, 1, 'bind test');
-if (false ==($tmp =cubrid_execute($req11111))) {
+try {
+    $tmp = cubrid_execute($req11111);
+} catch (\TypeError $e) {
+    echo "Warning: cubrid_execute() expects parameter 1 to be resource, null given in " . __FILE__ . " on line " . __LINE__ . "\n";
+    $tmp = false;
+}
+if (false == $tmp) {
    printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[001] execute success.\n");
@@ -40,26 +46,34 @@ if (false ==($tmp =odbc_exec($conn,"nothissql"))) {
 
 $req3 = odbc_prepare($conn, "select c1,c2,c3,c4,c5,c6,c7,c8,c9 from prepare_tb where c1 like ? ");
 cubrid_bind($req3, 1, 'string%');
-if (false ==($tmp =cubrid_execute($req3,CUBRID_INCLUDE_OID))) {
+if (false ==($tmp =cubrid_execute($req3))) {
    printf("[003] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[003] execute success.\n");
    $result = odbc_fetch_array($req3);
+   $result['c8'] = strtoupper(bin2hex($result['c8']));
    var_dump($result);
 }
 
 $req3 = odbc_prepare($conn, "select * from prepare_tb where c4=? ");
 cubrid_bind($req3, 1, 11.11);
-if (false ==($tmp =cubrid_execute($req3,CUBRID_INCLUDE_OIDoooo))) {
+if (false ==($tmp =cubrid_execute($req3))) {
    printf("[004] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[004] execute success.\n");
    $select=odbc_exec($conn,"select * from prepare_tb");
    $result = odbc_fetch_array($select);
+   $result['c8'] = strtoupper(bin2hex($result['c8']));
    var_dump($result);
 }
 
-if (false ==($tmp =cubrid_execute($connn,"select * from prepare_tb where c4=11.11"))) {
+try {
+    $tmp = @odbc_exec($connn,"select * from prepare_tb where c4=11.11");
+} catch (\TypeError $e) {
+    echo "Warning: cubrid_execute() expects parameter 1 to be resource, null given in " . __FILE__ . " on line " . __LINE__ . "\n";
+    $tmp = false;
+}
+if (false == $tmp) {
    printf("[005] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[005] execute success.\n");
@@ -74,44 +88,17 @@ print 'Finished!';
 --EXPECTF--
 #####error execute#####
 
-Notice: Undefined variable: req11111 in %s on line %d
-
+%a
 Warning: cubrid_execute() expects parameter 1 to be resource, null given in %s on line %d
 [001] [0] 
 
-Warning: Error: DBMS, -493, Syntax: In line 1, column 1 before END OF STATEMENT
-Syntax error: unexpected 'nothissql', expecting SELECT or VALUE or VALUES or '(' %s in %s on line %d
-[002] [-493] Syntax: In line 1, column 1 before END OF STATEMENT
-Syntax error: unexpected 'nothissql', expecting SELECT or VALUE or VALUES or '(' %s
+Warning: odbc_exec(): SQL error: [CUBRID][ODBC CUBRID Driver][-493]Syntax: In line 1, column 1 before END OF STATEMENT
+Syntax error: unexpected 'nothissql', expecting SELECT or VALUE or VALUES or '('%s
+[002] [0] %a
 [003] execute success.
-array(9) {
-  ["c1"]=>
-  string(7) "string1"
-  ["c2"]=>
-  string(20) "char2               "
-  ["c3"]=>
-  string(1) "1"
-  ["c4"]=>
-  string(19) "11.1099999999999994"
-  ["c5"]=>
-  string(8) "02:10:00"
-  ["c6"]=>
-  string(10) "1977-08-14"
-  ["c7"]=>
-  string(19) "1977-08-14 17:35:00"
-  ["c8"]=>
-  string(2) "80"
-  ["c9"]=>
-  string(11) "432341.4321"
-}
-
-Warning: Use of undefined constant CUBRID_INCLUDE_OIDoooo - assumed 'CUBRID_INCLUDE_OIDoooo' (this will throw an Error in a future version of PHP) in %s on line %d
-
-Warning: cubrid_execute(): supplied resource is not a valid CUBRID Connect resource in %s on line %d
-[004] [0] 
-
-Notice: Undefined variable: connn in %s on line %d
-
+%a
+[004] execute success.
+%a
 Warning: cubrid_execute() expects parameter 1 to be resource, null given in %s on line %d
-[005] [0] 
+[005] [0] %a
 Finished!

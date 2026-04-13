@@ -3,12 +3,13 @@ cubrid_list_dbs for APIS-135 Issue
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc')
 ?>
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 if (!$conn) {
     printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
     exit(1);

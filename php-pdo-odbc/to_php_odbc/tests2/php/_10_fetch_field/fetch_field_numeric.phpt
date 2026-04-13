@@ -8,16 +8,16 @@ require_once('skipifconnectfailure.inc');
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 //Various types of tables
 
 printf("#####First: Data type is numeric#####\n");
-$delete_result1=cubrid_query("drop class if exists numeric_tb");
+$delete_result1=odbc_exec($conn, "drop class if exists numeric_tb");
 if (!$delete_result1) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result1=cubrid_query("create class numeric_tb(smallint_t smallint,short_t short, int_t int ,bigint_t bigint,decimal_t decimal(15,2), numeric_t numeric(38,10), float_t float, real_t real, monetary_t monetary, double_t double )");
+$create_result1=odbc_exec($conn, "create class numeric_tb(smallint_t smallint,short_t short, int_t int ,bigint_t bigint,decimal_t decimal(15,2), numeric_t numeric(38,10), float_t float, real_t real, monetary_t monetary, double_t double )");
 if (!$create_result1) {
     die('Create Failed: ' . odbc_errormsg());
 }

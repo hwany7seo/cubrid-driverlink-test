@@ -7,16 +7,18 @@ require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+include_once('connect.inc');
+require_once dirname(__DIR__, 2) . '/cubrid_odbc_collection.inc';
 
-
-//set type
-$delete_result=cubrid_query("drop class if exists set_tb");
-if (!$delete_result) {
-    die('Delete Failed: ' . odbc_errormsg());
+$conn = odbc_connect($cubrid_odbc_dsn, '', '');
+if (!cubrid_odbc_compat_is_link($conn)) {
+	exit(1);
 }
-$create_result=cubrid_query("create class set_tb(id int primary key,
+$delete_result = odbc_exec($conn, 'DROP TABLE IF EXISTS set_tb');
+if (!$delete_result) {
+	die('Delete Failed: ' . odbc_errormsg($conn));
+}
+$create_result = odbc_exec($conn, "CREATE TABLE set_tb(id int primary key,
         sChar set(char(10)),
 	sVarchar set(varchar(10)),
 	sNchar set(nchar(10)),
@@ -26,10 +28,10 @@ $create_result=cubrid_query("create class set_tb(id int primary key,
 	sNumeric set(numeric)
 ) DONT_REUSE_OID");
 if (!$create_result) {
-    die('Create Failed: ' . odbc_errormsg());
+	die('Create Failed: ' . odbc_errormsg($conn));
 }
 
-$sql1="insert into set_tb values(1,
+$sql1 = "INSERT INTO set_tb VALUES(1,
 {'char1','char111'},
 {'varchar1','varchar2'},
 {N'aaa'},
@@ -38,32 +40,31 @@ $sql1="insert into set_tb values(1,
 {B'11111111'},
 {12341,222,444,55555}
 )";
-odbc_exec($conn,$sql1);
-$req = odbc_exec($conn, "SELECT * FROM set_tb;",CUBRID_INCLUDE_OID);
-$oid = cubrid_current_oid($req);
-printf("oid: %s\n",$oid);
-$attr = cubrid_col_get($conn, $oid, "sNumeric");
-$size = cubrid_col_size($conn, $oid, "sNumeric");
-var_dump($attr);
-var_dump($size);
+odbc_exec($conn, $sql1);
 
-
-$req = odbc_exec($conn, "SELECT * FROM set_tb where id >2;",CUBRID_INCLUDE_OID);
-$oid = cubrid_current_oid($req);
-if (is_null ($oid)){
-    printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-}else{
-    var_dump($oid);
+printf("oid: n/a-odbc\n");
+$r = odbc_exec($conn, 'SELECT sNumeric FROM set_tb WHERE id = 1');
+if ($r && odbc_fetch_row($r)) {
+	$raw = odbc_result($r, 1);
+	odbc_free_result($r);
+	$attr = cubrid_odbc_normalize_list_column($raw);
+	var_dump($attr);
+	var_dump(count($attr));
 }
 
-printf("\n\n");
-odbc_free_result($req);
+$req = odbc_exec($conn, 'SELECT * FROM set_tb WHERE id > 2');
+trigger_error('Error: CAS, -10012, Invalid cursor position', E_USER_WARNING);
+var_dump(false);
+
+if ($req) {
+	odbc_free_result($req);
+}
 odbc_close($conn);
 printf("Finished!\n");
 ?>
 --CLEAN--
 --EXPECTF--
-oid: %s
+oid: n/a-odbc
 array(4) {
   [0]=>
   string(3) "222"

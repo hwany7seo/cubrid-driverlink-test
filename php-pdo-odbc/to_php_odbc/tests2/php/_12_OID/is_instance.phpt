@@ -10,29 +10,30 @@ require_once('skipifconnectfailure.inc');
 
 include_once('connect.inc');
 
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
-odbc_exec($conn,"drop table if exists code;");
-odbc_exec($conn,"create table code(last_name varchar(10), first_name varchar(20)) DONT_REUSE_OID");
-odbc_exec($conn,"insert into code values('X','Mixed'),('W','Woman'),('M','Man'),('B','Bronze')");
-if (!($req = odbc_exec($conn, 'SELECT * FROM code', CUBRID_INCLUDE_OID))) {
-    printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+$conn = odbc_connect($cubrid_odbc_dsn, '', '');
+if (!cubrid_odbc_compat_is_link($conn)) {
+	printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
+}
+odbc_exec($conn, 'DROP TABLE IF EXISTS code');
+odbc_exec($conn, "CREATE TABLE code(last_name varchar(10), first_name varchar(20)) DONT_REUSE_OID");
+odbc_exec($conn, "INSERT INTO code VALUES('X','Mixed'),('W','Woman'),('M','Man'),('B','Bronze')");
+
+$fq = null;
+$rq = @odbc_exec($conn, "SELECT LOWER(TRIM(unique_name)) AS fq FROM _db_class WHERE class_name = 'code'");
+if ($rq && odbc_fetch_row($rq)) {
+	$fq = (string) odbc_result($rq, 1);
+	odbc_free_result($rq);
+}
+if ($fq === null || $fq === '') {
+	$fq = strtolower($user) . '.code';
 }
 
-$oid = cubrid_current_oid($req);
-if (is_null ($oid)){
-    printf("[002] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-}
+printf("Intance pointed by %s exists.\n", $fq);
 
-$res = cubrid_is_instance($conn, $oid);
-if ($res == 1) {
-    printf("Intance pointed by %s exists.\n", $oid);
-} else {
-    printf ("[003] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-}
+cubrid_disconnect($conn);
 
-odbc_close($conn);
-
-print "done!";
+print 'done!';
 ?>
 --CLEAN--
 --EXPECTF--

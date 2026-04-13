@@ -21,9 +21,6 @@ if (!cubrid_odbc_compat_is_link($conn)) {
     printf("[001] No connection after table.inc\n");
     exit(1);
 }
-
-cubrid_odbc_set_last_connection($conn);
-
 $blob = "\x89PNG\r\n\x1a\n" . str_repeat("\xFE\x01", 200) . 'cubrid_odbc_lob_basic';
 $blob_len = strlen($blob);
 

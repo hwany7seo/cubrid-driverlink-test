@@ -3,12 +3,13 @@ cubrid_fetch_lengths
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc')
 ?>
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 odbc_exec($conn,"drop table if exists fetch_length_tb");
 odbc_exec($conn,"CREATE TABLE fetch_length_tb(c1 string, c2 char(20), c3 int, c4 double, c5 time, c6 date, c7 TIMESTAMP,c8 bit, c9 numeric(13,4),c10 clob,c11 blob);");
 odbc_exec($conn,"insert into fetch_length_tb values('string1','char1',1,11.11,TIME '02:10:00',DATE '08/14/1977', TIMESTAMP '08/14/1977 5:35:00 pm',B'1',432341.4321, CHAR_TO_CLOB('This is a Dog'), BIT_TO_BLOB(X'000001'))");
@@ -16,7 +17,7 @@ odbc_exec($conn,"insert into fetch_length_tb(c1,c2,c3,c4) values('string2','char
 odbc_exec($conn,"insert into fetch_length_tb(c5,c6,c7,c8,c9) values(TIME '00:00:00', DATE '2008-10-31',TIMESTAMP '10/31',B'1',513254.3143513)");
 
 print("#####positive example#####\n");
-if (!$req = cubrid_query("select c1,c2,c3,c4,c5,c6,c7,c8,c9 from fetch_length_tb order by c1 DESC", $conn)) {
+if (!$req = odbc_exec($conn, "select c1,c2,c3,c4,c5,c6,c7,c8,c9 from fetch_length_tb order by c1 DESC")) {
     printf("correct1 [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
@@ -33,7 +34,7 @@ print_r(cubrid_fetch_lengths($req));
 odbc_free_result($req);
 
 print("\n\n#####negative example#####\n");
-if (!$req2 = cubrid_query("select c1,c2,c3,c4,c5,c6,c7,c8,c9 from fetch_length_tb where c3 > 10", $conn)) {
+if (!$req2 = odbc_exec($conn, "select c1,c2,c3,c4,c5,c6,c7,c8,c9 from fetch_length_tb where c3 > 10")) {
    printf("negative1 query [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    $row2 = odbc_fetch_row($req2);

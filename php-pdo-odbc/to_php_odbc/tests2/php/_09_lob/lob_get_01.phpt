@@ -3,6 +3,7 @@ cubrid_lob_get  cubrid_lob_export cubrid_lob_size
 --SKIPIF-- 
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -13,7 +14,7 @@ $tmp = NULL;
 $fp1 = fopen('php/_09_lob/logo1.png', 'rb');
 $fp2= fopen('php/_09_lob/logo2.png', 'rb');
 $fp3= fopen('php/_09_lob/logo3.png', 'rb');
-$conn=odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn=odbc_connect($cubrid_odbc_dsn, "", "");
 odbc_exec($conn,"drop table if exists get_tb");
 odbc_exec($conn,"CREATE TABLE get_tb(a int AUTO_INCREMENT,b blob, e blob, f clob)");
 $cubrid_req = odbc_prepare($conn, "insert into get_tb (b,e) values (?,?)");

@@ -3,6 +3,7 @@ cubrid_unbuffered_query cubrid_free_result
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -10,7 +11,7 @@ require_once('skipifconnectfailure.inc');
 include_once("connect.inc");
 
 $tmp = NULL;
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 odbc_exec($conn, 'DROP TABLE IF EXISTS unbuffered_tb');
 odbc_exec($conn,"CREATE TABLE unbuffered_tb(id int primary key, name varchar(10))");
 odbc_exec($conn,"insert into unbuffered_tb values(1,'name1'),(2,'name2'),(3,'name3'),(4,'name4'),(5,'name5')");

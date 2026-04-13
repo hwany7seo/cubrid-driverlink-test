@@ -8,4 +8,4 @@ echo phpversion();
 ?>
 --CLEAN--
 --EXPECTF--
-7.%s
+%d.%s

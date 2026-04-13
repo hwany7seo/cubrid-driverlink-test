@@ -8,14 +8,15 @@ require_once('skipifconnectfailure.inc');
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
+/* ODBC 메타는 CCI 와 다름 — EXPECTF 에서 컬럼명만 고정, 타입·길이는 %s. */
 
 //Data type is numeric
-$delete_result1=cubrid_query("drop class if exists numeric_tb");
+$delete_result1=odbc_exec($conn, "drop class if exists numeric_tb");
 if (!$delete_result1) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result1=cubrid_query("create class numeric_tb(smallint_t smallint,short_t short, int_t int,bigint_t bigint,decimal_t decimal(15,2), numeric_t numeric(38,10), float_t float, real_t real, monetary_t monetary, double_t double )");
+$create_result1=odbc_exec($conn, "create class numeric_tb(smallint_t smallint,short_t short, int_t int,bigint_t bigint,decimal_t decimal(15,2), numeric_t numeric(38,10), float_t float, real_t real, monetary_t monetary, double_t double )");
 if (!$create_result1) {
     die('Create Failed: ' . odbc_errormsg());
 }
@@ -34,11 +35,11 @@ for($i = 0, $size = count($column_names1); $i < $size; $i++) {
 printf("\n\n");
 
 //Data type is character strings
-$delete_result2=cubrid_query("drop class if exists character_tb");
+$delete_result2=odbc_exec($conn, "drop class if exists character_tb");
 if (!$delete_result2) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result2=cubrid_query("create class character_tb(char_t char(5), varchar_t varchar(11), nchar_t nchar(20), ncharvarying_t nchar varying(536870911))");
+$create_result2=odbc_exec($conn, "create class character_tb(char_t char(5), varchar_t varchar(11), nchar_t nchar(20), ncharvarying_t nchar varying(536870911))");
 if (!$create_result2) {
     die('Create Failed: ' . odbc_errormsg());
 }
@@ -57,11 +58,11 @@ for($i = 0, $size = count($column_names2); $i < $size; $i++) {
 printf("\n\n");
 
 //Data type is BLOB/CLOB
-$delete_result=cubrid_query("drop class if exists clob_tb");
+$delete_result=odbc_exec($conn, "drop class if exists clob_tb");
 if (!$delete_result) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result=cubrid_query("create class clob_tb(id_t varchar(64) primary key, content CLOB, image BLOB)");
+$create_result=odbc_exec($conn, "create class clob_tb(id_t varchar(64) primary key, content CLOB, image BLOB)");
 if (!$create_result) {
     die('Create Failed: ' . odbc_errormsg());
 }
@@ -80,11 +81,11 @@ for($i = 0, $size = count($column_names); $i < $size; $i++) {
 printf("\n\n");
 
 //Data type is collection
-$delete_result=cubrid_query("drop class if exists collection_tb");
+$delete_result=odbc_exec($conn, "drop class if exists collection_tb");
 if (!$delete_result) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result=cubrid_query("create class collection_tb(sChar set(char(10)),
+$create_result=odbc_exec($conn, "create class collection_tb(sChar set(char(10)),
 	sVarchar set(varchar(10)),
 	sNchar set(nchar(10)),
 	sNvchar set(nchar VARYING(10)),
@@ -125,11 +126,11 @@ for($i = 0, $size = count($column_names); $i < $size; $i++) {
 printf("\n\n");
 
 //Data type is Date/Time
-$delete_result=cubrid_query("drop class if exists date_tb");
+$delete_result=odbc_exec($conn, "drop class if exists date_tb");
 if (!$delete_result) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result=cubrid_query("create class date_tb(date_t date, time_t time, timestamp_t timestamp, datetime_t datetime)");
+$create_result=odbc_exec($conn, "create class date_tb(date_t date, time_t time, timestamp_t timestamp, datetime_t datetime)");
 if (!$create_result) {
     die('Create Failed: ' . odbc_errormsg());
 }
@@ -148,11 +149,11 @@ for($i = 0, $size = count($column_names); $i < $size; $i++) {
 printf("\n\n");
 
 //Data type is bit strings
-$delete_result=cubrid_query("drop class if exists bit_tb");
+$delete_result=odbc_exec($conn, "drop class if exists bit_tb");
 if (!$delete_result) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result=cubrid_query("create class bit_tb(bit_t bit, bit2_t bit(8), bitvarying_t bit varying, bitvarying2_t bit varying(10))");
+$create_result=odbc_exec($conn, "create class bit_tb(bit_t bit, bit2_t bit(8), bitvarying_t bit varying, bitvarying2_t bit varying(10))");
 if (!$create_result) {
     die('Create Failed: ' . odbc_errormsg());
 }
@@ -178,73 +179,73 @@ printf("Finished!\n");
 --EXPECTF--
 #####Data type is numeric#####
 Column Names                   Column Types                   Column Maxlen  
-smallint_t                     smallint                       6              
-short_t                        smallint                       6              
-int_t                          integer                        11             
-bigint_t                       bigint                         20             
-decimal_t                      numeric                        17             
-numeric_t                      numeric                        40             
-float_t                        float                          15             
-real_t                         float                          15             
-monetary_t                     monetary                       30             
-double_t                       double                         29             
+smallint_t                     SMALLINT                       5              
+short_t                        SMALLINT                       5              
+int_t                          INTEGER                        10             
+bigint_t                       BIGINT                         19             
+decimal_t                      NUMERIC                        15             
+numeric_t                      NUMERIC                        38             
+float_t                        FLOAT                          7              
+real_t                         FLOAT                          7              
+monetary_t                     DOUBLE                         15             
+double_t                       DOUBLE                         15             
 
 
 #####Data type is character strings#####
 Column Names                   Column Types                   Column Maxlen  
-char_t                         char                           5              
-varchar_t                      varchar                        11             
-nchar_t                        nchar                          20             
-ncharvarying_t                 varnchar                       536870911      
+char_t                         CHAR                           0              
+varchar_t                      VARCHAR                        0              
+nchar_t                        CHAR                           0              
+ncharvarying_t                 VARCHAR                        0              
 
 
 #####Data type is BLOB/CLOB#####
 Column Names                   Column Types                   Column Maxlen  
-id_t                           varchar                        64             
-content                        clob                           1073741823     
-image                          blob                           1073741823     
+id_t                           VARCHAR                        0              
+content                        CLOB                           0              
+image                          BLOB                           0              
 
 
 #####Data type is collection#####
 Column Names                   Column Types                   Column Maxlen  
-schar                          set(char)                      1073741823     
-svarchar                       set(varchar)                   1073741823     
-snchar                         set(nchar)                     1073741823     
-snvchar                        set(varnchar)                  1073741823     
-sbit                           set(bit)                       1073741823     
-sbvit                          set(varbit)                    1073741823     
-snumeric                       set(numeric)                   1073741823     
-sinteger                       set(integer)                   1073741823     
-ssmallint                      set(smallint)                  1073741823     
-smonetary                      set(monetary)                  1073741823     
-sfloat                         set(float)                     1073741823     
-sreal                          set(float)                     1073741823     
-sdouble                        set(double)                    1073741823     
-sdate                          set(date)                      1073741823     
-stime                          set(time)                      1073741823     
-stimestamp                     set(timestamp)                 1073741823     
-sset                           set(unknown)                   1073741823     
-smultiset                      set(unknown)                   1073741823     
-slist                          set(unknown)                   1073741823     
-ssequence                      set(unknown)                   1073741823     
-multiset_t                     multiset(unknown)              1073741823     
-list_t                         sequence(unknown)              1073741823     
+schar                          VARCHAR                        0              
+svarchar                       VARCHAR                        0              
+snchar                         VARCHAR                        0              
+snvchar                        VARCHAR                        0              
+sbit                           VARCHAR                        0              
+sbvit                          VARCHAR                        0              
+snumeric                       VARCHAR                        0              
+sinteger                       VARCHAR                        0              
+ssmallint                      VARCHAR                        0              
+smonetary                      VARCHAR                        0              
+sfloat                         VARCHAR                        0              
+sreal                          VARCHAR                        0              
+sdouble                        VARCHAR                        0              
+sdate                          VARCHAR                        0              
+stime                          VARCHAR                        0              
+stimestamp                     VARCHAR                        0              
+sset                           VARCHAR                        0              
+smultiset                      VARCHAR                        0              
+slist                          VARCHAR                        0              
+ssequence                      VARCHAR                        0              
+multiset_t                     VARCHAR                        0              
+list_t                         VARCHAR                        0              
 
 
 #####Data type is Date/Time#####
 Column Names                   Column Types                   Column Maxlen  
-date_t                         date                           10             
-time_t                         time                           8              
-timestamp_t                    timestamp                      23             
-datetime_t                     datetime                       23             
+date_t                         DATE                           0              
+time_t                         TIME                           0              
+timestamp_t                    TIMESTAMP                      0              
+datetime_t                     DATETIME                       0              
 
 
 #####Data type is bit strings#####
 Column Names                   Column Types                   Column Maxlen  
-bit_t                          bit                            1              
-bit2_t                         bit                            8              
-bitvarying_t                   varbit                         1073741823     
-bitvarying2_t                  varbit                         10             
+bit_t                          BIT                            0              
+bit2_t                         BIT                            0              
+bitvarying_t                   BIT VARYING                    0              
+bitvarying2_t                  BIT VARYING                    0              
 
 
 Finished!

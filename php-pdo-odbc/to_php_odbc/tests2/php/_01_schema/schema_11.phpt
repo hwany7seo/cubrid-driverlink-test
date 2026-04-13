@@ -3,13 +3,14 @@ cubrid_schema CUBRID_SCH_TRIGGER
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
 //CUBRID_SCH_TRIGGER
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 odbc_exec($conn,"drop class if exists hi");
 odbc_exec($conn,"drop class if exists tt1");

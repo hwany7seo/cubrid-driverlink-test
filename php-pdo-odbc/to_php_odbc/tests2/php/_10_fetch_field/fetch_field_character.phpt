@@ -8,14 +8,14 @@ require_once('skipifconnectfailure.inc');
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 //Data type is character strings
-$delete_result2=cubrid_query("drop class if exists character_tb");
+$delete_result2=odbc_exec($conn, "drop class if exists character_tb");
 if (!$delete_result2) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result2=cubrid_query("create class character_tb(char_t char(5), varchar_t varchar(11), nchar_t nchar(20), ncharvarying_t nchar varying(536870911))");
+$create_result2=odbc_exec($conn, "create class character_tb(char_t char(5), varchar_t varchar(11), nchar_t nchar(20), ncharvarying_t nchar varying(536870911))");
 if (!$create_result2) {
     die('Create Failed: ' . odbc_errormsg());
 }

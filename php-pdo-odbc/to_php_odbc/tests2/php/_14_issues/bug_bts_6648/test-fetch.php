@@ -6,7 +6,7 @@ for ($i = 0; $i <1;$i++) {
     // $con = cubrid_connect ("10.24.18.65", 33099, "ccitest", "dba", "") 
 
     if ($con) { 
-            $req = cubrid_query ($sql, $con); 
+            $req = odbc_exec($con, $sql); 
             //$req = cubrid_execute ($con, $sql) 
             if (! $req) { 
                 break; 

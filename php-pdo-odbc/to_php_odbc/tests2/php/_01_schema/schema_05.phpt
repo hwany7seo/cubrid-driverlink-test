@@ -3,6 +3,7 @@ cubrid_schema CUBRID_SCH_CONSTRAINT
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -12,7 +13,7 @@ include "connect.inc";
 //CUBRID_SCH_CONSTRAINT parameter
 //table contains index, reverse index, unique index,shared, not null and REVERSE UNIQUE INDEX 
 printf("\n#####CUBRID_SCH_CONSTRAINT #####\n");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 odbc_exec($conn,"drop table if EXISTS schema_2;");
 odbc_exec($conn,"drop table if EXISTS schema_1;");

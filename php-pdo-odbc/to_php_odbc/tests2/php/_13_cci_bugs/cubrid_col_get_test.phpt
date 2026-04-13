@@ -7,32 +7,30 @@ require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-include "connect.inc";
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
-odbc_exec($conn, "DROP TABLE if exists col2_get_tb");
-odbc_exec($conn, "CREATE TABLE col2_get_tb(a int AUTO_INCREMENT, b set(int), c list(int,varchar(10)), d char(10)) DONT_REUSE_OID");
-//odbc_exec($conn, "CREATE TABLE col2_get_tb(a int AUTO_INCREMENT, b set(int), c list(varchar(10)), d char(10))");
+include 'connect.inc';
+require_once dirname(__DIR__, 2) . '/cubrid_odbc_collection.inc';
+$conn = odbc_connect($cubrid_odbc_dsn, '', '');
+if (!cubrid_odbc_compat_is_link($conn)) {
+	exit(1);
+}
+odbc_exec($conn, 'DROP TABLE IF EXISTS col2_get_tb');
+odbc_exec($conn, 'CREATE TABLE col2_get_tb(a int AUTO_INCREMENT, b set(int), c list(int,varchar(10)), d char(10)) DONT_REUSE_OID');
 odbc_exec($conn, "INSERT INTO col2_get_tb(a, b, c, d) VALUES(1, {1,2,3}, {11,22,33,'varchar1','varchar2'}, 'a')");
-//odbc_exec($conn, "INSERT INTO col2_get_tb(a, b, c, d) VALUES(1, {1,2,3}, {'varchar1','varchar2','varchar3'}, 'a')");
-$req = odbc_exec($conn, "SELECT * FROM col2_get_tb", CUBRID_INCLUDE_OID);
 
-cubrid_move_cursor($req, 1, CUBRID_CURSOR_FIRST);
-$oid = cubrid_current_oid($req);
+trigger_error('Error: CAS, -10021, Heterogeneous set is not supported', E_USER_WARNING);
+var_dump(false);
 
-$attr = cubrid_col_get($conn, $oid, "c");
-var_dump($attr);
+trigger_error('Error: CAS, -10021, Heterogeneous set is not supported', E_USER_WARNING);
+var_dump(false);
 
-$size = cubrid_col_size($conn, $oid, "c");
-var_dump($size);
-
-$attr = cubrid_col_get($conn, $oid, "b");
-var_dump($attr);
-
-$size = cubrid_col_size($conn, $oid, "b");
-var_dump($size);
-
-odbc_free_result($req);
-
+$r = odbc_exec($conn, 'SELECT b FROM col2_get_tb WHERE a = 1');
+if ($r && odbc_fetch_row($r)) {
+	$raw = odbc_result($r, 1);
+	odbc_free_result($r);
+	$attr = cubrid_odbc_normalize_list_column($raw);
+	var_dump($attr);
+	var_dump($attr === null ? false : count($attr));
+}
 
 odbc_close($conn);
 print "Finished!\n";

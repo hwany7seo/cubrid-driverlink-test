@@ -8,7 +8,7 @@ require_once('skipifconnectfailure.inc');
 --FILE--
 <?php
 include_once "connect.inc";
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 $unescaped_str = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
 $escaped_str = cubrid_real_escape_string($unescaped_str);
 

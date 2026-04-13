@@ -11,8 +11,6 @@ require_once('until.php');
 include_once('connect.inc');
 
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
-cubrid_odbc_set_last_connection($conn);
-
 require_once('table.inc');
 
 $sql_stmt = "INSERT INTO php_cubrid_test(d) VALUES('php-test')";

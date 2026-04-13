@@ -25,8 +25,6 @@ if (!cubrid_odbc_compat_is_link($conn)) {
     printf("[001] No connection after table.inc\n");
     exit(1);
 }
-cubrid_odbc_set_last_connection($conn);
-
 $lob_data = "Hello, welcome to CUBRID world! I'm LOB.";
 
 if (!odbc_exec($conn, "DELETE FROM php_cubrid_test WHERE d = 'lob2_read_odbc'")) {

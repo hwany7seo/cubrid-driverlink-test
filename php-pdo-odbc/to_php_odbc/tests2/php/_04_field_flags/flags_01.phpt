@@ -3,13 +3,14 @@ cubrid_field_flag
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
 //table contains all kinds of type
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 odbc_exec($conn,"drop table if exists flag1_tb;");
 odbc_exec($conn,"CREATE TABLE flag1_tb(c1 string primary key , c2 char(20) not null , c3 int unique key auto_increment, c4 double default 22.22, c5 time default TIME '23:59:59', c6 date, c7 TIMESTAMP default TIMESTAMP  '2038-01-19 12:14:07',c8 bit, c9 numeric(13,4));");
 odbc_exec($conn,"insert into flag1_tb values('string111111','char11111',1,11.11,TIME '02:10:00',DATE '1977-08-14', TIMESTAMP '1977-08-14 5:35:00 pm',B'1',432341.4321)");

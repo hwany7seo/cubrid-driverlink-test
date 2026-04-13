@@ -3,6 +3,7 @@ cubrid_fetch_object
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -16,7 +17,7 @@ if (is_null($tmp2 = @cubrid_fetch_object($conn))) {
     printf("[002] Expecting NULL, got %s,%s\n", gettype($tmp2), $tmp2);
 }
 
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 odbc_exec($conn,"drop table if exists fetch_object_tb");
 odbc_exec($conn,"CREATE TABLE fetch_object_tb(c1 string, c2 char(20), c3 int, c4 double, c5 time, c6 date)");

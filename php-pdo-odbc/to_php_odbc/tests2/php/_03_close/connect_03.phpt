@@ -3,6 +3,7 @@ cubrid_connect $new_link = true
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc')
 ?>
 --FILE--
@@ -10,28 +11,28 @@ require_once('skipifconnectfailure.inc')
 include_once('connect.inc');
 printf("#####positive example#####\n");
 printf("\n#####new_link is true#####\n");
-$conn1 = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn1 = odbc_connect($cubrid_odbc_dsn, "", "");
 if (!$conn1) {
     printf("[001] [%d] %s\n", odbc_error(), odbc_errormsg());
 }else{
     printf("[001]conn1 values: %s \n",$conn1);
 }
 
-$conn2 = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn2 = odbc_connect($cubrid_odbc_dsn, "", "");
 if (!$conn2) {
     printf("[002] [%d] %s\n", odbc_error(), odbc_errormsg());
 }else{
     printf("[002]conn2 values: %s \n",$conn2);
 }
 
-$conn3 = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn3 = odbc_connect($cubrid_odbc_dsn, "", "");
 if (!$conn3) {
     printf("[003] [%d] %s\n", odbc_error(), odbc_errormsg());
 }else{
     printf("[003]conn3 values: %s \n",$conn3);
 }
 
-$conn4 = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn4 = odbc_connect($cubrid_odbc_dsn, "", "");
 if (!$conn4) {
     printf("[004] [%d] %s\n", odbc_error(), odbc_errormsg());
 }else{

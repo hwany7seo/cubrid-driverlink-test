@@ -3,12 +3,13 @@ negative: cubrid_lob2_tell64, cubrid_lob2_seek64
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
 include "connectLarge.inc";
-$conn=odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn=odbc_connect($cubrid_odbc_dsn, "", "");
 $req=odbc_exec($conn, "select * from largeTable");
 $row = cubrid_fetch($req, CUBRID_NUM | CUBRID_LOB);
 $lob=$row[1];

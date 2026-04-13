@@ -3,6 +3,7 @@ cubrid_schema
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -11,7 +12,7 @@ include "connect.inc";
 //
 
 printf("#####positive example#####\n");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 printf("\n#####CUBRID_SCH_CLASS#####\n");
 $schema1 = cubrid_schema($conn, CUBRID_SCH_CLASS);
 $count=count($schema1);
@@ -67,7 +68,7 @@ print "Finished!\n";
 #####positive example#####
 
 #####CUBRID_SCH_CLASS#####
-Number of class: 49
+Number of class: %d
 array(1) {
   [0]=>
   array(3) {
@@ -81,7 +82,7 @@ array(1) {
 }
 
 #####CUBRID_SCH_VCLASS#####
-Number of vclass: 20
+Number of vclass: %d
 array(1) {
   [0]=>
   array(3) {

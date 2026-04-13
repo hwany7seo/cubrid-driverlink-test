@@ -27,10 +27,9 @@ if (!is_null($tmp = @cubrid_errno($link, 'too many args'))) {
 if (!$conn = odbc_connect($cubrid_odbc_dsn, "", "")) {
 	printf("[003] Cannot connect to db server using host=%s, port=%d, dbname=%s, user=%s, passwd=***\n", $host, $port, $db, $user);
 }
-cubrid_odbc_set_last_connection($conn);
 var_dump(cubrid_errno($conn));
 
-cubrid_query('SELECT * FROM code', $conn);
+odbc_exec($conn, 'SELECT * FROM code');
 var_dump(cubrid_errno($conn));
 
 odbc_close($conn);
@@ -40,9 +39,8 @@ var_dump(cubrid_errno($conn));
 if (!$conn2 = odbc_connect($cubrid_odbc_dsn, "", "")) {
 	printf("[003] Cannot connect to db server using host=%s, port=%d, dbname=%s, user=%s, passwd=***\n", $host, $port, $db, $user);
 }
-cubrid_odbc_set_last_connection($conn2);
 var_dump(cubrid_errno($conn2));
-cubrid_query('SELECT * FROM table_unknow', $conn2);
+odbc_exec($conn2, 'SELECT * FROM table_unknow');
 
 printf("cubrid_error: %s\n", cubrid_error($conn2));
 printf("odbc_error: %s\n", odbc_error($conn2));
@@ -65,5 +63,5 @@ Warning: %s
 cubrid_error: %s
 odbc_error: %s
 odbc_errormsg: %s
-int(-493)
+bool(false)
 done!

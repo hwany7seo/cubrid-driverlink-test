@@ -11,8 +11,6 @@ include_once("connect.inc");
 
 $tmp = NULL;
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
-cubrid_odbc_set_last_connection($conn);
-
 if (cubrid_get_autocommit($conn)) {
 	printf("Autocommit is ON.\n");
 } else {
@@ -20,37 +18,31 @@ if (cubrid_get_autocommit($conn)) {
 }
 
 @odbc_exec($conn, "DROP TABLE IF EXISTS autocommit_test");
-cubrid_query('CREATE TABLE autocommit_test(a int)', $conn);
-cubrid_query('INSERT INTO autocommit_test(a) VALUES(1)', $conn);
+odbc_exec($conn, 'CREATE TABLE autocommit_test(a int)');
+odbc_exec($conn, 'INSERT INTO autocommit_test(a) VALUES(1)');
 
 odbc_close($conn);
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
-cubrid_odbc_set_last_connection($conn);
-
-$req = cubrid_query('SELECT * FROM autocommit_test', $conn);
+$req = odbc_exec($conn, 'SELECT * FROM autocommit_test');
 $res = cubrid_fetch_assoc($req);
 
 var_dump($res);
 
 cubrid_set_autocommit($conn, CUBRID_AUTOCOMMIT_FALSE);
-cubrid_query('UPDATE autocommit_test SET a=2', $conn);
+odbc_exec($conn, 'UPDATE autocommit_test SET a=2');
 
 odbc_close($conn);
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
-cubrid_odbc_set_last_connection($conn);
-
-$req = cubrid_query('SELECT * FROM autocommit_test', $conn);
+$req = odbc_exec($conn, 'SELECT * FROM autocommit_test');
 $res = cubrid_fetch_assoc($req);
 
 var_dump($res);
 
-cubrid_query('DROP TABLE IF EXISTS autocommit_test', $conn);
+odbc_exec($conn, 'DROP TABLE IF EXISTS autocommit_test');
 
 odbc_close($conn);
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
-cubrid_odbc_set_last_connection($conn);
-
-$req = cubrid_query('SELECT * FROM autocommit_test', $conn);
+$req = odbc_exec($conn, 'SELECT * FROM autocommit_test');
 
 odbc_close($conn);
 

@@ -8,7 +8,7 @@ require_once('skipifconnectfailure.inc');
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 if (cubrid_get_autocommit($conn)) {
     printf("Autocommit is ON.\n");
 } else {
@@ -17,52 +17,52 @@ if (cubrid_get_autocommit($conn)) {
 
 cubrid_set_autocommit($conn,CUBRID_AUTOCOMMIT_FALSE);
 odbc_exec($conn, "DROP TABLE if exists commit1_tb");
-cubrid_query('CREATE TABLE commit1_tb(a int, b varchar(10))');
+odbc_exec($conn, 'CREATE TABLE commit1_tb(a int, b varchar(10))');
 odbc_commit($conn);
 
 printf("#####correct example#####\n");
 //insert 
-cubrid_query('INSERT INTO commit1_tb(a) VALUE(1),(2),(3)');
-$req = cubrid_query('SELECT * FROM commit1_tb');
+odbc_exec($conn, 'INSERT INTO commit1_tb(a) VALUE(1),(2),(3)');
+$req = odbc_exec($conn, 'SELECT * FROM commit1_tb');
 $num_before = odbc_num_rows($req);
 printf("Before rollback, record num: %d\n",$num_before);
 
 odbc_rollback($conn);
-$req = cubrid_query('SELECT * FROM commit1_tb');
+$req = odbc_exec($conn, 'SELECT * FROM commit1_tb');
 $num_after = odbc_num_rows($req);
 printf("After rollback, record num: %d\n",$num_after);
 
 //update
-cubrid_query('INSERT INTO commit1_tb(a) VALUE(1),(2),(3)');
+odbc_exec($conn, 'INSERT INTO commit1_tb(a) VALUE(1),(2),(3)');
 odbc_commit($conn);
-cubrid_query("update commit1_tb set b='hasname' where a=3 ");
-$req = cubrid_query('SELECT * FROM commit1_tb where a=3');
+odbc_exec($conn, "update commit1_tb set b='hasname' where a=3 ");
+$req = odbc_exec($conn, 'SELECT * FROM commit1_tb where a=3');
 $result = odbc_fetch_array($req);
 printf("Before rollback:\n");
 var_dump($result);
 
 odbc_rollback($conn);
-$req = cubrid_query('SELECT * FROM commit1_tb where a=3');
+$req = odbc_exec($conn, 'SELECT * FROM commit1_tb where a=3');
 $result = odbc_fetch_array($req);
 printf("After rollback:\n");
 var_dump($result);
 
 //
-cubrid_query("delete from commit1_tb where a=3 ");
-$req = cubrid_query('SELECT * FROM commit1_tb where a=3');
+odbc_exec($conn, "delete from commit1_tb where a=3 ");
+$req = odbc_exec($conn, 'SELECT * FROM commit1_tb where a=3');
 $result = odbc_fetch_array($req);
 printf("Before rollback:\n");
 var_dump($result);
 
 odbc_rollback($conn);
-$req = cubrid_query('SELECT * FROM commit1_tb where a=3');
+$req = odbc_exec($conn, 'SELECT * FROM commit1_tb where a=3');
 $result = odbc_fetch_array($req);
 printf("After rollback:\n");
 var_dump($result);
 
 //drop table
-cubrid_query("drop table commit1_tb ");
-$req = cubrid_query('SELECT * FROM commit1_tb');
+odbc_exec($conn, "drop table commit1_tb ");
+$req = odbc_exec($conn, 'SELECT * FROM commit1_tb');
 if(FALSE == $req){
    printf("[001]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
@@ -71,7 +71,7 @@ if(FALSE == $req){
    var_dump($result);
 }
 odbc_rollback($conn);
-$req = cubrid_query('SELECT * FROM commit1_tb');
+$req = odbc_exec($conn, 'SELECT * FROM commit1_tb');
 $result = odbc_fetch_array($req);
 printf("After rollback:\n");
 var_dump($result);
@@ -79,27 +79,27 @@ var_dump($result);
 
 printf("\n\n#####set autocommit true#####\n");
 cubrid_set_autocommit($conn,CUBRID_AUTOCOMMIT_TRUE);
-cubrid_query("INSERT INTO commit1_tb(a,b) values(8,'name8')");
-$req = cubrid_query('SELECT * FROM commit1_tb where a=8');
+odbc_exec($conn, "INSERT INTO commit1_tb(a,b) values(8,'name8')");
+$req = odbc_exec($conn, 'SELECT * FROM commit1_tb where a=8');
 $result = odbc_fetch_array($req);
 printf("Before rollback:\n");
 var_dump($result);
 
 odbc_rollback($conn);
-$req = cubrid_query('SELECT * FROM commit1_tb where a=8');
+$req = odbc_exec($conn, 'SELECT * FROM commit1_tb where a=8');
 $result = odbc_fetch_array($req);
 printf("After rollback:\n");
 var_dump($result);
 
 
-cubrid_query("delete from commit1_tb where a=8 ");
-$req = cubrid_query('SELECT * FROM commit1_tb where a=8');
+odbc_exec($conn, "delete from commit1_tb where a=8 ");
+$req = odbc_exec($conn, 'SELECT * FROM commit1_tb where a=8');
 $result = odbc_fetch_array($req);
 printf("Before rollback:\n");
 var_dump($result);
 
 odbc_rollback($conn);
-$req = cubrid_query('SELECT * FROM commit1_tb where a=8');
+$req = odbc_exec($conn, 'SELECT * FROM commit1_tb where a=8');
 $result = odbc_fetch_array($req);
 printf("After rollback:\n");
 var_dump($result);

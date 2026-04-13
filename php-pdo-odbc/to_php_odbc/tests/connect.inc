@@ -26,4 +26,4 @@ if ($dsn_override !== false && $dsn_override !== '') {
 		$db
 	);
 }
-require_once __DIR__ . '/cubrid_odbc_compat.inc';
+require_once __DIR__ . '/../cubrid_odbc_compat.inc';

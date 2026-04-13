@@ -17,7 +17,7 @@ if (!$conn) {
     exit(1);
 }
 
-@cubrid_query("DROP TABLE IF EXISTS php_cubrid_test", $conn);
+@odbc_exec($conn, "DROP TABLE IF EXISTS php_cubrid_test");
 
 odbc_exec($conn, "CREATE TABLE php_cubrid_test (a int AUTO_INCREMENT, b set(int), c list(int), d char(30)) DONT_REUSE_OID");
 

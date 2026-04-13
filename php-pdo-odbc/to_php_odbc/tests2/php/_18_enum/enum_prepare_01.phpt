@@ -8,7 +8,7 @@ require_once('skipifconnectfailure.inc')
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 //drop the class if exist
 $sql = "drop table if exists enum032";
@@ -34,9 +34,10 @@ for($i = 0; $i < $size; $i++) {
 printf("%-30s", $column_names1[$i]);
 }
 print("\n");
-while($row = odbc_fetch_row($req)){
-for($i = 0; $i < $size; $i++) {
-   printf("%-30s", $row[$i]);
+while (odbc_fetch_row($req)) {
+for ($i = 0; $i < $size; $i++) {
+   $__c = cubrid_odbc_result_cell($req, $i);
+   printf("%-30s", $__c !== false ? $__c : '');
 }
 print("\n");
 }
@@ -68,9 +69,10 @@ for($i = 0; $i < $size; $i++) {
 printf("%-30s", $column_names1[$i]);
 }
 print("\n");
-while($row = odbc_fetch_row($req)){
-for($i = 0; $i < $size; $i++) {
-   printf("%-30s", $row[$i]);
+while (odbc_fetch_row($req)) {
+for ($i = 0; $i < $size; $i++) {
+   $__c = cubrid_odbc_result_cell($req, $i);
+   printf("%-30s", $__c !== false ? $__c : '');
 }
 print("\n");
 }
@@ -93,9 +95,10 @@ for($i = 0; $i < $size; $i++) {
 printf("%-30s", $column_names1[$i]);
 }
 print("\n");
-while($row = odbc_fetch_row($req)){
-for($i = 0; $i < $size; $i++) {
-   printf("%-30s", $row[$i]);
+while (odbc_fetch_row($req)) {
+for ($i = 0; $i < $size; $i++) {
+   $__c = cubrid_odbc_result_cell($req, $i);
+   printf("%-30s", $__c !== false ? $__c : '');
 }
 print("\n");
 }
@@ -118,9 +121,10 @@ for($i = 0; $i < $size; $i++) {
 printf("%-30s", $column_names1[$i]);
 }
 print("\n");
-while($row = odbc_fetch_row($req)){
-for($i = 0; $i < $size; $i++) {
-   printf("%-30s", $row[$i]);
+while (odbc_fetch_row($req)) {
+for ($i = 0; $i < $size; $i++) {
+   $__c = cubrid_odbc_result_cell($req, $i);
+   printf("%-30s", $__c !== false ? $__c : '');
 }
 print("\n");
 }
@@ -153,9 +157,10 @@ for($i = 0; $i < $size; $i++) {
 printf("%-30s", $column_names1[$i]);
 }
 print("\n");
-while($row = odbc_fetch_row($req)){
-for($i = 0; $i < $size; $i++) {
-   printf("%-30s", $row[$i]);
+while (odbc_fetch_row($req)) {
+for ($i = 0; $i < $size; $i++) {
+   $__c = cubrid_odbc_result_cell($req, $i);
+   printf("%-30s", $__c !== false ? $__c : '');
 }
 print("\n");
 }

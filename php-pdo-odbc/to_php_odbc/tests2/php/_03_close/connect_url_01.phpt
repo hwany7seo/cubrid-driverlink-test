@@ -3,6 +3,7 @@ cubrid_connect_with_url
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -10,7 +11,7 @@ require_once('skipifconnectfailure.inc');
 include_once("connect.inc");
 printf("#####positive example#####\n");
 
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 if (!$conn) {
     printf("[001] [%d] %s\n", odbc_error(), odbc_errormsg());
 }
@@ -23,7 +24,7 @@ if ($conn != $conn1) {
 if ($conn == $conn2) {
     printf("[003] Can not make a new connection with the same parameters!");
 }
-$conn4 = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn4 = odbc_connect($cubrid_odbc_dsn, "", "");
 if (!$conn4) {
     printf("[004] [%d] %s\n", odbc_error(), odbc_errormsg());
 }else{
@@ -59,7 +60,7 @@ odbc_close($conn4);
 odbc_close($conn5);
 odbc_close($conn6);
 
-$conn7=odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn7=odbc_connect($cubrid_odbc_dsn, "", "");
 if (FALSE == $conn7) {
     printf("[007]No Expect: return value false. [%d] [%s]\n", odbc_error(), odbc_errormsg());
 }elseif(TRUE == $conn7){
@@ -88,7 +89,7 @@ if (FALSE == $conn8) {
     printf("[009]autocommit value: %s\n",$autocommit);
 }
 
-$conn9=odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn9=odbc_connect($cubrid_odbc_dsn, "", "");
 if (FALSE == $conn9) {
     printf("[010]Expect: return value false. [%d] [%s]\n", odbc_error(), odbc_errormsg());
 }elseif(TRUE == $conn9){

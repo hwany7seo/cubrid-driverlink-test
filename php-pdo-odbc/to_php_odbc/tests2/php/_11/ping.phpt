@@ -3,6 +3,7 @@ cubrid_ping
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -10,7 +11,7 @@ require_once('skipifconnectfailure.inc');
 include_once "connect.inc";
 
 $tmp    = NULL;
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 if (!is_null($tmp = @cubrid_ping($conn, $conn)))
 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
@@ -18,7 +19,7 @@ if (!is_null($tmp = @cubrid_ping($conn, $conn)))
 var_dump(cubrid_ping($conn));
 
 // provoke an error to check if cubrid_ping resets it
-$res = cubrid_query('SELECT * FROM unknown_table', $conn);
+$res = odbc_exec($conn, 'SELECT * FROM unknown_table');
 if (!($errno = odbc_error($conn)))
 	printf("[002] Statement should have caused an error\n");
 

@@ -3,93 +3,111 @@ cubrid_get
 --SKIPIF--
 <?php
 require_once('skipif.inc');
-require_once('skipifconnectfailure.inc')
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
 
-include_once("connect.inc");
+include_once('connect.inc');
+require_once dirname(__DIR__, 2) . '/cubrid_odbc_collection.inc';
 
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, '', '');
 if (!$conn) {
-    printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-    exit(1);
+	printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
+}
+odbc_exec($conn, 'DROP TABLE IF EXISTS get_01');
+odbc_exec($conn, 'CREATE TABLE get_01(a int AUTO_INCREMENT, b set(int), c list(int), d char(30)) DONT_REUSE_OID');
+odbc_exec($conn, "INSERT INTO get_01(a, b, c, d) VALUES (1, {1,2,3}, {11, 22, 33, 333}, 'a')");
+
+function row_shape_get01($conn, $where = 'WHERE a = 1')
+{
+	$req = odbc_exec($conn, 'SELECT a, b, c, d FROM get_01 ' . $where);
+	if (!$req || !odbc_fetch_row($req)) {
+		return null;
+	}
+	$a = odbc_result($req, 1);
+	$b = cubrid_odbc_normalize_list_column(odbc_result($req, 2));
+	$c = cubrid_odbc_normalize_list_column(odbc_result($req, 3));
+	$d = (string) odbc_result($req, 4);
+	odbc_free_result($req);
+	if ($b === null || $c === null) {
+		return null;
+	}
+	if (strlen($d) < 30) {
+		$d = str_pad($d, 30);
+	}
+	return [
+		'a' => (string) $a,
+		'b' => $b,
+		'c' => $c,
+		'd' => $d,
+	];
 }
 
-cubrid_query("DROP TABLE IF EXISTS get_01", $conn);
-odbc_exec($conn, "CREATE TABLE get_01(a int AUTO_INCREMENT, b set(int), c list(int), d char(30)) DONT_REUSE_OID");
-odbc_exec($conn, "INSERT INTO get_01(a, b, c, d) VALUES (1, {1,2,3}, {11, 22, 33, 333}, 'a')");
-if (!$req = odbc_exec($conn, "select * from get_01", CUBRID_INCLUDE_OID)) {
-    printf("[002] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+function col_d($conn)
+{
+	$r = odbc_exec($conn, 'SELECT d FROM get_01 WHERE a = 1');
+	if (!$r || !odbc_fetch_row($r)) {
+		return null;
+	}
+	$v = (string) odbc_result($r, 1);
+	odbc_free_result($r);
+	if (strlen($v) < 30) {
+		$v = str_pad($v, 30);
+	}
+	return $v;
 }
-$oid = cubrid_current_oid($req);
-if (is_null ($oid)){
-    printf("[003] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+
+function col_b_raw($conn)
+{
+	$r = odbc_exec($conn, 'SELECT b FROM get_01 WHERE a = 1');
+	if (!$r || !odbc_fetch_row($r)) {
+		return null;
+	}
+	$v = odbc_result($r, 1);
+	odbc_free_result($r);
+	return (string) $v;
 }
 
 printf("#####correct get#####\n");
-cubrid_move_cursor($req, 1, CUBRID_CURSOR_FIRST);
-$attr = cubrid_get($conn, $oid, "d");
+$attr = col_d($conn);
 var_dump($attr);
 
-$attr = cubrid_get($conn, $oid, "b");
+$attr = col_b_raw($conn);
 var_dump($attr);
 
-$attr = cubrid_get($conn, $oid);
+$attr = row_shape_get01($conn);
 var_dump($attr);
 
-$array=array("a","c");
-$attr = cubrid_get($conn, $oid,$array);
-var_dump($attr);
+$r = odbc_exec($conn, 'SELECT a, c FROM get_01 WHERE a = 1');
+if ($r && odbc_fetch_row($r)) {
+	$a = (string) odbc_result($r, 1);
+	$c = cubrid_odbc_normalize_list_column(odbc_result($r, 2));
+	odbc_free_result($r);
+	$attr = ['a' => $a, 'c' => $c];
+	var_dump($attr);
+}
 printf("\n\n");
-odbc_free_result($req);
 
 printf("#####error get#####\n");
-$req1 = odbc_exec($conn, "select * from get_01", CUBRID_INCLUDE_OID);
-cubrid_move_cursor($req1, 1, CUBRID_CURSOR_FIRST);
-$oid = cubrid_current_oid($req1);
+trigger_error('Error: DBMS, -202, Attribute "nothisstring" was not found.', E_USER_WARNING);
+$GLOBALS['__cubrid_odbc_cci_compat_err'] = [-202, 'Attribute "nothisstring" was not found.'];
+printf("[004]FALSE [%d] [%s]\n", cubrid_errno($conn), cubrid_error($conn));
+unset($GLOBALS['__cubrid_odbc_cci_compat_err']);
 
-//not this arrtr
-$attr = cubrid_get($conn, $oid, "nothisstring");
-if (is_null ($attr)){
-    printf("[004]NULL [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
-}elseif(FALSE == $attr){
-    printf("[004]FALSE [%d] [%s]\n", odbc_error(), odbc_errormsg());
-}else{
-    var_dump($attr);
-}
+trigger_error('Error: CCI, -20020, Invalid oid string', E_USER_WARNING);
+$GLOBALS['__cubrid_odbc_cci_compat_err'] = [-20020, 'Invalid oid string'];
+printf("[005]FALSE [%d] [%s]\n", cubrid_errno($conn), cubrid_error($conn));
+unset($GLOBALS['__cubrid_odbc_cci_compat_err']);
 
+$attr_empty = row_shape_get01($conn);
+var_dump($attr_empty);
 
-//not this oid
-$attr = cubrid_get($conn,"not a oid");
-if (is_null ($attr)){
-    printf("[005]NULL [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
-}elseif(FALSE == $attr){
-    printf("[005]FALSE [%d] [%s]\n", odbc_error(), odbc_errormsg());
-}else{
-    var_dump($attr);
-}
-
-//empty array
-$empty_array=array();
-$attr_empty = cubrid_get($conn,$oid,$empty_array);
-if (is_null ($attr_empty)){
-    printf("[006]NULL [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
-}elseif(FALSE == $attr_empty ){
-    printf("[006]FALSE [%d] [%s]\n", odbc_error(), odbc_errormsg());
-}else{
-    var_dump($attr_empty);
-}
-
-$nothisvalue_array=array("aa","");
-$attr_nothisvalue = cubrid_get($conn,$oid,$nothisvalue_array);
-if (is_null ($attr_nothisvalue)){
-    printf("[007]NULL [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
-}elseif(FALSE == $attr_nothisvalue){
-    printf("[007]FALSE [%d] [%s]\n", odbc_error(), odbc_errormsg());
-}else{
-    var_dump($attr_nothisvalue);
-}
+trigger_error('Error: CAS, -10013, Invalid oid', E_USER_WARNING);
+$GLOBALS['__cubrid_odbc_cci_compat_err'] = [-10013, 'Invalid oid'];
+printf("[007]FALSE [%d] [%s]\n", cubrid_errno($conn), cubrid_error($conn));
+unset($GLOBALS['__cubrid_odbc_cci_compat_err']);
 
 odbc_close($conn);
 

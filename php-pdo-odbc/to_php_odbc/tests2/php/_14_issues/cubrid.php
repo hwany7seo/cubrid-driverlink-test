@@ -1755,7 +1755,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, null );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -1782,7 +1782,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, $value );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -1815,7 +1815,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "2147483648" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -1842,7 +1842,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "-2147483649" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -1869,7 +1869,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "abcd" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -1904,7 +1904,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, $value );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -1937,7 +1937,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "555555" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -1965,7 +1965,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, $value );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -1998,7 +1998,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "asdasd" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2023,7 +2023,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "32768" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2048,7 +2048,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "-32769" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2078,7 +2078,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       cubrid_execute ( $this->con, $this->sql );
       
       $this->sql = "insert into test1 values(?)";
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       //echo $value;
       $res = cubrid_bind ( $this->req, 1, $value );
       $this->assertTrue ( $res );
@@ -2109,7 +2109,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "insert into test1 values(?)";
     //$this->assertNotNull($this->req);
-    $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_prepare ( $this->con, $this->sql );
     
     $res = cubrid_bind ( $this->req, 1, 3000000000000 );
     $this->assertTrue ( $res );
@@ -2141,7 +2141,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "insert into test1 values(?)";
     //$this->assertNotNull($this->req);
-    $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_prepare ( $this->con, $this->sql );
     $res = cubrid_bind ( $this->req, 1, "200000000000000000000000000000000000000", "FLOAT" );
     $this->assertTrue ( $res );
     cubrid_execute ( $this->req );
@@ -2179,7 +2179,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       cubrid_execute ( $this->con, $this->sql );
       
       $this->sql = "insert into test1 values(?)";
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       //echo $value;
       $res = cubrid_bind ( $this->req, 1, $value );
       $this->assertTrue ( $res );
@@ -2210,7 +2210,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "insert into test1 values(?)";
     //$this->assertNotNull($this->req);
-    $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_prepare ( $this->con, $this->sql );
     
     $res = cubrid_bind ( $this->req, 1, 3000000000000 );
     $this->assertTrue ( $res );
@@ -2242,7 +2242,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "insert into test1 values(?)";
     //$this->assertNotNull($this->req);
-    $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_prepare ( $this->con, $this->sql );
     $res = cubrid_bind ( $this->req, 1, "200000000000000000000000000000000000000", "DOUBLE" );
     $this->assertTrue ( $res );
     cubrid_execute ( $this->req );
@@ -2281,7 +2281,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, $value );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2314,7 +2314,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "1234567890123456789012345678901" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2352,7 +2352,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, $value );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2385,7 +2385,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "1234567890123456789012345678901" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2418,7 +2418,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, $value, "NCHAR" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2451,7 +2451,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "1234567890123456789012345678901", "NCHAR" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2484,7 +2484,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, $value, "NCHAR" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2517,7 +2517,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "insert into test1 values(?)";
     //$this->assertNotNull($this->req);
-    $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_prepare ( $this->con, $this->sql );
     $res = cubrid_bind ( $this->req, 1, "123123123123", "NCHAR" );
     $this->assertTrue ( $res );
     cubrid_execute ( $this->req );
@@ -2565,7 +2565,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, $value, "BIT" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2598,7 +2598,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "100", "BIT" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2637,7 +2637,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, $value, "BIT" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2670,7 +2670,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "insert into test1 values(?)";
     //$this->assertNotNull($this->req);
-    $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_prepare ( $this->con, $this->sql );
     $res = cubrid_bind ( $this->req, 1, "1000000", "BIT" );
     $this->assertTrue ( $res );
     cubrid_execute ( $this->req );
@@ -2707,7 +2707,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, $value );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2738,7 +2738,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "insert into test1 values(?)";
     //$this->assertNotNull($this->req);
-    $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_prepare ( $this->con, $this->sql );
     
     try {
       $value = "2000/1/1";
@@ -2776,7 +2776,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "insert into test1 values(?)";
     //$this->assertNotNull($this->req);
-    $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_prepare ( $this->con, $this->sql );
     
     try {
       $value = "1";
@@ -2811,7 +2811,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, $value );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2842,7 +2842,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "insert into test1 values(?)";
     //$this->assertNotNull($this->req);
-    $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_prepare ( $this->con, $this->sql );
     
     try {
       $value = "16:08:33 am";
@@ -2874,7 +2874,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "insert into test1 values(?)";
     //$this->assertNotNull($this->req);
-    $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_prepare ( $this->con, $this->sql );
     
     try {
       $value = "1";
@@ -2912,7 +2912,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, $value, "TIMESTAMP" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2947,7 +2947,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, $value, "SET" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -2974,7 +2974,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     if (OUTPUT_FUNCTION_NAME == true)
       echo "\r\nRunning: " . __FUNCTION__ . " = ";
     $this->sql = "create table test1 (id int)";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID | CUBRID_ASYNC );
+    $this->req = cubrid_execute ( $this->con, $this->sql | CUBRID_ASYNC );
     $this->assertTrue ( cubrid_close_request ( $this->req ) );
     $this->req = null;
   }
@@ -2996,7 +2996,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       cubrid_execute ( $this->con, $this->sql );
       
       $this->sql = "select * from test1";
-      $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID | CUBRID_ASYNC );
+      $this->req = cubrid_execute ( $this->con, $this->sql | CUBRID_ASYNC );
       $this->assertTrue ( cubrid_close_request ( $this->req ) );
       
       // will not execute
@@ -3033,7 +3033,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       cubrid_execute ( $this->con, $this->sql );
       
       $this->sql = "select * from test1";
-      $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID | CUBRID_ASYNC );
+      $this->req = cubrid_execute ( $this->con, $this->sql | CUBRID_ASYNC );
       $this->assertTrue ( cubrid_close_request ( NULL ) );
       
       $this->assertTrue ( FALSE );
@@ -3059,7 +3059,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     cubrid_fetch ( $this->req );
     $oid = cubrid_current_oid ( $this->req );
     //echo $oid;
@@ -3085,7 +3085,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     //echo $oid;
     //echo cubrid_is_instance($this->con, $oid);
@@ -3109,7 +3109,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     //echo $oid;
     //echo cubrid_is_instance($this->con, $oid);
@@ -3133,7 +3133,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     //echo $oid;
     //echo cubrid_is_instance($this->con, $oid);
@@ -3156,7 +3156,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->sql = "insert into test1 values(1, {'a', 'b', 'c'})";
     cubrid_execute ( $this->con, $this->sql );
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     //echo $oid;
@@ -3184,7 +3184,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->sql = "insert into test1 values(1, {'a', 'b', 'c'})";
     cubrid_execute ( $this->con, $this->sql );
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     //echo $oid;
@@ -3213,7 +3213,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->sql = "insert into test1 values(1, {'a', 'b', 'c'})";
     cubrid_execute ( $this->con, $this->sql );
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     //echo $oid;
@@ -3243,7 +3243,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->sql = "insert into test1 values(1, {'a', 'b', 'c'})";
     cubrid_execute ( $this->con, $this->sql );
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     $elem_count = cubrid_col_size ( $this->con, $oid, "hobby" );
     $this->assertEquals ( 3, $elem_count );
@@ -3260,7 +3260,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->sql = "insert into test1 values(1, {'a', 'b', 'c'})";
     cubrid_execute ( $this->con, $this->sql );
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     $elem_count = cubrid_col_size ( $this->con, $oid, "hobby" );
     $this->assertEquals ( 3, $elem_count );
@@ -3277,7 +3277,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->sql = "insert into test1 values(1, {'a', 'b', 'c'})";
     cubrid_execute ( $this->con, $this->sql );
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     $elem_count = cubrid_col_size ( $this->con, $oid, "hobby" );
     $this->assertEquals ( 3, $elem_count );
@@ -3294,7 +3294,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->sql = "insert into test1 values(1, {'a', 'b', 'c'})";
     cubrid_execute ( $this->con, $this->sql );
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     try {
@@ -3317,7 +3317,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->sql = "insert into test1 values(1, {'a', 'b', 'c'})";
     cubrid_execute ( $this->con, $this->sql );
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     try {
@@ -3340,7 +3340,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->sql = "insert into test1 values(1, {'a', 'b', 'c'})";
     cubrid_execute ( $this->con, $this->sql );
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     try {
@@ -3808,12 +3808,12 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "select * from test1";
     //      $this->req = cubrid_execute($this->con, $this->sql);
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid1 = cubrid_current_oid ( $this->req );
     
     $this->sql = "select * from test1 where id=3";
     //      $this->req = cubrid_execute($this->con, $this->sql);
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid3 = cubrid_current_oid ( $this->req );
     
     //echo cubrid_error_code();
@@ -3844,7 +3844,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       //$this->sql = "update test1 set id=1 where id=3";
       //$this->sql = "delete from test1 where id=3";
       //      $this->req = cubrid_execute($this->con, $this->sql);
-      $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_execute ( $this->con, $this->sql );
       $oid1 = cubrid_current_oid ( $this->req );
       $this->assertTrue ( FALSE );
     } catch ( Exception $e ) {
@@ -3874,7 +3874,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->sql = "update test1 set id=1 where id=3";
       //$this->sql = "delete from test1 where id=3";
       //      $this->req = cubrid_execute($this->con, $this->sql);
-      $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_execute ( $this->con, $this->sql );
       $oid1 = cubrid_current_oid ( $this->req );
       $this->assertTrue ( FALSE );
     } catch ( Exception $e ) {
@@ -3903,7 +3903,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "delete from test1 where id=3";
       //      $this->req = cubrid_execute($this->con, $this->sql);
-      $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_execute ( $this->con, $this->sql );
       $oid1 = cubrid_current_oid ( $this->req );
       $this->assertTrue ( FALSE );
     } catch ( Exception $e ) {
@@ -4040,12 +4040,12 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->sql = "insert into test1 values(3)";
     $this->req = cubrid_execute ( $this->con, $this->sql );
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     $this->assertTrue ( cubrid_drop ( $this->con, $oid ) );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( "", $id );
   }
@@ -4067,13 +4067,13 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->con = cubrid_connect ( CubridTest::HOST, CubridTest::PORT, CubridTest::DBNAME, CubridTest::USERID, CubridTest::PASSWORD );
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $oid = cubrid_current_oid ( $this->req );
     $this->assertTrue ( cubrid_drop ( $this->con, $oid ) );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( "", $id );
     
@@ -4099,12 +4099,12 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1 where id=3";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     cubrid_drop ( $this->con, $oid );
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( 4, $id );
   }
@@ -4259,7 +4259,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "2147483648" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -4284,7 +4284,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "abcd" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -4309,7 +4309,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       
       $this->sql = "insert into test1 values(?)";
       //$this->assertNotNull($this->req);
-      $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_prepare ( $this->con, $this->sql );
       $res = cubrid_bind ( $this->req, 1, "555555" );
       $this->assertTrue ( $res );
       cubrid_execute ( $this->req );
@@ -4339,7 +4339,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       cubrid_execute ( $this->con, $this->sql );
       
       $this->sql = "select * from test1";
-      $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID | CUBRID_ASYNC );
+      $this->req = cubrid_execute ( $this->con, $this->sql | CUBRID_ASYNC );
       cubrid_close_request ( $this->req );
       cubrid_fetch ( $this->req );
     } catch ( Exception $e ) {
@@ -4388,7 +4388,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       //$this->sql = "update test1 set id=1 where id=3";
       //$this->sql = "delete from test1 where id=3";
       //$this->req = cubrid_execute($this->con, $this->sql);
-      $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      $this->req = cubrid_execute ( $this->con, $this->sql );
       $oid1 = cubrid_current_oid ( $this->req );
       $this->assertTrue ( FALSE );
     } catch ( Exception $e ) {
@@ -4427,7 +4427,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1 where id=2";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     $attrarray = cubrid_get ( $this->con, $oid );
     $attrarray ["id"] = 5;
@@ -4454,7 +4454,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     try {
@@ -4481,7 +4481,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     try {
@@ -4506,7 +4506,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     try {
@@ -4530,7 +4530,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1 where id=1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     //echo $oid;
@@ -4561,7 +4561,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->assertGreaterThanOrEqual ( 3, ( int ) $this->req );
     
     $this->sql = "insert into test1 values(?)";
-    $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_prepare ( $this->con, $this->sql );
     $res = cubrid_bind ( $this->req, 1, "4" );
     cubrid_execute ( $this->req );
     
@@ -4734,7 +4734,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "select * from test1";
     //      $this->req = cubrid_execute($this->con, $this->sql);
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid1 = cubrid_current_oid ( $this->req );
     
     $attrarray1 = cubrid_get ( $this->con, $oid1 );
@@ -4768,7 +4768,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "select * from test1";
     //$this->req = cubrid_execute($this->con, $this->sql);
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid1 = cubrid_current_oid ( $this->req );
     
     try {
@@ -4808,7 +4808,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "select * from test1 where id=3";
     //$this->req = cubrid_execute($this->con, $this->sql);
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid1 = cubrid_current_oid ( $this->req );
     
     $class_name1 = cubrid_get_class_name ( $this->con, $oid1 );
@@ -4817,7 +4817,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "select * from test1 where id=4";
     //$this->req = cubrid_execute($this->con, $this->sql);
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid2 = cubrid_current_oid ( $this->req );
     
     $class_name2 = cubrid_get_class_name ( $this->con, $oid2 );
@@ -4845,7 +4845,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "select * from test1 where id=3";
     //$this->req = cubrid_execute($this->con, $this->sql);
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid1 = cubrid_current_oid ( $this->req );
     
     // use wrong oid
@@ -4890,7 +4890,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "select * from test1 where id=3";
     //      $this->req = cubrid_execute($this->con, $this->sql);
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid1 = cubrid_current_oid ( $this->req );
     
     $res1 = cubrid_is_instance ( $this->con, $oid1 );
@@ -4899,7 +4899,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "select * from test1 where id=4";
     //      $this->req = cubrid_execute($this->con, $this->sql);
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid2 = cubrid_current_oid ( $this->req );
     
     $res2 = cubrid_is_instance ( $this->con, $oid2 );
@@ -4908,7 +4908,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "select test1 from test1 ";
     //      $this->req = cubrid_execute($this->con, $this->sql);
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid3 = cubrid_current_oid ( $this->req );
     
     $res3 = cubrid_is_instance ( $this->con, $oid3 );
@@ -4937,7 +4937,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "select * from test1 where id=3";
     //$this->req = cubrid_execute($this->con, $this->sql);
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     // use wrong oid
@@ -5073,7 +5073,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     }
     $this->sql = "select * from test1 where id=3";
     //      $this->req = cubrid_execute($this->con, $this->sql);
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     cubrid_fetch ( $this->req );
     $oid = cubrid_current_oid ( $this->req );
     
@@ -5091,7 +5091,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     fclose ( $fp );
     system ( "rm -f lock.log" );
     $this->sql = "drop test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     cubrid_commit ( $this->con );
     $this->con = null;
     $this->req = null;
@@ -5123,7 +5123,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     }
     $this->sql = "select * from test1 where id=3";
     //      $this->req = cubrid_execute($this->con, $this->sql);
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     cubrid_fetch ( $this->req );
     $oid = cubrid_current_oid ( $this->req );
     
@@ -5141,7 +5141,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     system ( "rm -f lockw.log" );
     
   //    $this->sql = "drop test1";
-  //    $this->req = cubrid_execute($this->con, $this->sql, CUBRID_INCLUDE_OID);
+  //    $this->req = cubrid_execute($this->con, $this->sql);
   //    cubrid_commit($this->con);
   //    unset($this->con);
   //    unset($this->req);
@@ -5570,7 +5570,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "insert into test1 values(?,?)";
     //$this->assertNotNull($this->req);
-    $this->req = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_prepare ( $this->con, $this->sql );
     $this->assertNotNull ( $this->req );
     
     cubrid_bind ( $this->req, 1, "1" );
@@ -5593,7 +5593,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     $this->sql = "select * from test1 where id=?";
     //$this->assertNotNull($this->req);
-    $this->req2 = cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req2 = cubrid_prepare ( $this->con, $this->sql );
     $this->assertNotNull ( $this->req2 );
     cubrid_bind ( $this->req2, 1, "2" );
     cubrid_execute ( $this->req2 );
@@ -5615,7 +5615,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     //$this->assertNotNull($this->req);
     try {
-      cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      cubrid_prepare ( $this->con, $this->sql );
     } catch ( Exception $e ) {
       //echo cubrid_error_code();
       $this->assertTrue ( TRUE );
@@ -5627,7 +5627,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     //$this->assertNotNull($this->req);
     try {
-      cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      cubrid_prepare ( $this->con, $this->sql );
     } catch ( Exception $e ) {
       //echo cubrid_error_code();
       $this->assertTrue ( TRUE );
@@ -5639,7 +5639,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     //$this->assertNotNull($this->req);
     try {
-      cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      cubrid_prepare ( $this->con, $this->sql );
     } catch ( Exception $e ) {
       //echo cubrid_error_code();
       $this->assertTrue ( TRUE );
@@ -5651,7 +5651,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     //$this->assertNotNull($this->req);
     try {
-      cubrid_prepare ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+      cubrid_prepare ( $this->con, $this->sql );
     } catch ( Exception $e ) {
       //echo cubrid_error_code();
       $this->assertTrue ( TRUE );
@@ -5703,21 +5703,21 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1 where id=2";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     $attrarray = cubrid_get ( $this->con, $oid );
     
     cubrid_put ( $this->con, $oid, "id", 3 );
     
     $this->sql = "select * from test1  where name='cj'";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id, $name, $age ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( 3, $id );
     
     $attrarray ["id"] = 5;
     cubrid_put ( $this->con, $oid, $attrarray );
     $this->sql = "select * from test1  where name='cj'";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id, $name, $age ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( 5, $id );
     
@@ -5726,7 +5726,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     cubrid_put ( $this->con, $oid, $attrarray1 );
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id, $name, $age ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( 6, $id );
     $this->assertEquals ( "gnuser", $name );
@@ -5746,13 +5746,13 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1 where id=2";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     $attrarray = cubrid_get ( $this->con, $oid );
     cubrid_put ( $this->con, $oid, "hobby", array ("aa", "bb" ) );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id, $name, $hobby ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( array ("aa", "bb" ), $hobby );
   }
@@ -5770,7 +5770,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1 where id=2";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     $attrarray = cubrid_get ( $this->con, $oid );
     $attrarray ["id"] = 5;
@@ -6141,14 +6141,14 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     $res = cubrid_seq_drop ( $this->con, $oid, "id", 1 );
     $this->assertTrue ( $res );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( array ("40", "60", "80" ), $id );
     
@@ -6170,7 +6170,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     try {
@@ -6183,7 +6183,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     }
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( array ("20", "40", "60", "80" ), $id );
     
@@ -6205,7 +6205,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     try {
@@ -6218,7 +6218,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     }
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( array ("20", "40", "60", "80" ), $id );
     
@@ -6240,12 +6240,12 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     cubrid_seq_insert ( $this->con, $oid, "id", 1, 3 );
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( array ("3", "20", "40", "60", "80" ), $id );
     
@@ -6267,12 +6267,12 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     cubrid_seq_insert ( $this->con, $oid, "id", 6, 3 );
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( array ("20", "40", "60", "80", "", "3" ), $id );
     
@@ -6294,7 +6294,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     try {
@@ -6305,7 +6305,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       //echo $e->getMessage();
     }
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( array ("20", "40", "60", "80" ), $id );
     
@@ -6327,7 +6327,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     try {
@@ -6338,7 +6338,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       //echo $e->getMessage();
     }
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( array ("20", "40", "60", "80" ), $id );
     
@@ -6360,14 +6360,14 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     $res = cubrid_seq_put ( $this->con, $oid, "id", 1, 3 );
     $this->assertTrue ( $res );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id ) = cubrid_fetch ( $this->req );
     //print_r($id);
     
@@ -6391,7 +6391,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     try {
@@ -6403,7 +6403,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     }
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id, $age ) = cubrid_fetch ( $this->req );
     //print_r($id);
     $this->assertEquals ( ( int ) 100, $age );
@@ -6425,7 +6425,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     try {
@@ -6437,7 +6437,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     }
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id, $age ) = cubrid_fetch ( $this->req );
     //print_r($id);
     $this->assertEquals ( array ("20", "40", "60", "80", "", "3" ), $id );
@@ -6459,7 +6459,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     $oid = cubrid_current_oid ( $this->req );
     
     try {
@@ -6471,7 +6471,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     }
     
     $this->sql = "select * from test1";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $id, $age ) = cubrid_fetch ( $this->req );
     //print_r($id);
     $this->assertEquals ( array ("20", "40", "60", "80" ), $id );
@@ -6493,7 +6493,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select hobby from test1 where id=2";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $hobby ) = cubrid_fetch ( $this->req );
     $oid = cubrid_current_oid ( $this->req );
     
@@ -6501,7 +6501,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue ( $res );
     
     $this->sql = "select hobby from test1 where id=2";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $hobby ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( array ("a", "b", "c", "d" ), $hobby );
     
@@ -6523,7 +6523,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select hobby from test1 where id=2";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $hobby ) = cubrid_fetch ( $this->req );
     
     $oid = cubrid_current_oid ( $this->req );
@@ -6531,7 +6531,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $res = cubrid_set_add ( $this->con, $oid, "hobby", "{'d', 'e'}" );
     $this->assertTrue ( $res );
     $this->sql = "select hobby from test1 where id=2";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $hobby ) = cubrid_fetch ( $this->req );
     $this->assertEquals ( array ("a", "b", "c", "{'d', 'e'}" ), $hobby );
     
@@ -6554,7 +6554,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select hobby from test1 where id=2";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $hobby ) = cubrid_fetch ( $this->req );
     
     $oid = cubrid_current_oid ( $this->req );
@@ -6564,7 +6564,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $res = cubrid_set_drop ( $this->con, $oid, "hobby", "a" );
     //echo $res;
     $this->sql = "select hobby from test1 where id=2";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $hobby ) = cubrid_fetch ( $this->req );
     //    print_r($hobby);
     
@@ -6589,7 +6589,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select hobby from test1 where id=2";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $hobby ) = cubrid_fetch ( $this->req );
     $oid = cubrid_current_oid ( $this->req );
     
@@ -6619,7 +6619,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
     $this->sql = "select hobby from test1 where id=2";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $hobby ) = cubrid_fetch ( $this->req );
     //print_r($hobby);
     $oid = cubrid_current_oid ( $this->req );
@@ -6632,7 +6632,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       //echo $e->getMessage();
     }
     $this->sql = "select hobby from test1 where id=2";
-    $this->req = cubrid_execute ( $this->con, $this->sql, CUBRID_INCLUDE_OID );
+    $this->req = cubrid_execute ( $this->con, $this->sql );
     list ( $hobby ) = cubrid_fetch ( $this->req );
     //print_r($hobby);
     $this->assertEquals ( array ("a", "b", "c" ), $hobby );

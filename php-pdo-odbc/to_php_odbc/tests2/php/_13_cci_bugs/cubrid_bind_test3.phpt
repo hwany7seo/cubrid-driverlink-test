@@ -8,7 +8,7 @@ require_once('skipifconnectfailure.inc');
 --FILE--
 <?php
 include "connect.inc";
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 odbc_exec($conn, 'DROP TABLE IF EXISTS bit1_tb');
 odbc_exec($conn, 'DROP TABLE IF EXISTS bit2_tb');
 odbc_exec($conn, 'DROP TABLE IF EXISTS bit3_tb');

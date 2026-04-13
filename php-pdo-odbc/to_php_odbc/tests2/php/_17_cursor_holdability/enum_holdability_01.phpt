@@ -8,20 +8,20 @@ require_once('skipifconnectfailure.inc')
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 cubrid_set_autocommit($conn, false);
 
 $sql = "drop class if exists enum01";
-$req = odbc_exec($conn, $sql, CUBRID_INCLUDE_OID);
+$req = odbc_exec($conn, $sql);
 
 $sql = "create class enum01(i INT, working_days ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), answers ENUM('Yes', 'No', 'Cancel'))";
-$req = odbc_exec($conn, $sql, CUBRID_INCLUDE_OID);
+$req = odbc_exec($conn, $sql);
 
 $sql = "insert into enum01 values(3, 'Wednesday','Cancel'),(2,'Tuesday','No'),(1,1,1)";
-$req = odbc_exec($conn, $sql, CUBRID_INCLUDE_OID);
+$req = odbc_exec($conn, $sql);
 
 $sql = "select * from enum01";
-$req_holdability = odbc_prepare($conn, $sql, CUBRID_INCLUDE_OID);
+$req_holdability = odbc_prepare($conn, $sql);
 cubrid_execute($req_holdability);
 $column_names1 = cubrid_column_names($req_holdability);
 $column_types1 = cubrid_column_types($req_holdability);
@@ -31,15 +31,17 @@ for($i = 0; $i < $size; $i++) {
 printf("%-30s", $column_names1[$i]);
 }
 print("\n");
-$row = odbc_fetch_row($req_holdability);
-for($i = 0; $i < $size; $i++) {
-   printf("%-30s", $row[$i]);
+if (odbc_fetch_row($req_holdability)) {
+for ($i = 0; $i < $size; $i++) {
+   $__c = cubrid_odbc_result_cell($req_holdability, $i);
+   printf("%-30s", $__c !== false ? $__c : '');
+}
 }
 odbc_commit($conn);
 print("\n");
 
 $sql = "insert into enum01 values(1,1,1),(2,'Tuesday','No'), (3, 'Wednesday','Cancel')";
-$req = odbc_exec($conn, $sql, CUBRID_INCLUDE_OID);
+$req = odbc_exec($conn, $sql);
 odbc_commit($conn);
 
 $column_names1 = cubrid_column_names($req_holdability);
@@ -51,19 +53,22 @@ printf("%-30s", $column_names1[$i]);
 }
 //fetch next
 print("\n");
-$row = odbc_fetch_row($req_holdability);
-for($i = 0; $i < $size; $i++) {
-   printf("%-30s", $row[$i]);
+if (odbc_fetch_row($req_holdability)) {
+for ($i = 0; $i < $size; $i++) {
+   $__c = cubrid_odbc_result_cell($req_holdability, $i);
+   printf("%-30s", $__c !== false ? $__c : '');
+}
 }
 odbc_commit($conn);
 print("\n");
 print("**********************Fetch all************************\n");
 //fetch all
 $row_size = 2;
-while($row = odbc_fetch_row($req_holdability)){
+while (odbc_fetch_row($req_holdability)) {
     $row_size++;
-for($i = 0; $i < $size; $i++) {
-   printf("%-30s", $row[$i]);
+for ($i = 0; $i < $size; $i++) {
+   $__c = cubrid_odbc_result_cell($req_holdability, $i);
+   printf("%-30s", $__c !== false ? $__c : '');
 }
 odbc_commit($conn);
 print("\n");
@@ -78,10 +83,11 @@ printf("%-30s", $column_names1[$i]);
 //fetch all
 print("\n**********************Fetch all************************\n");
 $row_size = 0;
-while($row = odbc_fetch_row($req_holdability)){
+while (odbc_fetch_row($req_holdability)) {
     $row_size++;
-for($i = 0; $i < $size; $i++) {
-   printf("%-30s", $row[$i]);
+for ($i = 0; $i < $size; $i++) {
+   $__c = cubrid_odbc_result_cell($req_holdability, $i);
+   printf("%-30s", $__c !== false ? $__c : '');
 }
 odbc_commit($conn);
 print("\n");

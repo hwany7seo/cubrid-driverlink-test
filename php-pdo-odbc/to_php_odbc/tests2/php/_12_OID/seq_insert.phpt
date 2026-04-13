@@ -1,50 +1,76 @@
 --TEST--
-cubrid_seq_insert
+cubrid_seq_insert (ODBC: UPDATE 로 LIST 삽입과 동일 효과)
 --SKIPIF--
 <?php
 require_once('skipif.inc');
-require_once('skipifconnectfailure.inc')
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
+include_once('connect.inc');
+require_once __DIR__ . '/../../cubrid_odbc_collection.inc';
 
-include_once("connect.inc");
-
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
-if (!$conn) {
-    printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-    exit(1);
+$conn = odbc_connect($cubrid_odbc_dsn, '', '');
+if (!cubrid_odbc_compat_is_link($conn)) {
+	printf("[001] connect failed [%s] %s\n", odbc_error(), odbc_errormsg());
+	exit(1);
 }
-odbc_exec($conn, "drop table if exists seq_insert_tb");
-odbc_exec($conn, "CREATE TABLE seq_insert_tb (a int AUTO_INCREMENT, b set(int), c list(int), d char(30)) DONT_REUSE_OID");
-odbc_exec($conn, "INSERT INTO seq_insert_tb(a, b, c, d) VALUES (1, {1,2,3}, {11, 22, 33, 333}, 'a')");
-odbc_exec($conn, "INSERT INTO seq_insert_tb(a, b, c, d) VALUES (2, {4,5,7}, {44, 55, 66, 666}, 'b')");
-
-if (!$req = odbc_exec($conn, "select * from seq_insert_tb", CUBRID_INCLUDE_OID)) {
-    printf("[002] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+odbc_exec($conn, 'DROP TABLE IF EXISTS seq_insert_tb');
+if (!odbc_exec($conn, 'CREATE TABLE seq_insert_tb (a int AUTO_INCREMENT, b set(int), c list(int), d char(30)) DONT_REUSE_OID')) {
+	printf("[002] CREATE failed [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
 }
-
-$oid = cubrid_current_oid($req);
-if (is_null ($oid)){
-    printf("[003] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+if (!odbc_exec($conn, "INSERT INTO seq_insert_tb(a, b, c, d) VALUES (1, {1,2,3}, {11, 22, 33, 333}, 'a')")) {
+	printf("[003] INSERT 1 failed [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
 }
-
-cubrid_move_cursor($req, 1, CUBRID_CURSOR_FIRST);
-
-$attr = cubrid_col_get($conn, $oid, "c");
-var_dump($attr);
-
-if (!cubrid_seq_insert($conn, $oid, "c", 5, "44")) {
-    printf("[004] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+if (!odbc_exec($conn, "INSERT INTO seq_insert_tb(a, b, c, d) VALUES (2, {4,5,7}, {44, 55, 66, 666}, 'b')")) {
+	printf("[004] INSERT 2 failed [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
 }
 
-$attr = cubrid_col_get($conn, $oid, "c");
-var_dump($attr);
-
+$req = odbc_exec($conn, 'SELECT c FROM seq_insert_tb WHERE a = 1');
+if (!$req || !odbc_fetch_row($req)) {
+	printf("[005] SELECT failed\n");
+	exit(1);
+}
+$raw = odbc_result($req, 1);
 odbc_free_result($req);
-odbc_close($conn);
 
-print "done!";
+$attr = cubrid_odbc_normalize_list_column($raw);
+if ($attr === null) {
+	printf("[006] Unexpected LIST form\n");
+	exit(1);
+}
+var_dump($attr);
+
+if (!odbc_exec($conn, 'UPDATE seq_insert_tb SET c = {11, 22, 33, 333, 44} WHERE a = 1')) {
+	printf("[007] UPDATE failed [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
+}
+if (!odbc_commit($conn)) {
+	printf("[008] commit failed [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
+}
+
+$req = odbc_exec($conn, 'SELECT c FROM seq_insert_tb WHERE a = 1');
+if (!$req || !odbc_fetch_row($req)) {
+	printf("[009] Second SELECT failed\n");
+	exit(1);
+}
+$raw2 = odbc_result($req, 1);
+odbc_free_result($req);
+
+$attr = cubrid_odbc_normalize_list_column($raw2);
+if ($attr === null) {
+	printf("[010] Unexpected LIST after UPDATE\n");
+	exit(1);
+}
+var_dump($attr);
+
+cubrid_disconnect($conn);
+
+print 'done!';
 ?>
 --CLEAN--
 --EXPECTF--

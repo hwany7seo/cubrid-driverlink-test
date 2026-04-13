@@ -10,8 +10,6 @@ require_once('skipifconnectfailure.inc');
 include_once("connect.inc");
 
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
-cubrid_odbc_set_last_connection($conn);
-
 if (false !== ($tmp = odbc_exec($conn, 'THIS IS NOT SQL'))) {
 	printf("[003] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 }

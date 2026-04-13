@@ -1,5 +1,5 @@
 --TEST--
-column
+cubrid_column_names/types/len via ODBC (field_flag suite)
 --SKIPIF--
 <?php
 require_once('skipif.inc');
@@ -8,83 +8,116 @@ require_once('skipifconnectfailure.inc');
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
+
+/**
+ * Get column size map for a table via odbc_columns() (SQLColumns catalog function).
+ * Returns: [ lowercase_column_name => COLUMN_SIZE, ... ]
+ *
+ * NOTE: odbc_field_len() / cubrid_field_len() use SQL_COLUMN_PRECISION (deprecated ODBC 2.x
+ * attribute). For string/binary/date types this either wraps in a 16-bit short causing
+ * overflow, or returns semantically wrong values (e.g. precision=0 for DATE).
+ * odbc_columns() exposes COLUMN_SIZE from SQLColumns(), which is ODBC 3.x-compliant and
+ * maps to SQL_DESC_LENGTH without the short overflow issue.
+ */
+function get_column_size_map($conn, $table_name) {
+    $size_map = [];
+    $col_meta = odbc_columns($conn, null, null, $table_name, '%');
+    if ($col_meta) {
+        while (odbc_fetch_row($col_meta)) {
+            $col_name = strtolower(odbc_result($col_meta, 'COLUMN_NAME'));
+            $size_map[$col_name] = odbc_result($col_meta, 'COLUMN_SIZE');
+        }
+        odbc_free_result($col_meta);
+    }
+    return $size_map;
+}
 
 //Data type is numeric
-$delete_result1=cubrid_query("drop class if exists numeric_tb");
+$delete_result1=odbc_exec($conn, "drop class if exists numeric_tb");
 if (!$delete_result1) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result1=cubrid_query("create class numeric_tb(smallint_t smallint,short_t short, int_t int,bigint_t bigint,decimal_t decimal(15,2), numeric_t numeric(38,10), float_t float, real_t real, monetary_t monetary, double_t double )");
+odbc_free_result($delete_result1);
+$create_result1=odbc_exec($conn, "create class numeric_tb(smallint_t smallint,short_t short, int_t int,bigint_t bigint,decimal_t decimal(15,2), numeric_t numeric(38,10), float_t float, real_t real, monetary_t monetary, double_t double )");
 if (!$create_result1) {
     die('Create Failed: ' . odbc_errormsg());
 }
+odbc_free_result($create_result1);
 
 $result1 = odbc_exec($conn, "SELECT * FROM numeric_tb;");
-
 $column_names1 = cubrid_column_names($result1);
 $column_types1 = cubrid_column_types($result1);
+$size_map1 = get_column_size_map($conn, 'numeric_tb');
 
 printf("#####Data type is numeric#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names1); $i < $size; $i++) {
-    $column_len1 = cubrid_field_len($result1, $i);
-    printf("%-30s %-30s %-15s\n", $column_names1[$i], $column_types1[$i], $column_len1); 
+    $colkey = strtolower($column_names1[$i]);
+    $column_len1 = $size_map1[$colkey] ?? 'N/A';
+    printf("%-30s %-30s %-15s\n", $column_names1[$i], $column_types1[$i], $column_len1);
 }
 printf("\n\n");
 
 //Data type is character strings
-$delete_result2=cubrid_query("drop class if exists character_tb");
+$delete_result2=odbc_exec($conn, "drop class if exists character_tb");
 if (!$delete_result2) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result2=cubrid_query("create class character_tb(char_t char(5), varchar_t varchar(11), nchar_t nchar(20), ncharvarying_t nchar varying(536870911))");
+odbc_free_result($delete_result2);
+$create_result2=odbc_exec($conn, "create class character_tb(char_t char(5), varchar_t varchar(11), nchar_t nchar(20), ncharvarying_t nchar varying(536870911))");
 if (!$create_result2) {
     die('Create Failed: ' . odbc_errormsg());
 }
+odbc_free_result($create_result2);
 
 $result2 = odbc_exec($conn, "SELECT * FROM character_tb;");
-
 $column_names2 = cubrid_column_names($result2);
 $column_types2 = cubrid_column_types($result2);
+$size_map2 = get_column_size_map($conn, 'character_tb');
 
 printf("#####Data type is character strings#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names2); $i < $size; $i++) {
-    $column_len2 = cubrid_field_len($result2, $i);
+    $colkey = strtolower($column_names2[$i]);
+    $column_len2 = $size_map2[$colkey] ?? 'N/A';
     printf("%-30s %-30s %-15s\n", $column_names2[$i], $column_types2[$i], $column_len2);
 }
 printf("\n\n");
 
 //Data type is BLOB/CLOB
-$delete_result=cubrid_query("drop class if exists clob_tb");
+$delete_result=odbc_exec($conn, "drop class if exists clob_tb");
 if (!$delete_result) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result=cubrid_query("create class clob_tb(id_t varchar(64) primary key, content CLOB, image BLOB)");
+odbc_free_result($delete_result);
+$create_result=odbc_exec($conn, "create class clob_tb(id_t varchar(64) primary key, content CLOB, image BLOB)");
 if (!$create_result) {
     die('Create Failed: ' . odbc_errormsg());
 }
+odbc_free_result($create_result);
 
 $result = odbc_exec($conn, "SELECT * FROM clob_tb;");
-
 $column_names = cubrid_column_names($result);
 $column_types = cubrid_column_types($result);
+$size_map = get_column_size_map($conn, 'clob_tb');
 
 printf("#####Data type is BLOB/CLOB#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names); $i < $size; $i++) {
-    $column_len = cubrid_field_len($result, $i);
+    $colkey = strtolower($column_names[$i]);
+    $column_len = $size_map[$colkey] ?? 'N/A';
     printf("%-30s %-30s %-15s\n", $column_names[$i], $column_types[$i], $column_len);
 }
 printf("\n\n");
 
 //Data type is collection
-$delete_result=cubrid_query("drop class if exists collection_tb");
+$delete_result=odbc_exec($conn, "drop class if exists collection_tb");
 if (!$delete_result) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result=cubrid_query("create class collection_tb(sChar set(char(10)),
+odbc_free_result($delete_result);
+$create_result=odbc_exec($conn, "create class collection_tb(sChar set(char(10)),
 	sVarchar set(varchar(10)),
 	sNchar set(nchar(10)),
 	sNvchar set(nchar VARYING(10)),
@@ -110,62 +143,70 @@ $create_result=cubrid_query("create class collection_tb(sChar set(char(10)),
 if (!$create_result) {
     die('Create Failed: ' . odbc_errormsg());
 }
+odbc_free_result($create_result);
 
 $result = odbc_exec($conn, "SELECT * FROM collection_tb;");
-
 $column_names = cubrid_column_names($result);
 $column_types = cubrid_column_types($result);
+$size_map = get_column_size_map($conn, 'collection_tb');
 
 printf("#####Data type is collection#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names); $i < $size; $i++) {
-    $column_len = cubrid_field_len($result, $i);
+    $colkey = strtolower($column_names[$i]);
+    $column_len = $size_map[$colkey] ?? 'N/A';
     printf("%-30s %-30s %-15s\n", $column_names[$i], $column_types[$i], $column_len);
 }
 printf("\n\n");
 
 //Data type is Date/Time
-$delete_result=cubrid_query("drop class if exists date_tb");
+$delete_result=odbc_exec($conn, "drop class if exists date_tb");
 if (!$delete_result) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result=cubrid_query("create class date_tb(date_t date, time_t time, timestamp_t timestamp, datetime_t datetime)");
+odbc_free_result($delete_result);
+$create_result=odbc_exec($conn, "create class date_tb(date_t date, time_t time, timestamp_t timestamp, datetime_t datetime)");
 if (!$create_result) {
     die('Create Failed: ' . odbc_errormsg());
 }
+odbc_free_result($create_result);
 
 $result = odbc_exec($conn, "SELECT * FROM date_tb;");
-
 $column_names = cubrid_column_names($result);
 $column_types = cubrid_column_types($result);
+$size_map = get_column_size_map($conn, 'date_tb');
 
 printf("#####Data type is Date/Time#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names); $i < $size; $i++) {
-    $column_len = cubrid_field_len($result, $i);
+    $colkey = strtolower($column_names[$i]);
+    $column_len = $size_map[$colkey] ?? 'N/A';
     printf("%-30s %-30s %-15s\n", $column_names[$i], $column_types[$i], $column_len);
 }
 printf("\n\n");
 
 //Data type is bit strings
-$delete_result=cubrid_query("drop class if exists bit_tb");
+$delete_result=odbc_exec($conn, "drop class if exists bit_tb");
 if (!$delete_result) {
     die('Delete Failed: ' . odbc_errormsg());
 }
-$create_result=cubrid_query("create class bit_tb(bit_t bit, bit2_t bit(8), bitvarying_t bit varying, bitvarying2_t bit varying(10))");
+odbc_free_result($delete_result);
+$create_result=odbc_exec($conn, "create class bit_tb(bit_t bit, bit2_t bit(8), bitvarying_t bit varying, bitvarying2_t bit varying(10))");
 if (!$create_result) {
     die('Create Failed: ' . odbc_errormsg());
 }
+odbc_free_result($create_result);
 
 $result = odbc_exec($conn, "SELECT * FROM bit_tb;");
-
 $column_names = cubrid_column_names($result);
 $column_types = cubrid_column_types($result);
+$size_map = get_column_size_map($conn, 'bit_tb');
 
 printf("#####Data type is bit strings#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names); $i < $size; $i++) {
-    $column_len = cubrid_field_len($result, $i);
+    $colkey = strtolower($column_names[$i]);
+    $column_len = $size_map[$colkey] ?? 'N/A';
     printf("%-30s %-30s %-15s\n", $column_names[$i], $column_types[$i], $column_len);
 }
 printf("\n\n");
@@ -178,76 +219,75 @@ printf("Finished!\n");
 --EXPECTF--
 #####Data type is numeric#####
 Column Names                   Column Types                   Column Maxlen  
-smallint_t                     smallint                       6              
-short_t                        smallint                       6              
-int_t                          integer                        11             
-bigint_t                       bigint                         20             
-decimal_t                      numeric                        17             
-numeric_t                      numeric                        40             
-float_t                        float                          15             
-real_t                         float                          15             
-monetary_t                     monetary                       30             
-double_t                       double                         29             
+smallint_t                     SMALLINT                       5              
+short_t                        SMALLINT                       5              
+int_t                          INTEGER                        10             
+bigint_t                       BIGINT                         19             
+decimal_t                      NUMERIC                        15             
+numeric_t                      NUMERIC                        38             
+float_t                        FLOAT                          7              
+real_t                         FLOAT                          7              
+monetary_t                     DOUBLE                         15             
+double_t                       DOUBLE                         15             
 
 
 #####Data type is character strings#####
 Column Names                   Column Types                   Column Maxlen  
-char_t                         char                           5              
-varchar_t                      varchar                        11             
-nchar_t                        nchar                          20             
-ncharvarying_t                 varnchar                       536870911      
+char_t                         CHAR                           5              
+varchar_t                      VARCHAR                        11             
+nchar_t                        CHAR                           20             
+ncharvarying_t                 VARCHAR                        536870911      
 
 
 #####Data type is BLOB/CLOB#####
 Column Names                   Column Types                   Column Maxlen  
-id_t                           varchar                        64             
-content                        clob                           1073741823     
-image                          blob                           1073741823     
+id_t                           VARCHAR                        64             
+content                        CLOB                           1073741823     
+image                          BLOB                           1073741823     
 
 
 #####Data type is collection#####
 Column Names                   Column Types                   Column Maxlen  
-schar                          set(char)                      1073741823     
-svarchar                       set(varchar)                   1073741823     
-snchar                         set(nchar)                     1073741823     
-snvchar                        set(varnchar)                  1073741823     
-sbit                           set(bit)                       1073741823     
-sbvit                          set(varbit)                    1073741823     
-snumeric                       set(numeric)                   1073741823     
-sinteger                       set(integer)                   1073741823     
-ssmallint                      set(smallint)                  1073741823     
-smonetary                      set(monetary)                  1073741823     
-sfloat                         set(float)                     1073741823     
-sreal                          set(float)                     1073741823     
-sdouble                        set(double)                    1073741823     
-sdate                          set(date)                      1073741823     
-stime                          set(time)                      1073741823     
-stimestamp                     set(timestamp)                 1073741823     
-sset                           set(unknown)                   1073741823     
-smultiset                      set(unknown)                   1073741823     
-slist                          set(unknown)                   1073741823     
-ssequence                      set(unknown)                   1073741823     
-multiset_t                     multiset(unknown)              1073741823     
-list_t                         sequence(unknown)              1073741823     
+schar                          VARCHAR                        1073741823     
+svarchar                       VARCHAR                        1073741823     
+snchar                         VARCHAR                        1073741823     
+snvchar                        VARCHAR                        1073741823     
+sbit                           VARCHAR                        1073741823     
+sbvit                          VARCHAR                        1073741823     
+snumeric                       VARCHAR                        1073741823     
+sinteger                       VARCHAR                        1073741823     
+ssmallint                      VARCHAR                        1073741823     
+smonetary                      VARCHAR                        1073741823     
+sfloat                         VARCHAR                        1073741823     
+sreal                          VARCHAR                        1073741823     
+sdouble                        VARCHAR                        1073741823     
+sdate                          VARCHAR                        1073741823     
+stime                          VARCHAR                        1073741823     
+stimestamp                     VARCHAR                        1073741823     
+sset                           VARCHAR                        1073741823     
+smultiset                      VARCHAR                        1073741823     
+slist                          VARCHAR                        1073741823     
+ssequence                      VARCHAR                        1073741823     
+multiset_t                     VARCHAR                        1073741823     
+list_t                         VARCHAR                        1073741823     
 
 
 #####Data type is Date/Time#####
 Column Names                   Column Types                   Column Maxlen  
-date_t                         date                           10             
-time_t                         time                           8              
-timestamp_t                    timestamp                      23             
-datetime_t                     datetime                       23             
+date_t                         DATE                           10             
+time_t                         TIME                           8              
+timestamp_t                    TIMESTAMP                      23             
+datetime_t                     TIMESTAMP                      23             
 
 
 #####Data type is bit strings#####
 Column Names                   Column Types                   Column Maxlen  
-bit_t                          bit                            1              
-bit2_t                         bit                            8              
-bitvarying_t                   varbit                         1073741823     
-bitvarying2_t                  varbit                         10             
+bit_t                          BIT                            1              
+bit2_t                         BIT                            1              
+bitvarying_t                   BIT VARYING                    134217728      
+bitvarying2_t                  BIT VARYING                    2              
 
 
 Finished!
-
 
 

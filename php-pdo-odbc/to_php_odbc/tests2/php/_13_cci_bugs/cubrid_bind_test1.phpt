@@ -8,7 +8,7 @@ require_once('skipifconnectfailure.inc');
 --FILE--
 <?php
 include "connect.inc";
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 odbc_exec($conn, 'DROP TABLE IF EXISTS time_tb');
 $sql = <<<EOD
 CREATE TABLE time_tb(c1 string, time_tb time,date_t date);

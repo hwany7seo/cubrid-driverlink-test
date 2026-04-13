@@ -26,7 +26,7 @@ if (!($pconn = cubrid_pconnect($host, $port, $db, $user, $passwd))) {
     printf("[003] Can not connect to the server using host=%s, port=%s, user=%s, passwd=***\n", $host, $port, $user);
 }
 
-$req = cubrid_query("SELECT * FROM code", $pconn);
+$req = odbc_exec($pconn, "SELECT * FROM code");
 $row = cubrid_fetch_assoc($req);
 var_dump($row);
 
@@ -42,7 +42,7 @@ if (!($pconn = cubrid_pconnect_with_url($connect_url, $user, $passwd))) {
     printf("[003] Can not connect to the server using url=%s, user=%s, passwd=***\n", $host, $port, $user);
 }
 
-$req = cubrid_query("SELECT * FROM code", $pconn);
+$req = odbc_exec($pconn, "SELECT * FROM code");
 $row = cubrid_fetch_assoc($req);
 var_dump($row);
 

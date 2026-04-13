@@ -3,44 +3,64 @@ cubrid_lock_read
 --SKIPIF--
 <?php
 require_once('skipif.inc');
-require_once('skipifconnectfailure.inc')
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
 
-include_once("connect.inc");
+include_once('connect.inc');
+require_once dirname(__DIR__, 2) . '/cubrid_odbc_collection.inc';
 
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
-odbc_exec($conn, "drop table if exists php_cubrid_test");
-odbc_exec($conn, "CREATE TABLE php_cubrid_test (a int AUTO_INCREMENT, b set(int), c list(int), d char(30)) DONT_REUSE_OID");
+$conn = odbc_connect($cubrid_odbc_dsn, '', '');
+if (!cubrid_odbc_compat_is_link($conn)) {
+	printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+	exit(1);
+}
+odbc_exec($conn, 'DROP TABLE IF EXISTS php_cubrid_test');
+odbc_exec($conn, 'CREATE TABLE php_cubrid_test (a int AUTO_INCREMENT, b set(int), c list(int), d char(30)) DONT_REUSE_OID');
 odbc_exec($conn, "INSERT INTO php_cubrid_test(a, b, c, d) VALUES (1, {1,2,3}, {11, 22, 33, 333}, 'a')");
 odbc_exec($conn, "INSERT INTO php_cubrid_test(a, b, c, d) VALUES (2, {4,5,7}, {44, 55, 66, 666}, 'b')");
 
-if (!$req = odbc_exec($conn, "select * from php_cubrid_test", CUBRID_INCLUDE_OID)) {
-    printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+$r = odbc_exec($conn, 'SELECT b FROM php_cubrid_test WHERE a = 1');
+if (!$r || !odbc_fetch_row($r)) {
+	printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+} else {
+	$rawb = odbc_result($r, 1);
+	odbc_free_result($r);
+	var_dump((string) $rawb);
 }
 
-$oid = cubrid_current_oid($req);
-if (is_null ($oid)){
-    printf("[002] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+function row_shape($conn, $whereSql)
+{
+	$req = odbc_exec($conn, 'SELECT a, b, c, d FROM php_cubrid_test ' . $whereSql);
+	if (!$req || !odbc_fetch_row($req)) {
+		return null;
+	}
+	$a = odbc_result($req, 1);
+	$b = cubrid_odbc_normalize_list_column(odbc_result($req, 2));
+	$c = cubrid_odbc_normalize_list_column(odbc_result($req, 3));
+	$d = (string) odbc_result($req, 4);
+	odbc_free_result($req);
+	if ($b === null || $c === null) {
+		return null;
+	}
+	if (strlen($d) < 30) {
+		$d = str_pad($d, 30);
+	}
+	return [
+		'a' => (string) $a,
+		'b' => $b,
+		'c' => $c,
+		'd' => $d,
+	];
 }
 
-cubrid_move_cursor($req, 1, CUBRID_CURSOR_FIRST);
-
-if (!cubrid_lock_read($conn, $oid)) {
-    printf("[003] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-}
-
-$attr = cubrid_get($conn, $oid, "b");
+$attr = row_shape($conn, 'WHERE a = 1 ORDER BY a');
 var_dump($attr);
 
-$attr = cubrid_get($conn, $oid);
-var_dump($attr);
-
-odbc_free_result($req);
 odbc_close($conn);
 
-print "done!";
+print 'done!';
 ?>
 --CLEAN--
 --EXPECTF--

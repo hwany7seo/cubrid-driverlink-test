@@ -22,13 +22,12 @@ if (false !== ($tmp = @cubrid_fetch($conn))) {
 }
 
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
-cubrid_odbc_set_last_connection($conn);
 if (!$conn) {
     printf("[003] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
     exit(1);
 }
 
-if (!$req = cubrid_query("select * from code", $conn)) {
+if (!$req = odbc_exec($conn, "select * from code")) {
     printf("[004] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
 }
 

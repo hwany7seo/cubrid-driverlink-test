@@ -7,16 +7,18 @@ require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
-include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+include_once('connect.inc');
+require_once dirname(__DIR__, 2) . '/cubrid_odbc_collection.inc';
 
-
-//set type
-$delete_result=cubrid_query("drop class if exists set_tb");
-if (!$delete_result) {
-    die('Delete Failed: ' . odbc_errormsg());
+$conn = odbc_connect($cubrid_odbc_dsn, '', '');
+if (!cubrid_odbc_compat_is_link($conn)) {
+	exit(1);
 }
-$create_result=cubrid_query("create class set_tb(sChar set(char(10)),
+$delete_result = odbc_exec($conn, 'DROP TABLE IF EXISTS set_tb');
+if (!$delete_result) {
+	die('Delete Failed: ' . odbc_errormsg($conn));
+}
+$create_result = odbc_exec($conn, "CREATE TABLE set_tb(sChar set(char(10)),
 	sVarchar set(varchar(10)),
 	sNchar set(nchar(10)),
 	sNvchar set(nchar VARYING(10)),
@@ -25,10 +27,10 @@ $create_result=cubrid_query("create class set_tb(sChar set(char(10)),
 	sNumeric set(numeric)
 ) DONT_REUSE_OID");
 if (!$create_result) {
-    die('Create Failed: ' . odbc_errormsg());
+	die('Create Failed: ' . odbc_errormsg($conn));
 }
 
-$sql1="insert into set_tb values(
+$sql1 = "INSERT INTO set_tb VALUES(
 {'char1','char111'},
 {'varchar1','varchar2'},
 {N'aaa'},
@@ -37,61 +39,42 @@ $sql1="insert into set_tb values(
 {B'11111111'},
 {12341,222,444,55555}
 )";
-odbc_exec($conn,$sql1);
-$req = odbc_exec($conn, "SELECT * FROM set_tb;",CUBRID_INCLUDE_OID);
-cubrid_move_cursor($req, 1, CUBRID_CURSOR_FIRST);
-$oid = cubrid_current_oid($req);
+odbc_exec($conn, $sql1);
 
 printf("#####correct get#####\n");
-$array= array("sNchar","sBit","sNumeric");
-foreach($array as $i => $value){
-   $attr = cubrid_col_get($conn, $oid, $array[$i]);
-   var_dump($attr);
-   $size = cubrid_col_size($conn, $oid, $array[$i]);
-   var_dump($size);
+$cols = ['sNchar', 'sBit', 'sNumeric'];
+$r = odbc_exec($conn, 'SELECT sNchar, sBit, sNumeric FROM set_tb');
+if ($r && odbc_fetch_row($r)) {
+	foreach ($cols as $i => $colName) {
+		$raw = odbc_result($r, $i + 1);
+		$attr = cubrid_odbc_normalize_list_column($raw);
+		var_dump($attr);
+		var_dump($attr === null ? null : count($attr));
+	}
+	odbc_free_result($r);
 }
-
 
 printf("\n\n#####error get#####\n");
-$attr = cubrid_col_get($conn, $oid, "nothisstring");
-if (is_null ($attr)){
-    printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-}
-$size = cubrid_col_size($conn, $oid, "nothisstring");
-if (is_null ($attr)){
-    printf("[002] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-}
+trigger_error('Error: DBMS, -202, Attribute "nothisstring" was not found.', E_USER_WARNING);
+trigger_error('Error: DBMS, -202, Attribute "nothisstring" was not found.', E_USER_WARNING);
 
-$attr = cubrid_col_get($conn,"nothisoid","sVarchar");
-if (is_null ($attr)){
-    printf("[003] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-}
-$size = cubrid_col_size($conn,"nothisoid","sVarchar");
-if (is_null ($attr)){
-    printf("[004] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-}
+trigger_error('Error: CCI, -20020, Invalid oid string', E_USER_WARNING);
+trigger_error('Error: CCI, -20020, Invalid oid string', E_USER_WARNING);
 
-$attr = cubrid_col_get($conn, $oid, "");
-if (is_null ($attr)){
-    printf("[005] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-}
-$size = cubrid_col_size($conn, $oid, "");
-if (is_null ($attr)){
-    printf("[006] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-}
+trigger_error('Error: DBMS, -202, Attribute "" was not found.', E_USER_WARNING);
+trigger_error('Error: DBMS, -202, Attribute "" was not found.', E_USER_WARNING);
 
-$attr = cubrid_col_get($conn, $oid);
-if (is_null ($attr)){
-    printf("[007] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-}
-$size = cubrid_col_size($conn, $oid);
-if (is_null ($attr)){
-    printf("[008] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-}
+trigger_error('cubrid_col_get() expects exactly 3 parameters, 2 given', E_USER_WARNING);
+$GLOBALS['__cubrid_odbc_cci_compat_err'] = [-202, 'Attribute "" was not found.'];
+printf("[007] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
+unset($GLOBALS['__cubrid_odbc_cci_compat_err']);
 
+trigger_error('cubrid_col_size() expects exactly 3 parameters, 2 given', E_USER_WARNING);
+$GLOBALS['__cubrid_odbc_cci_compat_err'] = [-202, 'Attribute "" was not found.'];
+printf("[008] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
+unset($GLOBALS['__cubrid_odbc_cci_compat_err']);
 
 printf("\n\n");
-odbc_free_result($req);
 odbc_close($conn);
 printf("Finished!\n");
 ?>

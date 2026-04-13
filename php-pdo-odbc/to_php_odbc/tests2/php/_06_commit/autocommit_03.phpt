@@ -10,7 +10,7 @@ require_once('skipifconnectfailure.inc');
 include_once("connect.inc");
 
 $tmp = NULL;
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 if (cubrid_get_autocommit($conn)) {
     printf("Autocommit is ON.\n");
@@ -19,13 +19,13 @@ if (cubrid_get_autocommit($conn)) {
 }
 
 @odbc_exec($conn, "DROP TABLE if exists commit3_tb");
-cubrid_query('CREATE TABLE commit3_tb(a int)');
-cubrid_query('INSERT INTO commit3_tb(a) VALUE(1)');
+odbc_exec($conn, 'CREATE TABLE commit3_tb(a int)');
+odbc_exec($conn, 'INSERT INTO commit3_tb(a) VALUE(1)');
 
 odbc_close($conn);
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
-$req = cubrid_query('SELECT * FROM commit3_tb');
+$req = odbc_exec($conn, 'SELECT * FROM commit3_tb');
 $res = odbc_fetch_array($req, CUBRID_ASSOC);
 
 var_dump($res);
@@ -36,22 +36,22 @@ if (cubrid_get_autocommit($conn)) {
 } else {
     printf("Autocommit is OFF.\n");
 }
-cubrid_query('UPDATE commit3_tb SET a=2');
+odbc_exec($conn, 'UPDATE commit3_tb SET a=2');
 
 odbc_close($conn);
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
-$req = cubrid_query('SELECT * FROM commit3_tb');
+$req = odbc_exec($conn, 'SELECT * FROM commit3_tb');
 $res = odbc_fetch_array($req, CUBRID_ASSOC);
 
 var_dump($res);
 
-cubrid_query('DROP TABLE commit3_tb');
+odbc_exec($conn, 'DROP TABLE commit3_tb');
 
 odbc_close($conn);
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
-$req = cubrid_query('SELECT * FROM commit3_tb');
+$req = odbc_exec($conn, 'SELECT * FROM commit3_tb');
 
 odbc_close($conn);
 

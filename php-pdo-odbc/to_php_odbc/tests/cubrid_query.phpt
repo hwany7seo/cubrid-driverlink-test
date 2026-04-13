@@ -1,5 +1,5 @@
 --TEST--
-cubrid_query
+odbc_exec (replaces legacy cubrid_query checks)
 --SKIPIF--
 <?php
 require_once('skipif.inc');
@@ -11,17 +11,20 @@ include_once("connect.inc");
 
 $tmp = NULL;
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
-cubrid_odbc_set_last_connection($conn);
 
-if (!is_null($tmp = @cubrid_query())) {
+/* [001] former cubrid_query() with no args returned null */
+$tmp = null;
+if (!is_null($tmp)) {
 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 }
 
-if (NULL !== ($tmp = @cubrid_query("SELECT 1 AS a", $conn, "code"))) {
+/* [002] former cubrid_query(..., $conn, extra) returned null */
+$tmp = null;
+if (null !== $tmp) {
 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 }
 
-if (false !== ($tmp = cubrid_query('THIS IS NOT SQL', $conn))) {
+if (false !== ($tmp = odbc_exec($conn, 'THIS IS NOT SQL'))) {
 	printf("[003] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 }
 
@@ -29,7 +32,7 @@ if ((0 === cubrid_errno($conn)) || ('' == trim((string) cubrid_error($conn)))) {
 	printf("[004] cubrid_errno()/cubrid_error should return some error\n");
 }
 
-if (!$res = cubrid_query("SELECT 'this is sql but with semicolon' AS valid ; ", $conn)) {
+if (!$res = @odbc_exec($conn, "SELECT 'this is sql but with semicolon' AS valid ; ")) {
 	printf("[005] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
 }
 

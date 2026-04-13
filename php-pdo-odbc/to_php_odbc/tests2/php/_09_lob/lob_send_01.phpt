@@ -3,6 +3,7 @@ cubrid_lob_send cubrid_lob_close
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -13,7 +14,7 @@ $tmp = NULL;
 $fp1=fopen('php/_09_lob/clob1.txt','r');
 $fp2=fopen('php/_09_lob/clob2.txt','r');
 $fp3=fopen('php/_09_lob/clob3.txt','r');
-$conn=odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn=odbc_connect($cubrid_odbc_dsn, "", "");
 odbc_exec($conn,"drop table if exists send_tb");
 odbc_exec($conn,"CREATE TABLE send_tb(a int AUTO_INCREMENT, f clob)");
 $cubrid_req = odbc_prepare($conn, "insert into send_tb (f) values (?)");

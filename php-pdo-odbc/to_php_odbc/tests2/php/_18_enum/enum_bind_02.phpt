@@ -8,19 +8,19 @@ require_once('skipifconnectfailure.inc')
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 //drop the class if exist
 $sql = "drop class if exists t1";
-$req = odbc_exec($conn, $sql, CUBRID_INCLUDE_OID);
+$req = odbc_exec($conn, $sql);
 
 //create the class
 $sql = "create table t1(e1 enum ('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'),e2 enum('02/23/2012', '12/21/2012'), e3 enum('11:12:09', '13:13:13'), e4 enum('123', '9876', '-34'))";
-$req = odbc_exec($conn, $sql, CUBRID_INCLUDE_OID);
+$req = odbc_exec($conn, $sql);
 
 //insert 
 $sql = "insert into t1 values(2, 1, 1, 2), (5, 2, 1, 1), (6, 2, 2, 3),(1, 1, 1, 2), (7, 1, 2, 3), (4, 2, 2, 2), (3, 1, 1, 1)";
-$req = odbc_exec($conn, $sql, CUBRID_INCLUDE_OID);
+$req = odbc_exec($conn, $sql);
 
 //select bind
 print("*****************************************\n");
@@ -50,7 +50,7 @@ cubrid_bind($req, 4, $d );
 cubrid_bind($req, 5, $e);
 cubrid_bind($req, 6, $f, "number" );
 
-odbc_execute($req);
+cubrid_execute($req);
 
 $column_names1 = cubrid_column_names($req);
 $column_types1 = cubrid_column_types($req);
@@ -59,9 +59,10 @@ for($i = 0; $i < $size; $i++) {
 printf("%-40s", $column_names1[$i]);
 }
 print("\n");
-while($row = odbc_fetch_row($req)){
-for($i = 0; $i < $size; $i++) {
-   printf("%-40s", $row[$i]);
+while (odbc_fetch_row($req)) {
+for ($i = 0; $i < $size; $i++) {
+   $__c = cubrid_odbc_result_cell($req, $i);
+   printf("%-40s", $__c !== false ? $__c : '');
 }
 print("\n");
 }
@@ -69,14 +70,14 @@ print("\n");
 //select data
 print("*****************************************\n");
 $sql = "select repeat(e1, ?), substring(e1, ?, ?), concat(e1,?, e2, ?, e3), repeat(?, e1) from t1 order by 1, 2, 3, 4";
-$req = odbc_prepare($conn, $sql, CUBRID_INCLUDE_OID);
+$req = odbc_prepare($conn, $sql);
 cubrid_bind($req, 1, 2);
 cubrid_bind($req, 2, 2 );
 cubrid_bind($req, 3, 4 );
 cubrid_bind($req, 4, "contact1" );
 cubrid_bind($req, 5, "contact2");
 cubrid_bind($req, 6, "repeat_value" );
-odbc_execute($req);
+cubrid_execute($req);
 $column_names1 = cubrid_column_names($req);
 $column_types1 = cubrid_column_types($req);
 $size = count($column_names1);
@@ -84,9 +85,10 @@ for($i = 0; $i < $size; $i++) {
 printf("%-100s", $column_names1[$i]);
 }
 print("\n");
-while($row = odbc_fetch_row($req)){
-for($i = 0; $i < $size; $i++) {
-   printf("%-100s", $row[$i]);
+while (odbc_fetch_row($req)) {
+for ($i = 0; $i < $size; $i++) {
+   $__c = cubrid_odbc_result_cell($req, $i);
+   printf("%-100s", $__c !== false ? $__c : '');
 }
 print("\n");
 }

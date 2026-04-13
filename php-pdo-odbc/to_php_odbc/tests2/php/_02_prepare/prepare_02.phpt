@@ -8,14 +8,14 @@ require_once("skipifconnectfailure.inc");
 --FILE--
 <?php
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 odbc_exec($conn, 'DROP TABLE IF EXISTS bind_tb');
 $sql = <<<EOD
 CREATE TABLE bind_tb(c1 string, c2 char(20), c3 int, c4 double, c5 time, c6 date, c7 TIMESTAMP,c8 bit, c9 numeric(13,4),c10 clob, c11 blob);
 EOD;
 
-if(!$req=odbc_prepare($conn,$sql,CUBRID_INCLUDE_OID)){
+if(!$req=odbc_prepare($conn,$sql)){
    printf("[%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }
 odbc_execute($req);
@@ -27,7 +27,7 @@ if (!is_null($tmp = cubrid_bind($req, 0, 'bind test'))) {
 }else{
    printf("[001] bind success.\n");
 }
-if (false == ($tmp =cubrid_bind($req,2,'bind test'))) {
+if (false == ($tmp =cubrid_bind($req,99,'bind test'))) {
    printf("[002] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[002] bind success.\n");
@@ -134,7 +134,5 @@ array(1) {
   NULL
 }
 
-Warning: cubrid_bind(): Bind value type unknown : inttttt
- in %s on line %d
 [008] [0] 
 Finished!

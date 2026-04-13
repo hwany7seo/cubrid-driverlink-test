@@ -11,7 +11,7 @@ $retval = check_table_existence($conn, "php_cubrid_test");
 if($retval == -1) {
     exit(1);
 } elseif ($retval == 1) {
-    cubrid_query('DROP TABLE php_cubrid_test', $conn);
+    odbc_exec($conn, 'DROP TABLE php_cubrid_test');
 }
 
 if (!odbc_commit($conn)) {

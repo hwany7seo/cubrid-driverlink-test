@@ -10,32 +10,26 @@ require_once('skipifconnectfailure.inc');
 include_once("connect.inc");
 
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
-cubrid_odbc_set_last_connection($conn);
-
 @odbc_exec($conn, "DROP TABLE IF EXISTS rollback_test");
-cubrid_query('CREATE TABLE rollback_test(a int)', $conn);
-cubrid_query('INSERT INTO rollback_test(a) VALUES(1)', $conn);
+odbc_exec($conn, 'CREATE TABLE rollback_test(a int)');
+odbc_exec($conn, 'INSERT INTO rollback_test(a) VALUES(1)');
 
 odbc_close($conn);
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
-cubrid_odbc_set_last_connection($conn);
-
 cubrid_set_autocommit($conn, CUBRID_AUTOCOMMIT_FALSE);
 
-$req = cubrid_query('SELECT * FROM rollback_test', $conn);
+$req = odbc_exec($conn, 'SELECT * FROM rollback_test');
 $res = cubrid_fetch_assoc($req);
 
 var_dump($res);
 
-cubrid_query('DROP TABLE IF EXISTS rollback_test', $conn);
+odbc_exec($conn, 'DROP TABLE IF EXISTS rollback_test');
 
 odbc_rollback($conn);
 
 odbc_close($conn);
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
-cubrid_odbc_set_last_connection($conn);
-
-$req = cubrid_query('SELECT * FROM rollback_test', $conn);
+$req = odbc_exec($conn, 'SELECT * FROM rollback_test');
 $res = cubrid_fetch_assoc($req);
 
 var_dump($res);

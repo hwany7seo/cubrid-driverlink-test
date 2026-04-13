@@ -1,5 +1,8 @@
 #!/bin/bash
 set -x
+_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=/dev/null
+source "${_SCRIPT_DIR}/../../unixodbc_cubrid_env.sh"
 phppath=$1
 
 function runNormalCases()

@@ -14,8 +14,6 @@ require_once('skipifconnectfailure.inc');
 include_once('connect.inc');
 
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
-cubrid_odbc_set_last_connection($conn);
-
 if (!($res = odbc_exec($conn, "SELECT * FROM code LIMIT 5"))) {
 	printf('[003] [%s] %s\n', odbc_error($conn), odbc_errormsg($conn));
 	exit(1);

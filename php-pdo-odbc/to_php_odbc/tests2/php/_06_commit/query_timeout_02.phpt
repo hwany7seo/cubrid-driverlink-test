@@ -3,6 +3,7 @@ cubrid_get_query_timeout cubrid_set_query_timeout
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -10,7 +11,7 @@ require_once('skipifconnectfailure.inc');
 
 include_once('connect.inc');
 printf("#####correct example#####\n");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 odbc_exec($conn, "DROP TABLE if exists timeout2_tb");
 odbc_exec($conn, "create table timeout2_tb(id int, name varchar(10))");
 odbc_exec($conn, "insert into timeout2_tb values(1,'nameq'),(2,'name2'),(3,'name3')");

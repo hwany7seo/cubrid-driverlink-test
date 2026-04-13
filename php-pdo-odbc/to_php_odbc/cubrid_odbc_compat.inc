@@ -1,6 +1,7 @@
 <?php
 /**
  * cubrid-php 레거시 호출명을 ext/odbc + CUBRID ODBC 조합에서 쓰기 위한 최소 호환 레이어 (PHP 8.4).
+ * tests/ · tests2/ 공통: to_php_odbc/cubrid_odbc_compat.inc (각 connect.inc 가 ../ 로 로드).
  * 완전한 CCI/확장 API 대체는 아니며, 드라이버 전용 동작이 필요한 테스트는 별도 스킵/정리가 필요합니다.
  */
 if (!defined('CUBRID_NUM')) {
@@ -81,15 +82,6 @@ if (!function_exists('cubrid_odbc_compat_odbc_errno_msg')) {
 		$st = is_string($st) ? $st : '';
 		$msg = is_string($msg) ? $msg : '';
 		return [cubrid_odbc_compat_parse_errno($st, $msg), $msg];
-	}
-}
-
-if (!function_exists('cubrid_odbc_set_last_connection')) {
-	function cubrid_odbc_set_last_connection(mixed $conn): void
-	{
-		if (cubrid_odbc_compat_is_link($conn)) {
-			$GLOBALS['__cubrid_odbc_last_conn'] = $conn;
-		}
 	}
 }
 
@@ -233,75 +225,37 @@ if (!function_exists('cubrid_disconnect')) {
 	function cubrid_disconnect($conn)
 	{
 		if (isset($GLOBALS['__cubrid_odbc_last_conn']) && $GLOBALS['__cubrid_odbc_last_conn'] === $conn) {
-			unset($GLOBALS['__cubrid_odbc_last_conn'], $GLOBALS['__cubrid_odbc_last_result']);
+			unset($GLOBALS['__cubrid_odbc_last_conn']);
 		}
 		return odbc_close($conn);
 	}
 }
 
-if (!function_exists('cubrid_query')) {
-	/**
-	 * cubrid_query(string $sql [, $conn]) 또는 잘못 변환된 cubrid_query($conn, string $sql) 모두 허용.
-	 * 연결이 생략되면 마지막으로 등록된 연결(__cubrid_odbc_last_conn)을 사용.
-	 * 인자 0개·불필요한 추가 인자는 cubrid-php 와 같이 null 을 반환한다.
-	 */
-	function cubrid_query($sqlOrConn = null, $connOrSql = null, mixed ...$extra)
-	{
-		if (func_num_args() === 0) {
-			return null;
-		}
-		if (count($extra) > 0) {
-			return null;
-		}
-		$a = $sqlOrConn;
-		$b = $connOrSql;
-		if (cubrid_odbc_compat_is_link($a) && is_string($b)) {
-			$sql = $b;
-			$conn = $a;
-		} elseif (is_string($a)) {
-			$sql = $a;
-			$conn = $b;
-			if (($conn === null || $conn === false) && isset($GLOBALS['__cubrid_odbc_last_conn'])
-				&& cubrid_odbc_compat_is_link($GLOBALS['__cubrid_odbc_last_conn'])) {
-				$conn = $GLOBALS['__cubrid_odbc_last_conn'];
-			}
-		} else {
-			return false;
-		}
-		if (!cubrid_odbc_compat_is_link($conn)) {
-			return false;
-		}
-		$GLOBALS['__cubrid_odbc_last_conn'] = $conn;
-		$res = odbc_exec($conn, $sql);
-		if ($res !== false) {
-			$GLOBALS['__cubrid_odbc_last_result'] = $res;
-		}
-		return $res;
-	}
-}
-
 if (!function_exists('cubrid_fetch')) {
 	/**
-	 * cubrid_fetch([$result [, $mode]]) — 인자 생략 시 마지막 쿼리 결과(cubrid_query/odbc_exec 후)를 사용.
-	 * 인자 1개이고 값이 fetch 모드 상수(1~4)이면 결과 핸들 없이 모드만 지정한 호출로 본다.
+	 * cubrid_fetch($result [, $mode]) — ODBC 포팅: 결과 핸들(odbc_exec 등)을 첫 인자로 필수.
+	 * 인자 생략·모드만 단독 지정(cubrid_fetch(CUBRID_NUM))은 지원하지 않는다.
 	 */
 	function cubrid_fetch($result = null, $mode = CUBRID_BOTH)
 	{
 		$argc = func_num_args();
 		if ($argc === 0) {
-			$result = $GLOBALS['__cubrid_odbc_last_result'] ?? null;
-			$mode = CUBRID_BOTH;
-			if ($result === null || $result === false) {
-				return null;
-			}
-		} elseif ($argc === 1 && is_int($result) && $result >= CUBRID_NUM && $result <= CUBRID_OBJECT) {
-			$mode = $result;
-			$result = $GLOBALS['__cubrid_odbc_last_result'] ?? null;
-			if ($result === null || $result === false) {
-				return null;
-			}
-		} elseif ($argc === 1 && cubrid_odbc_compat_is_link($result)) {
+			trigger_error('cubrid_fetch() expects at least 1 parameter, 0 given', E_USER_WARNING);
 			return false;
+		}
+		if ($argc === 1 && is_int($result) && $result >= CUBRID_NUM && $result <= CUBRID_OBJECT) {
+			trigger_error(
+				'cubrid_fetch(): result handle required as first argument (ODBC port; no implicit last result)',
+				E_USER_WARNING
+			);
+			return false;
+		}
+		if ($argc === 1 && cubrid_odbc_compat_is_link($result)) {
+			return false;
+		}
+		$modeVal = CUBRID_BOTH;
+		if ($argc >= 2) {
+			$modeVal = func_get_arg(1);
 		}
 		if ($result === false || $result === null) {
 			return false;
@@ -313,7 +267,7 @@ if (!function_exists('cubrid_fetch')) {
 		if ($row === false) {
 			return false;
 		}
-		switch ($mode) {
+		switch ($modeVal) {
 			case CUBRID_ASSOC:
 				return $row;
 			case CUBRID_NUM:
@@ -341,6 +295,24 @@ if (!function_exists('cubrid_fetch_assoc')) {
 			return false;
 		}
 		return odbc_fetch_array($result);
+	}
+}
+
+/**
+ * odbc_fetch_row() 직후 현재 행의 컬럼 값(0 기반 인덱스).
+ * PHP odbc_fetch_row 는 bool 만 반환하므로, 행 데이터는 odbc_result 으로 읽는다.
+ */
+if (!function_exists('cubrid_odbc_result_cell')) {
+	function cubrid_odbc_result_cell($result, int $field_offset_0)
+	{
+		if ($result === false || $result === null) {
+			return false;
+		}
+		$n = odbc_num_fields($result);
+		if ($n === false || $field_offset_0 < 0 || $field_offset_0 >= (int) $n) {
+			return false;
+		}
+		return odbc_result($result, $field_offset_0 + 1);
 	}
 }
 
@@ -375,9 +347,6 @@ if (!function_exists('cubrid_free_result')) {
 	{
 		if ($result === false || $result === null) {
 			return false;
-		}
-		if (isset($GLOBALS['__cubrid_odbc_last_result']) && $GLOBALS['__cubrid_odbc_last_result'] === $result) {
-			unset($GLOBALS['__cubrid_odbc_last_result']);
 		}
 		return odbc_free_result($result);
 	}
@@ -446,12 +415,16 @@ if (!function_exists('cubrid_column_names')) {
 			return false;
 		}
 		$n = odbc_num_fields($result);
-		if ($n === false || $n < 1) {
+		if ($n === false) {
 			return false;
+		}
+		if ($n < 1) {
+			return [];
 		}
 		$names = [];
 		for ($i = 1; $i <= $n; $i++) {
-			$names[] = odbc_field_name($result, $i);
+			$v = odbc_field_name($result, $i);
+			$names[] = ($v === false || $v === null) ? '' : (string) $v;
 		}
 		return $names;
 	}
@@ -464,14 +437,74 @@ if (!function_exists('cubrid_column_types')) {
 			return false;
 		}
 		$n = odbc_num_fields($result);
-		if ($n === false || $n < 1) {
+		if ($n === false) {
 			return false;
+		}
+		if ($n < 1) {
+			return [];
 		}
 		$types = [];
 		for ($i = 1; $i <= $n; $i++) {
-			$types[] = odbc_field_type($result, $i);
+			$v = odbc_field_type($result, $i);
+			/* PHP 8+: printf %s 에 false 를 넘기면 빈 칸·경고 — 항상 문자열로 */
+			$types[] = ($v === false || $v === null) ? '' : (string) $v;
 		}
 		return $types;
+	}
+}
+
+if (!function_exists('cubrid_field_name')) {
+	function cubrid_field_name($result, int $field_offset_0)
+	{
+		if ($result === false || $result === null) {
+			return false;
+		}
+		$n = odbc_num_fields($result);
+		if ($n === false || $field_offset_0 < 0 || $field_offset_0 >= (int) $n) {
+			return false;
+		}
+		$name = odbc_field_name($result, $field_offset_0 + 1);
+		return $name !== false ? $name : false;
+	}
+}
+
+if (!function_exists('cubrid_field_table')) {
+	function cubrid_field_table($result, int $field_offset_0)
+	{
+		if ($result === false || $result === null) {
+			return false;
+		}
+		$n = odbc_num_fields($result);
+		if ($n === false || $field_offset_0 < 0 || $field_offset_0 >= (int) $n) {
+			return false;
+		}
+		/* PHP ODBC does not expose result-column table/catalog; keep empty string. */
+		return '';
+	}
+}
+
+if (!function_exists('cubrid_field_type')) {
+	function cubrid_field_type($result, int $field_offset_0)
+	{
+		if ($result === false || $result === null) {
+			return false;
+		}
+		$n = odbc_num_fields($result);
+		if ($n === false || $field_offset_0 < 0 || $field_offset_0 >= (int) $n) {
+			return false;
+		}
+		$t = odbc_field_type($result, $field_offset_0 + 1);
+		return $t !== false ? $t : false;
+	}
+}
+
+if (!function_exists('cubrid_next_result')) {
+	function cubrid_next_result($result)
+	{
+		if ($result === false || $result === null) {
+			return null;
+		}
+		return odbc_next_result($result);
 	}
 }
 
@@ -482,7 +515,10 @@ if (!function_exists('cubrid_field_len')) {
 			return false;
 		}
 		$len = odbc_field_len($result, $field_offset_0 + 1);
-		return $len !== false ? $len : -1;
+		if ($len === false || $len === null) {
+			return -1;
+		}
+		return (int) $len;
 	}
 }
 

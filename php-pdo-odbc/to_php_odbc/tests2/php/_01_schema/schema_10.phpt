@@ -3,6 +3,7 @@ cubrid_schema CUBRID_SCH_ATTR_PRIVILEGE
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--

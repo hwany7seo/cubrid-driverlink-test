@@ -7,3 +7,10 @@ ruby-odbc/cubrid-ruby/
 python-odbc/to_pyodbc/**/*.result
 python-odbc/**/__pycache__/
 python-odbc/pyodbc
+php-pdo-odbc/*/*/*.log
+php-pdo-odbc/*/*/*.out
+php-pdo-odbc/*/*/*.exp
+php-pdo-odbc/*/*/*.diff
+php-pdo-odbc/*/*/.cubrid*.php
+php-pdo-odbc/*/*/cubrid*.php
+php-pdo-odbc/php-src/

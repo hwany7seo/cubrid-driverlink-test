@@ -2,8 +2,15 @@
 # PHP ODBC 변환 테스트 — tests2 (cubrid-php tests2_74 대응). PHP 8.4.19 권장.
 # 사용 예: PHP_BIN=/usr/local/php-8.4.19/bin/php ./run_php_odbc_tests2.sh php/_02_prepare/prepare_01.phpt
 # dnf PHP: TEST_PHP_EXECUTABLE는 절대 경로여야 함(run-tests.php가 file_exists로 검사).
+#
+# unixODBC: ../unixodbc_cubrid_env.sh (CUBRID_ODBC_Unicode · test-db-server 용)
+# ~/.odbc.ini 의 명명 DSN(예: [CUBRID_Unicode])을 쓰려면:
+#   export PHP_ODBC_TEST_DSN=CUBRID_Unicode
+# (connect.inc 가 해당 문자열을 odbc_connect 첫 인자로 그대로 사용합니다.)
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=/dev/null
+source "${ROOT}/../unixodbc_cubrid_env.sh"
 _php_resolve() {
 	if [[ "${1:-}" == /* ]]; then
 		printf '%s' "$1"
@@ -22,6 +29,11 @@ EXEC_PHP="$(_php_resolve "${TEST_PHP_EXECUTABLE:-$PHP_RESOLVED}")" || {
 }
 export TEST_PHP_EXECUTABLE="$EXEC_PHP"
 export TEST_PHP_SRCDIR="${TEST_PHP_SRCDIR:-$ROOT/tests2}"
+
+if [[ -z "${NO_INTERACTION:-}" ]] && [[ ! -t 0 ]]; then
+	export NO_INTERACTION=1
+fi
+
 cd "$ROOT/tests2"
 if [ "$#" -eq 0 ]; then
 	set -- .

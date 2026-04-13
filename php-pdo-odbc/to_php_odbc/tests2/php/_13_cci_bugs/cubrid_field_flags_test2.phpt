@@ -3,12 +3,13 @@ cubrid_bind
 --SKIPIF--
 <?php
 require_once('skipif.inc');
+require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
 include "connect.inc";
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 odbc_exec($conn, 'DROP TABLE IF EXISTS blob_tb');
 odbc_exec($conn,"CREATE TABLE blob_tb(id int, c10 clob,c11 blob);");
 odbc_exec($conn,"insert into blob_tb values( 1, CHAR_TO_CLOB('This is a Dog'), BIT_TO_BLOB(X'000001'))");

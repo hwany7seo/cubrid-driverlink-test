@@ -9,7 +9,7 @@ require_once('skipifconnectfailure.inc');
 <?php
 //table contains all kind of types 
 include_once("connect.inc");
-$conn = odbc_connect("Driver={CUBRID Driver};server=test-db-server;port=33000;uid=dba;pwd=;database=" . $db, "", "");
+$conn = odbc_connect($cubrid_odbc_dsn, "", "");
 odbc_exec($conn,"drop table if exists field2_tb;");
 odbc_exec($conn,"CREATE TABLE field2_tb(c1 string primary key, c2 char(20) not null, c3 int default -2147483648 unique key);");
 odbc_exec($conn,"insert into field2_tb values('string111111','char11111',1)");

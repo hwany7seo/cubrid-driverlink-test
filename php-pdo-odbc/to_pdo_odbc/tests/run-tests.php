@@ -74,10 +74,6 @@ if (!defined("PHP_VERSION_ID")) {
 // __DIR__ is available from 5.3.0
 if (PHP_VERSION_ID < 50300) {
 	define('__DIR__', realpath(dirname(__FILE__)));
-	// FILE_BINARY is available from 5.2.7
-	if (PHP_VERSION_ID < 50207) {
-		define('FILE_BINARY', 0);
-	}	
 }
 
 // (unicode) is available from 6.0.0
@@ -144,7 +140,7 @@ if ((substr(PHP_OS, 0, 3) == "WIN") && empty($environment["SystemRoot"])) {
   $environment["SystemRoot"] = getenv("SystemRoot");
 }
 /* unixODBC: variables_order often omits E; proc_open test subprocess must see ODBC* / LD_LIBRARY_PATH */
-foreach (array('ODBCSYSINI', 'ODBCINI', 'ODBCINSTINI', 'LD_LIBRARY_PATH') as $__k) {
+foreach (array('ODBCSYSINI', 'ODBCINI', 'ODBCINSTINI', 'LD_LIBRARY_PATH', 'CUBRID_ODBC_DRIVER') as $__k) {
 	$__v = getenv($__k);
 	if ($__v !== false) {
 		$environment[$__k] = $__v;
