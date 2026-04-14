@@ -185,17 +185,17 @@ print "Finished!\n";
 [002]conn2 is active
 [003]conn3 is active
 [004]conn4 is active
-[001]Expect close true. [%a] %a
-[002]Expect close value false. [%a] %a
-[003]Expect close value false. [%a] %a
-[004]Expect close value false. [%a] %a
+[001]Expect close true. [] 
+[002]Expect close value false. [] 
+[003]Expect close value false. [] 
+[004]Expect close value false. [] 
 
 
 #####negative example for disconnect and close#####
-[005]Expect close value false. [%a] %a
-[006]Expect close value false. [%a] %a
-[007]Expect close value false. [%a] %a
-[008]Expect close value false. [%a] %a
-[009]Expect close value false. [%a] %a
-[0010]Return value is true, Expect. [%a] %a
+[005]Expect close value false. [] 
+[006]Expect close value false. [] 
+[007]Expect close value false. [] 
+[008]Expect close value false. [] 
+[009]Expect close value false. [] 
+[0010]Return value is true, Expect. [] 
 Finished!

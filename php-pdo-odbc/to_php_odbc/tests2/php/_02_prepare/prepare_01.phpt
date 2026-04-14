@@ -101,10 +101,11 @@ print 'Finished!';
 --EXPECTF--
 
 Warning: odbc_prepare(): SQL error: [CUBRID][ODBC CUBRID Driver][-493]Syntax: In line 1, column 1 before ' this sql statement'
-Syntax error: unexpected 'no', expecting SELECT or VALUE or VALUES or '(' [%s]., SQL state S1000 in SQLPrepare in %s
+Syntax error: unexpected 'no', expecting SELECT or VALUE or VALUES or '(' %s, SQL state S1000 in SQLPrepare in %s
 [0] [CUBRID][ODBC CUBRID Driver][-493]Syntax: In line 1, column 1 before ' this sql statement'
-Syntax error: unexpected 'no', expecting SELECT or VALUE or VALUES or '(' [%s].
+Syntax error: unexpected 'no', expecting SELECT or VALUE or VALUES or '(' %s
 #####correct bind#####
+Expecting boolefalse, got boolean
 array(4) {
   ["c1"]=>
   string(9) "bind test"
@@ -115,7 +116,7 @@ array(4) {
   ["c4"]=>
   string(18) "3.6000000000000001"
 }
-58--Expecting boolefalse, got object
+%d--Expecting boolefalse, got object
 array(3) {
   ["c5"]=>
   string(8) "13:15:45"

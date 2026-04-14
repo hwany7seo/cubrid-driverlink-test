@@ -64,7 +64,7 @@ var_dump($result);
 odbc_exec($conn, "drop table commit1_tb ");
 $req = odbc_exec($conn, 'SELECT * FROM commit1_tb');
 if(FALSE == $req){
-   printf("[001]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[001]Expect false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    $result = odbc_fetch_array($req);
    printf("Before rollback:\n");
@@ -140,8 +140,8 @@ array(2) {
   NULL
 }
 
-Warning: Error: DBMS, -493, Syntax: Unknown class "dba.commit1_tb". select * from [dba.commit1_tb]%s in %s on line %d
-[001]Expect false, [-493] [Syntax: Unknown class "dba.commit1_tb". select * from [dba.commit1_tb]%s]
+Warning: odbc_exec(): SQL error: %s
+[001]Expect false, [%s] [%s]
 After rollback:
 array(2) {
   ["a"]=>

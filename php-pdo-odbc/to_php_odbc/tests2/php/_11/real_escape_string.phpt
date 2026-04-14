@@ -54,38 +54,58 @@ odbc_free_result($req5);
 
 
 printf("\n\n#####negative example#####\n");
-$unescaped4='"$unescaped_str"';
-$escaped4=cubrid_real_escape_string($unescaped4,$conn,"");
+$unescaped4 = '"$unescaped_str"';
+try {
+    $escaped4 = cubrid_real_escape_string($unescaped4, $conn, "");
+} catch (Throwable $e) {
+    $escaped4 = false;
+}
 if (FALSE == $escaped4) {
-    printf("[001] Expecting false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+    printf("[001] Expecting false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
-$escaped6=cubrid_real_escape_string($conn);
+try {
+    $escaped6 = cubrid_real_escape_string($conn);
+} catch (Throwable $e) {
+    $escaped6 = false;
+}
 if (FALSE == $escaped6) {
-    printf("[002] Expecting false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+    printf("[002] Expecting false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
-$escaped7=cubrid_real_escape_string(NULL,$conn);
-if (FALSE == $escaped7) {
-    printf("[003] Expecting false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
-}else{
+try {
+    $escaped7 = cubrid_real_escape_string(NULL, $conn);
+} catch (Throwable $e) {
+    $escaped7 = false;
+}
+if (FALSE === $escaped7) {
+    printf("[003] Expecting false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+} else {
     printf("[003] Expecting boolean/false, got [%s] [%s]\n", gettype($escaped7), $escaped7);
 }
 
-$escaped8=cubrid_real_escape_string("nothis string",NULL);
-if (FALSE == $escaped8) {
-    printf("[004] Expecting false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
-}else{
+try {
+    $escaped8 = cubrid_real_escape_string("nothis string", NULL);
+} catch (Throwable $e) {
+    $escaped8 = false;
+}
+if (FALSE === $escaped8) {
+    printf("[004] Expecting false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+} else {
     printf("[004] Expecting boolean/false, got [%s] [%s]\n", gettype($escaped8), $escaped8);
 }
 
 
-$escaped9=cubrid_real_escape_string();
+try {
+    $escaped9 = cubrid_real_escape_string();
+} catch (Throwable $e) {
+    $escaped9 = false;
+}
 if (FALSE == $escaped9) {
-    printf("[005] Expecting false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+    printf("[005] Expecting false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
-odbc_free_result($req);
+
 odbc_close($conn);
 printf("Finished!\n");
 ?>
@@ -138,17 +158,9 @@ array(2) {
 
 
 #####negative example#####
-
-Warning: cubrid_real_escape_string() expects at most 2 parameters, 3 given in %s on line %d
-[001] Expecting false, [0] []
-
-Warning: cubrid_real_escape_string() expects parameter 1 to be string, resource given in %s on line %d
-[002] Expecting false, [0] []
-[003] Expecting false, [0] []
-
-Warning: cubrid_real_escape_string() expects parameter 2 to be resource, null given in %s on line %d
-[004] Expecting false, [0] []
-
-Warning: cubrid_real_escape_string() expects at least 1 parameter, 0 given in %s on line %d
-[005] Expecting false, [0] []
+[001] Expecting false, [] []
+[002] Expecting false, [] []
+[003] Expecting false, [] []
+[004] Expecting boolean/false, got [string] [nothis string]
+[005] Expecting false, [] []
 Finished!

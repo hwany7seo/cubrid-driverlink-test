@@ -193,62 +193,59 @@ double_t                       DOUBLE                         15
 
 #####Data type is character strings#####
 Column Names                   Column Types                   Column Maxlen  
-char_t                         CHAR                           0              
-varchar_t                      VARCHAR                        0              
-nchar_t                        CHAR                           0              
-ncharvarying_t                 VARCHAR                        0              
+char_t                         CHAR                           5              
+varchar_t                      VARCHAR                        11             
+nchar_t                        CHAR                           20             
+ncharvarying_t                 VARCHAR                        1073741823     
 
 
 #####Data type is BLOB/CLOB#####
 Column Names                   Column Types                   Column Maxlen  
-id_t                           VARCHAR                        0              
-content                        CLOB                           0              
-image                          BLOB                           0              
+id_t                           VARCHAR                        64             
+content                        CLOB                           1073741823     
+image                          BLOB                           1073741823     
 
 
 #####Data type is collection#####
 Column Names                   Column Types                   Column Maxlen  
-schar                          VARCHAR                        0              
-svarchar                       VARCHAR                        0              
-snchar                         VARCHAR                        0              
-snvchar                        VARCHAR                        0              
-sbit                           VARCHAR                        0              
-sbvit                          VARCHAR                        0              
-snumeric                       VARCHAR                        0              
-sinteger                       VARCHAR                        0              
-ssmallint                      VARCHAR                        0              
-smonetary                      VARCHAR                        0              
-sfloat                         VARCHAR                        0              
-sreal                          VARCHAR                        0              
-sdouble                        VARCHAR                        0              
-sdate                          VARCHAR                        0              
-stime                          VARCHAR                        0              
-stimestamp                     VARCHAR                        0              
-sset                           VARCHAR                        0              
-smultiset                      VARCHAR                        0              
-slist                          VARCHAR                        0              
-ssequence                      VARCHAR                        0              
-multiset_t                     VARCHAR                        0              
-list_t                         VARCHAR                        0              
+schar                          VARCHAR                        1073741823     
+svarchar                       VARCHAR                        1073741823     
+snchar                         VARCHAR                        1073741823     
+snvchar                        VARCHAR                        1073741823     
+sbit                           VARCHAR                        1073741823     
+sbvit                          VARCHAR                        1073741823     
+snumeric                       VARCHAR                        1073741823     
+sinteger                       VARCHAR                        1073741823     
+ssmallint                      VARCHAR                        1073741823     
+smonetary                      VARCHAR                        1073741823     
+sfloat                         VARCHAR                        1073741823     
+sreal                          VARCHAR                        1073741823     
+sdouble                        VARCHAR                        1073741823     
+sdate                          VARCHAR                        1073741823     
+stime                          VARCHAR                        1073741823     
+stimestamp                     VARCHAR                        1073741823     
+sset                           VARCHAR                        1073741823     
+smultiset                      VARCHAR                        1073741823     
+slist                          VARCHAR                        1073741823     
+ssequence                      VARCHAR                        1073741823     
+multiset_t                     VARCHAR                        1073741823     
+list_t                         VARCHAR                        1073741823     
 
 
 #####Data type is Date/Time#####
 Column Names                   Column Types                   Column Maxlen  
-date_t                         DATE                           0              
-time_t                         TIME                           0              
-timestamp_t                    TIMESTAMP                      0              
-datetime_t                     DATETIME                       0              
+date_t                         DATE                           10             
+time_t                         TIME                           11             
+timestamp_t                    TIMESTAMP                      23             
+datetime_t                     TIMESTAMP                      23             
 
 
 #####Data type is bit strings#####
 Column Names                   Column Types                   Column Maxlen  
-bit_t                          BIT                            0              
-bit2_t                         BIT                            0              
-bitvarying_t                   BIT VARYING                    0              
-bitvarying2_t                  BIT VARYING                    0              
+bit_t                          BIT                            1              
+bit2_t                         BIT                            1              
+bitvarying_t                   BIT VARYING                    134217728      
+bitvarying2_t                  BIT VARYING                    2              
 
 
 Finished!
-
-
-

@@ -235,7 +235,7 @@ Field Table     Field Name      Field Type
                                date_t                         DATE           
                                time_t                         TIME           
                                timestamp_t                    TIMESTAMP      
-                               datetime_t                     DATETIME       
+                               datetime_t                     TIMESTAMP      
 
 
 #####Data type is bit strings#####

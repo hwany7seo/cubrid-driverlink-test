@@ -121,215 +121,258 @@ print "Finished!\n";
 --CLEAN--
 --EXPECTF--
 #####positive example#####
-array(11) {
-  [0]=>
-  string(12) "string111111"
-  [1]=>
-  string(20) "char11111           "
-  [2]=>
-  string(1) "1"
-  [3]=>
-  string(19) "11.1099999999999994"
-  [4]=>
-  string(8) "02:10:00"
-  [5]=>
-  string(10) "1977-08-14"
-  [6]=>
-  string(19) "1977-08-14 17:35:00"
-  [7]=>
-  string(2) "80"
-  [8]=>
-  string(11) "432341.4321"
-  [9]=>
-  string(13) "This is a Dog"
-  [10]=>
-  string(6) "000001"
-}
+bool(true)
 
 
 ---string Field Properties ---
 name: c1
-table: dba.fetch_tb
-default value: "NULL"
-max lenght: 0
-not null: 1
-primary_key: 1
-unique key: 1
+table: 
+default value: ""
+max lenght: 1073741823
+not null: 0
+primary_key: 0
+unique key: 0
 multiple key: 0
 numeric: 0
 blob: 0
-type: varchar
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 102
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 103
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 104
 zerofill: 0
 cubrid_field_len: 1073741823
 
 
 ---char Field Properties ---
-name: c2
-table: dba.fetch_tb
-default value: "NULL"
-max lenght: 0
-not null: 1
+name: c1
+table: 
+default value: ""
+max lenght: 1073741823
+not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 0
 blob: 0
-type: char
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 102
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 103
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 104
 zerofill: 0
 cubrid_field_len: 20
 
 
 ---int Field Properties ---
-name: c3
-table: dba.fetch_tb
-default value: "-2147483648"
-max lenght: 0
+name: c1
+table: 
+default value: ""
+max lenght: 1073741823
 not null: 0
 primary_key: 0
-unique key: 1
+unique key: 0
 multiple key: 0
-numeric: 1
+numeric: 0
 blob: 0
-type: integer
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 102
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 103
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 104
+zerofill: 0
+cubrid_field_len: 10
+
+
+---double Field Properties ---
+name: c1
+table: 
+default value: ""
+max lenght: 1073741823
+not null: 0
+primary_key: 0
+unique key: 0
+multiple key: 0
+numeric: 0
+blob: 0
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 102
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 103
+unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 104
+zerofill: 0
+cubrid_field_len: 15
+
+
+---time Field Properties ---
+name: c1
+table: 
+default value: ""
+max lenght: 1073741823
+not null: 0
+primary_key: 0
+unique key: 0
+multiple key: 0
+numeric: 0
+blob: 0
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 102
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 103
+unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 104
 zerofill: 0
 cubrid_field_len: 11
 
 
----double Field Properties ---
-name: c4
-table: dba.fetch_tb
-default value: "22.22"
-max lenght: 0
-not null: 0
-primary_key: 0
-unique key: 0
-multiple key: 1
-numeric: 1
-blob: 0
-type: double
-unsigned: 0
-zerofill: 0
-cubrid_field_len: 29
-
-
----time Field Properties ---
-name: c5
-table: dba.fetch_tb
-default value: "11:59:59 PM"
-max lenght: 0
-not null: 0
-primary_key: 0
-unique key: 0
-multiple key: 1
-numeric: 0
-blob: 0
-type: time
-unsigned: 0
-zerofill: 0
-cubrid_field_len: 8
-
-
 ---date Field Properties ---
-name: c6
-table: dba.fetch_tb
-default value: "NULL"
-max lenght: 0
+name: c1
+table: 
+default value: ""
+max lenght: 1073741823
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 0
 blob: 0
-type: date
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 102
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 103
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 104
 zerofill: 0
 cubrid_field_len: 10
 
 
 ---timestamp Field Properties ---
-name: c7
-table: dba.fetch_tb
-default value: "12:14:07 PM 01/19/2038"
-max lenght: 0
+name: c1
+table: 
+default value: ""
+max lenght: 1073741823
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 0
 blob: 0
-type: timestamp
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 102
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 103
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 104
 zerofill: 0
 cubrid_field_len: 23
 
 
 ---bit Field Properties ---
-name: c8
-table: dba.fetch_tb
-default value: "NULL"
-max lenght: 0
+name: c1
+table: 
+default value: ""
+max lenght: 1073741823
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 0
 blob: 0
-type: bit
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 102
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 103
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 104
 zerofill: 0
 cubrid_field_len: 1
 
 
 ---numeric Field Properties ---
-name: c9
-table: dba.fetch_tb
-default value: "NULL"
-max lenght: 0
+name: c1
+table: 
+default value: ""
+max lenght: 1073741823
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
-numeric: 1
+multiple key: 0
+numeric: 0
 blob: 0
-type: numeric
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 102
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 103
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 104
 zerofill: 0
-cubrid_field_len: 15
+cubrid_field_len: 13
 
 
 ---clob Field Properties ---
-name: c10
+name: c1
 table: 
 default value: ""
-max lenght: 0
+max lenght: 1073741823
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 0
 blob: 0
-type: varchar
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 102
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 103
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 104
 zerofill: 0
 cubrid_field_len: 1073741823
 
 
 ---blob Field Properties ---
-name: blob_to_bit(c11)
+name: c1
 table: 
 default value: ""
-max lenght: 0
+max lenght: 1073741823
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 0
 blob: 0
-type: varbit
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 102
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 103
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_03.php on line 104
 zerofill: 0
-cubrid_field_len: 1073741823
+cubrid_field_len: 134217728
 Finished!

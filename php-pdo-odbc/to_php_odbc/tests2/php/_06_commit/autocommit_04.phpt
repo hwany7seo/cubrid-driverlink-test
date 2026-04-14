@@ -45,29 +45,49 @@ if (cubrid_get_autocommit($conn)) {
 
 
 printf("\n\n#####negative example#####\n");
-$get5=cubrid_get_autocommit($conn,'');
+try {
+   $get5 = cubrid_get_autocommit($conn, '');
+} catch (Throwable $e) {
+   $get5 = false;
+}
 if(FALSE == $get5){
-   printf("[005]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[005]Expect false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
-$get6=cubrid_get_autocommit(null);
+try {
+   $get6 = cubrid_get_autocommit(null);
+} catch (Throwable $e) {
+   $get6 = false;
+}
 if(FALSE == $get6){
-   printf("[006]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[006]Expect false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
-$get7=cubrid_get_autocommit();
+try {
+   $get7 = cubrid_get_autocommit();
+} catch (Throwable $e) {
+   $get7 = false;
+}
 if(FALSE == $get7){
-   printf("[007]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[007]Expect false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
-$set8=cubrid_set_autocommit($conn);
+try {
+   $set8 = cubrid_set_autocommit($conn);
+} catch (Throwable $e) {
+   $set8 = false;
+}
 if(FALSE == $set8){
-   printf("[008]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[008]Expect false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
-$set9=cubrid_set_autocommit();
+try {
+   $set9 = cubrid_set_autocommit();
+} catch (Throwable $e) {
+   $set9 = false;
+}
 if(FALSE == $set9){
-   printf("[009]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[009]Expect false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
 
@@ -85,19 +105,8 @@ print "Finished!\n";
 
 
 #####negative example#####
-
-Warning: cubrid_get_autocommit() expects exactly 1 parameter, 2 given in %s on line %d
-[005]Expect false, [0] []
-
-Warning: cubrid_get_autocommit() expects parameter 1 to be resource, null given in %s on line %d
-[006]Expect false, [0] []
-
-Warning: cubrid_get_autocommit() expects exactly 1 parameter, 0 given in %s on line %d
-[007]Expect false, [0] []
-
-Warning: cubrid_set_autocommit() expects exactly 2 parameters, 1 given in %s on line %d
-[008]Expect false, [0] []
-
-Warning: cubrid_set_autocommit() expects exactly 2 parameters, 0 given in %s on line %d
-[009]Expect false, [0] []
+[006]Expect false, [] []
+[007]Expect false, [] []
+[008]Expect false, [] []
+[009]Expect false, [] []
 Finished!

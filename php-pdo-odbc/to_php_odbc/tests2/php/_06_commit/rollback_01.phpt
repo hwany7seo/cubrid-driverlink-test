@@ -21,7 +21,7 @@ $conn = odbc_connect($cubrid_odbc_dsn, "", "");
 cubrid_set_autocommit($conn, CUBRID_AUTOCOMMIT_FALSE);
 
 $req = odbc_exec($conn, 'SELECT * FROM roll_tb');
-$res = odbc_fetch_array($req, CUBRID_ASSOC);
+$res = odbc_fetch_array($req);
 
 var_dump($res);
 
@@ -33,7 +33,7 @@ odbc_close($conn);
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 $req = odbc_exec($conn, 'SELECT * FROM roll_tb');
-$res = odbc_fetch_array($req, CUBRID_ASSOC);
+$res = odbc_fetch_array($req);
 
 var_dump($res);
 

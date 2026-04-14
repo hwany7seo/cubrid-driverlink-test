@@ -26,7 +26,7 @@ odbc_close($conn);
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 $req = odbc_exec($conn, 'SELECT * FROM commit3_tb');
-$res = odbc_fetch_array($req, CUBRID_ASSOC);
+$res = odbc_fetch_array($req);
 
 var_dump($res);
 
@@ -42,7 +42,7 @@ odbc_close($conn);
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
 $req = odbc_exec($conn, 'SELECT * FROM commit3_tb');
-$res = odbc_fetch_array($req, CUBRID_ASSOC);
+$res = odbc_fetch_array($req);
 
 var_dump($res);
 
@@ -70,5 +70,5 @@ array(1) {
   string(1) "1"
 }
 
-Warning: Error: DBMS, -493, Syntax: Unknown class "dba.commit3_tb". select * from [dba.commit3_tb]%s in %s on line %d
+Warning: odbc_exec(): SQL error: %s
 done!

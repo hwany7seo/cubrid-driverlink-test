@@ -2,8 +2,8 @@
 cubrid_connect_with_url_
 --SKIPIF--
 <?php
-require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
+die("skip PHP ODBC(ext/odbc): CUBRID PHP Extension-Only API — Not supported by PHP ODBC (URL connect)");
 ?>
 --FILE--
 <?php

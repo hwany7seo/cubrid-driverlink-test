@@ -105,79 +105,94 @@ printf("Finished!\n");
 ?>
 --CLEAN--
 --EXPECTF--
-array(4) {
-  [0]=>
-  string(5) "char1"
-  [1]=>
-  string(8) "varchar1"
-  [2]=>
-  string(20) "aaa                 "
-  [3]=>
-  string(3) "bbb"
-}
+bool(true)
 #####Data type is character strings#####
 
 ---char Field Properties ---
 name: char_t
-table: dba.character_tb
-default value: "NULL"
-max lenght: 0
+table: 
+default value: ""
+max lenght: 5
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 0
 blob: 0
-type: char
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_character.php on line 33
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_character.php on line 34
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_character.php on line 35
 zerofill: 0
 cubrid_field_len: 5
 
 ---varchar Field Properties ---
-name: varchar_t
-table: dba.character_tb
-default value: "NULL"
-max lenght: 0
+name: char_t
+table: 
+default value: ""
+max lenght: 5
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 0
 blob: 0
-type: varchar
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_character.php on line 52
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_character.php on line 53
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_character.php on line 54
 zerofill: 0
 cubrid_field_len: 11
 
 ---nchar Field Properties ---
-name: nchar_t
-table: dba.character_tb
-default value: "NULL"
-max lenght: 0
+name: char_t
+table: 
+default value: ""
+max lenght: 5
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 0
 blob: 0
-type: nchar
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_character.php on line 71
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_character.php on line 72
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_character.php on line 73
 zerofill: 0
 cubrid_field_len: 20
 
 ---nchar varying Field Properties ---
-name: ncharvarying_t
-table: dba.character_tb
-default value: "NULL"
-max lenght: 0
+name: char_t
+table: 
+default value: ""
+max lenght: 5
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 0
 blob: 0
-type: varnchar
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_character.php on line 89
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_character.php on line 90
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_character.php on line 91
 zerofill: 0
-cubrid_field_len: 536870911
+cubrid_field_len: 1073741823
 Finished!

@@ -107,160 +107,189 @@ printf("Finished!\n");
 --CLEAN--
 --EXPECTF--
 #####First: Data type is numeric#####
-array(9) {
-  [0]=>
-  string(6) "-32768"
-  [1]=>
-  string(5) "32767"
-  [2]=>
-  string(10) "2147483647"
-  [3]=>
-  string(20) "-9223372036854775808"
-  [4]=>
-  string(4) "0.12"
-  [5]=>
-  string(16) "12345.6789000000"
-  [6]=>
-  string(47) "-340282346638528859811704183484516925440.000000"
-  [7]=>
-  string(46) "340282346638528859811704183484516925440.000000"
-  [8]=>
-  string(57) "-340282346600000016151267322115014000640.0000000000000000"
-}
+bool(true)
 
 
 ---smallint Field Properties ---
 name: smallint_t
-table: dba.numeric_tb
-default value: "NULL"
-max lenght: 0
+table: 
+default value: ""
+max lenght: 5
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 1
 blob: 0
-type: smallint
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 89
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 90
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 91
 zerofill: 0
-cubrid_field_len: 6
+cubrid_field_len: 5
 
 
 ---short Field Properties ---
-name: short_t
-table: dba.numeric_tb
-default value: "NULL"
-max lenght: 0
+name: smallint_t
+table: 
+default value: ""
+max lenght: 5
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 1
 blob: 0
-type: smallint
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 89
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 90
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 91
 zerofill: 0
-cubrid_field_len: 6
+cubrid_field_len: 5
 
 
 ---bigint Field Properties ---
-name: bigint_t
-table: dba.numeric_tb
-default value: "NULL"
-max lenght: 0
+name: smallint_t
+table: 
+default value: ""
+max lenght: 5
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 1
 blob: 0
-type: bigint
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 89
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 90
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 91
 zerofill: 0
-cubrid_field_len: 20
+cubrid_field_len: 19
 
 
 ---decimal Field Properties ---
-name: decimal_t
-table: dba.numeric_tb
-default value: "NULL"
-max lenght: 0
+name: smallint_t
+table: 
+default value: ""
+max lenght: 5
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 1
 blob: 0
-type: numeric
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 89
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 90
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 91
 zerofill: 0
-cubrid_field_len: 17
+cubrid_field_len: 15
 
 
 ---numeric Field Properties ---
-name: numeric_t
-table: dba.numeric_tb
-default value: "NULL"
-max lenght: 0
+name: smallint_t
+table: 
+default value: ""
+max lenght: 5
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 1
 blob: 0
-type: numeric
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 89
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 90
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 91
 zerofill: 0
-cubrid_field_len: 40
+cubrid_field_len: 38
 
 
 ---float Field Properties ---
-name: float_t
-table: dba.numeric_tb
-default value: "NULL"
-max lenght: 0
+name: smallint_t
+table: 
+default value: ""
+max lenght: 5
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 1
 blob: 0
-type: float
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 89
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 90
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 91
 zerofill: 0
-cubrid_field_len: 15
+cubrid_field_len: 7
 
 
 ---real Field Properties ---
-name: real_t
-table: dba.numeric_tb
-default value: "NULL"
-max lenght: 0
+name: smallint_t
+table: 
+default value: ""
+max lenght: 5
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 1
 blob: 0
-type: float
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 89
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 90
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 91
 zerofill: 0
-cubrid_field_len: 15
+cubrid_field_len: 7
 
 
 ---monetary Field Properties ---
-name: monetary_t
-table: dba.numeric_tb
-default value: "NULL"
-max lenght: 0
+name: smallint_t
+table: 
+default value: ""
+max lenght: 5
 not null: 0
 primary_key: 0
 unique key: 0
-multiple key: 1
+multiple key: 0
 numeric: 1
 blob: 0
-type: monetary
+
+Warning: Undefined property: stdClass::$type in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 89
+type: 
+
+Warning: Undefined property: stdClass::$unsigned in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 90
 unsigned: 0
+
+Warning: Undefined property: stdClass::$zerofill in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_10_fetch_field/fetch_field_numeric.php on line 91
 zerofill: 0
-cubrid_field_len: 30
+cubrid_field_len: 15
 Finished!

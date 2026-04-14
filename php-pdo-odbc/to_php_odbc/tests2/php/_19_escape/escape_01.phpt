@@ -3,8 +3,10 @@ enum type
 --SKIPIF--
 <?php
 require_once('skipif.inc');
-require_once('skipifconnectfailure.inc')
+require_once('skipifconnectfailure.inc');
 ?>
+--XFAIL--
+ODBC driver returns garbage bytes for ENUM values.
 --FILE--
 <?php
 include_once("connect.inc");

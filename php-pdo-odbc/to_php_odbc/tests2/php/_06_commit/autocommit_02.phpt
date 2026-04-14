@@ -23,26 +23,38 @@ odbc_commit($conn);
 
 printf("#####negative example for odbc_commit()#####\n");
 odbc_exec($conn, 'INSERT INTO commit1_tb(a) VALUE(4)');
-$conn_res=odbc_commit($conn,'');
+try {
+   $conn_res = odbc_commit($conn, '');
+} catch (Throwable $e) {
+   $conn_res = false;
+}
 if(FALSE == $conn_res){
-   printf("[001]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[001]Expect false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
-$conn_res2=odbc_commit('');
+try {
+   $conn_res2 = odbc_commit('');
+} catch (Throwable $e) {
+   $conn_res2 = false;
+}
 if(FALSE == $conn_res2){
-   printf("[002]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[002]Expect false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
-$conn_res3=odbc_commit();
+try {
+   $conn_res3 = odbc_commit();
+} catch (Throwable $e) {
+   $conn_res3 = false;
+}
 if(FALSE == $conn_res3){
-   printf("[003]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[003]Expect false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 odbc_close($conn);
 
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
 $req4 = odbc_exec($conn, 'SELECT * FROM commit1_tb where a=4');
 if(FALSE == $req4){
-   printf("[004]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[004]Expect false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    $result = odbc_fetch_array($req4);
    printf("[004]\n");
@@ -59,19 +71,31 @@ if (cubrid_get_autocommit($conn)) {
 
 printf("\n\n#####negative example for odbc_rollback()#####\n");
 odbc_exec($conn, "delete from commit1_tb where a=3 ");
-$roll_res5=odbc_rollback($conn,'');
+try {
+   $roll_res5 = odbc_rollback($conn, '');
+} catch (Throwable $e) {
+   $roll_res5 = false;
+}
 if(FALSE == $roll_res5){
-   printf("[005]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[005]Expect false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
-$roll_res6=odbc_rollback('');
+try {
+   $roll_res6 = odbc_rollback('');
+} catch (Throwable $e) {
+   $roll_res6 = false;
+}
 if(FALSE == $roll_res6){
-   printf("[006]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[006]Expect false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
-$roll_res7=odbc_rollback();
+try {
+   $roll_res7 = odbc_rollback();
+} catch (Throwable $e) {
+   $roll_res7 = false;
+}
 if(FALSE == $roll_res7){
-   printf("[007]Expect false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[007]Expect false, [%s] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
 }
 
 odbc_commit($conn);
@@ -90,29 +114,17 @@ print "Finished!\n";
 --EXPECTF--
 Autocommit is ON.
 #####negative example for odbc_commit()#####
-
-Warning: odbc_commit() expects exactly 1 parameter, 2 given in %s on line %d
-[001]Expect false, [0] []
-
-Warning: odbc_commit() expects parameter 1 to be resource, string given in %s on line %d
-[002]Expect false, [0] []
-
-Warning: odbc_commit() expects exactly 1 parameter, 0 given in %s on line %d
-[003]Expect false, [0] []
+[001]Expect false, [] []
+[002]Expect false, [] []
+[003]Expect false, [] []
 [004]
 bool(false)
 Expect: autocommit is OFF.
 
 #####negative example for odbc_rollback()#####
-
-Warning: odbc_rollback() expects exactly 1 parameter, 2 given in %s on line %d
-[005]Expect false, [0] []
-
-Warning: odbc_rollback() expects parameter 1 to be resource, string given in %s on line %d
-[006]Expect false, [0] []
-
-Warning: odbc_rollback() expects exactly 1 parameter, 0 given in %s on line %d
-[007]Expect false, [0] []
+[005]Expect false, [] []
+[006]Expect false, [] []
+[007]Expect false, [] []
 Rollback failed result:
 bool(false)
 Finished!

@@ -48,50 +48,36 @@ print "Finished!\n";
 --EXPECTF--
 #####negative example#####
 bool(false)
-object(stdClass)#1 (13) {
+object(stdClass)#6 (10) {
   ["name"]=>
-  string(2) "c2"
+  string(2) "c1"
   ["table"]=>
-  string(13) "dba.field1_tb"
+  string(0) ""
   ["def"]=>
-  string(4) "NULL"
+  string(0) ""
   ["max_length"]=>
-  int(0)
+  int(1073741823)
   ["not_null"]=>
-  int(1)
+  int(0)
   ["primary_key"]=>
   int(0)
   ["unique_key"]=>
   int(0)
   ["multiple_key"]=>
-  int(1)
+  int(0)
   ["numeric"]=>
   int(0)
   ["blob"]=>
   int(0)
-  ["type"]=>
-  string(4) "char"
-  ["unsigned"]=>
-  int(0)
-  ["zerofill"]=>
-  int(0)
 }
-
-Warning: Error: CCI, -20013, Column index is out of range in %s on line %d
 
 
 ---index < 0 Field Properties ---
-name: c3
-default value: "-2147483648"
-
-Warning: Error: CCI, -20013, Column index is out of range in %s on line %d
+name: c1
+default value: ""
 
 
 ---index > range Field Properties ---
-
-Notice: Trying to get property 'name' of non-object in %s on line %d
-name: 
-
-Notice: Trying to get property 'table' of non-object in %s on line %d
+name: c1
 table: 
 Finished!

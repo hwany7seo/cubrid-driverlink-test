@@ -2,8 +2,8 @@
 charset_version_client negative (ODBC: CUBRID 확장 미사용 시 셤)
 --SKIPIF--
 <?php
-require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
+die("skip PHP ODBC(ext/odbc): CUBRID PHP Extension-Only API — Not supported by PHP ODBC");
 if (extension_loaded('cubrid')) {
 	die('skip ODBC shim: unload CUBRID PHP extension to avoid API name clash');
 }

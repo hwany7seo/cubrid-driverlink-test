@@ -4,6 +4,7 @@ cubrid_set_add cubrid_set_drop
 <?php
 require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
+die("skip PHP ODBC(ext/odbc): CUBRID PHP Extension-Only OID API — Not supported by PHP ODBC");
 ?>
 --FILE--
 <?php

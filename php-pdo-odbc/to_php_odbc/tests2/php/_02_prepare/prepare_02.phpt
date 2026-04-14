@@ -16,19 +16,19 @@ CREATE TABLE bind_tb(c1 string, c2 char(20), c3 int, c4 double, c5 time, c6 date
 EOD;
 
 if(!$req=odbc_prepare($conn,$sql)){
-   printf("[%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }
 odbc_execute($req);
 
 $req = odbc_prepare($conn, 'INSERT INTO bind_tb(c1) VALUES(?)');
 printf("#####error bind#####\n");
 if (!is_null($tmp = cubrid_bind($req, 0, 'bind test'))) {
-   printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[001] [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[001] bind success.\n");
 }
 if (false == ($tmp =cubrid_bind($req,99,'bind test'))) {
-   printf("[002] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[002] [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[002] bind success.\n");
 }
@@ -41,12 +41,12 @@ if (false == ($tmp =cubrid_bind($req, 1,bind test))) {
 
 $req4 = odbc_prepare($conn, 'INSERT INTO bind_tb(c3) VALUES(?)');
 if (false == ($tmp =cubrid_bind($req4,1,2147483648,'number'))) {
-   printf("[004] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[004] [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[004] bind success.\n");
 }
 if (false ==($tmp =cubrid_execute($req4))) {
-   printf("[004] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[004] [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[004] execute success.\n");
    $result = odbc_fetch_array($req4);
@@ -55,12 +55,12 @@ if (false ==($tmp =cubrid_execute($req4))) {
 
 $req5 = odbc_prepare($conn, 'INSERT INTO bind_tb(c3) VALUES(?)');
 if (false == ($tmp =cubrid_bind($req5,1,'1233','number'))) {
-   printf("[005] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[005] [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[005] bind success.\n");
 }
 if (false ==($tmp =cubrid_execute($req5))) {
-   printf("[005] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[005] [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[005] execute success.\n");
    $select=odbc_exec($conn,"select c3 from bind_tb");
@@ -70,12 +70,12 @@ if (false ==($tmp =cubrid_execute($req5))) {
 
 $req6= odbc_prepare($conn, 'INSERT INTO bind_tb(c4) VALUES(?)');
 if (false == ($tmp =cubrid_bind($req6,1,NULL))) {
-   printf("[006] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[006] [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[006] bind success.\n");
 }
 if (false ==($tmp =cubrid_execute($req6))) {
-   printf("[006] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[006] [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[006] execute success.\n");
    $select=odbc_exec($conn,"select c4 from bind_tb");
@@ -102,7 +102,7 @@ if (false ==($tmp =cubrid_execute($req7))) {
 
 $req8= odbc_prepare($conn, 'INSERT INTO bind_tb(c3) VALUES(?)');
 if (false == ($tmp =cubrid_bind($req8,1,222,'inttttt'))) {
-   printf("[008] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[008] [%s] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[008] bind success.\n");
 }
@@ -119,8 +119,8 @@ print 'Finished!';
 [002] bind success.
 [004] bind success.
 
-Warning: odbc_execute(): SQL error: [CUBRID][ODBC CUBRID Driver][-494]Semantic: Cannot coerce host var to type integer. [%s]., SQL state S1000 in SQLExecute in %s
-[004] [0] [CUBRID][ODBC CUBRID Driver][-494]Semantic: Cannot coerce host var to type integer. [%s].
+Warning: odbc_execute(): SQL error: [CUBRID][ODBC CUBRID Driver][-494]Semantic: Cannot coerce host var to type integer. %s, SQL state S1000 in SQLExecute in %s
+[004] [S1000] [CUBRID][ODBC CUBRID Driver][-494]Semantic: Cannot coerce host var to type integer. %s
 [005] bind success.
 [005] execute success.
 array(1) {
