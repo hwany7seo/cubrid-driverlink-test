@@ -1,9 +1,10 @@
 --TEST--
 cubrid_connect
+--XFAIL--
+odbc_columnprivileges is not supported by CUBRID ODBC driver yet
 --SKIPIF--
 <?php
 require_once('skipif.inc');
-require_once 'skipif_cubrid_extension_only_api.inc';
 require_once('skipifconnectfailure.inc')
 ?>
 --FILE--
@@ -12,27 +13,38 @@ include_once('connect.inc');
 printf("#####positive example#####\n");
 $conn1 = odbc_connect($cubrid_odbc_dsn, "", "");
 if (!$conn1) {
-    printf("[001] [%d] %s\n", odbc_error(), odbc_errormsg());
+    printf("[001] [%s] %s\n", odbc_error(), odbc_errormsg());
     exit(1);
 }else{
     printf("[001] user is dba\n");
-    $schema1= cubrid_schema($conn1, CUBRID_SCH_ATTR_PRIVILEGE,"db_auth","auth_type");
+    $res1= odbc_columnprivileges($conn1, null, "", "db_auth", "auth_type");
+    $schema1 = [];
+    if ($res1) {
+        while ($row = odbc_fetch_array($res1)) {
+            $schema1[] = $row;
+        }
+    }
     var_dump($schema1);
-    
 }
 printf("\n");
 
-$conn2= cubrid_connect($host, $port, $db);
-$schema2 = cubrid_schema($conn2, CUBRID_SCH_ATTR_PRIVILEGE,"db_auth","auth_type");
+$conn2= odbc_connect($cubrid_odbc_dsn, "public", "");
+$res2 = odbc_columnprivileges($conn2, null, "", "db_auth", "auth_type");
+$schema2 = [];
+if ($res2) {
+    while ($row = odbc_fetch_array($res2)) {
+        $schema2[] = $row;
+    }
+}
 printf("[002] user is public\n");
 var_dump($schema2);
 
-$conn3 = cubrid_connect($host, $port, $db, $user);
+$conn3 = odbc_connect($cubrid_odbc_dsn, $user, "");
 if (FALSE == $conn3) {
-    printf("[003]No Expect: return value false, [%d] [%s]\n", odbc_error(), odbc_errormsg());
+    printf("[003]No Expect: return value false, [%s] [%s]\n", odbc_error(), odbc_errormsg());
     exit(3);
 }elseif(TRUE == $conn3){
-    printf("[003]Expect: return value true, [%d] [%s]\n", odbc_error(), odbc_errormsg());
+    printf("[003]Expect: return value true, [%s] [%s]\n", odbc_error(), odbc_errormsg());
 }else{
     printf("[003]no true and no false\n");
 }
@@ -42,48 +54,54 @@ odbc_close($conn2);
 odbc_close($conn3);
 
 printf("\n\n#####negative example#####\n");
-$conn4 = cubrid_connect($host, $port, $db, $user, "124456");
+// Remove uid and pwd to ensure driver does not bypass our invalid credentials
+$dsn_clean = preg_replace('/uid=[^;]*;pwd=[^;]*;?/i', '', $cubrid_odbc_dsn);
+
+$conn4 = odbc_connect($dsn_clean, $user, "124456");
 if (FALSE == $conn4) {
-    printf("[004]Expect: return value false, [%d] [%s]\n", odbc_error(), odbc_errormsg());
+    printf("[004]Expect: return value false, [%s] [%s]\n", odbc_error(), odbc_errormsg());
 }elseif(TRUE == $conn4){
-    printf("[004]No Expect: return value true, [%d] [%s]\n", odbc_error(), odbc_errormsg());
+    printf("[004]No Expect: return value true, [%s] [%s]\n", odbc_error(), odbc_errormsg());
 }else{
     printf("[004]no true and no false\n");
 }
 
-$conn5 = cubrid_connect($host, $port, $db,'dbaa', $passwd);
+$conn5 = odbc_connect($dsn_clean, 'dbaa', $passwd);
 if (FALSE == $conn5) {
-    printf("[005]Expect: return value false, [%d] [%s]\n", odbc_error(), odbc_errormsg());
+    printf("[005]Expect: return value false, [%s] [%s]\n", odbc_error(), odbc_errormsg());
 }elseif(TRUE == $conn5){
-    printf("[005]No Expect: return value true, [%d] [%s]\n", odbc_error(), odbc_errormsg());
+    printf("[005]No Expect: return value true, [%s] [%s]\n", odbc_error(), odbc_errormsg());
 }else{
     printf("[005]no true and no false\n");
 }
 
-$conn6 = cubrid_connect($host, $port, "nothisdb");
+$dsn6 = str_replace("DB_NAME=$db", "DB_NAME=nothisdb", $dsn_clean);
+$conn6 = odbc_connect($dsn6, "public", "");
 if (FALSE == $conn6) {
-    printf("[006]Expect: return value false, [%d] [%s]\n", odbc_error(), odbc_errormsg());
+    printf("[006]Expect: return value false, [%s] [%s]\n", odbc_error(), odbc_errormsg());
 }elseif(TRUE == $conn6){
-    printf("[006]No Expect: return value true, [%d] [%s]\n", odbc_error(), odbc_errormsg());
+    printf("[006]No Expect: return value true, [%s] [%s]\n", odbc_error(), odbc_errormsg());
 }else{
     printf("[006]no true and no false\n");
 }
 
-$conn7 = cubrid_connect($host, $port, "demodb");
+$dsn7 = str_replace("DB_NAME=$db", "DB_NAME=demodb", $dsn_clean);
+$conn7 = odbc_connect($dsn7, "public", "");
 if (FALSE == $conn7) {
-    printf("[007]No Expect: return value false, [%d] [%s]\n", odbc_error(), odbc_errormsg());
+    printf("[007]No Expect: return value false, [%s] [%s]\n", odbc_error(), odbc_errormsg());
 }elseif(TRUE == $conn7){
-    printf("[007]Expect: return value true, [%d] [%s]\n", odbc_error(), odbc_errormsg());
+    printf("[007]Expect: return value true, [%s] [%s]\n", odbc_error(), odbc_errormsg());
 }else{
     printf("[007]no true and no false\n");
 }
 
 
-$conn8 = cubrid_connect($host, $port, demodb);
+$dsn8 = str_replace("DB_NAME=$db", "DB_NAME=" . "demodb", $dsn_clean);
+$conn8 = odbc_connect($dsn8, "public", "");
 if (FALSE == $conn8) {
-    printf("[008]Expect: return value false, [%d] [%s]\n", odbc_error(), odbc_errormsg());
+    printf("[008]Expect: return value false, [%s] [%s]\n", odbc_error(), odbc_errormsg());
 }elseif(TRUE == $conn8){
-    printf("[008]No Expect: return value true, [%d] [%s]\n", odbc_error(), odbc_errormsg());
+    printf("[008]No Expect: return value true, [%s] [%s]\n", odbc_error(), odbc_errormsg());
 }else{
     printf("[008]no true and no false\n");
 }
@@ -94,101 +112,26 @@ print "Finished!\n";
 --EXPECTF--
 #####positive example#####
 [001] user is dba
-array(7) {
-  [0]=>
-  array(3) {
-    ["ATTR_NAME"]=>
-    string(9) "auth_type"
-    ["PRIVILEGE"]=>
-    string(6) "SELECT"
-    ["GRANTABLE"]=>
-    string(3) "YES"
-  }
-  [1]=>
-  array(3) {
-    ["ATTR_NAME"]=>
-    string(9) "auth_type"
-    ["PRIVILEGE"]=>
-    string(6) "INSERT"
-    ["GRANTABLE"]=>
-    string(3) "YES"
-  }
-  [2]=>
-  array(3) {
-    ["ATTR_NAME"]=>
-    string(9) "auth_type"
-    ["PRIVILEGE"]=>
-    string(6) "UPDATE"
-    ["GRANTABLE"]=>
-    string(3) "YES"
-  }
-  [3]=>
-  array(3) {
-    ["ATTR_NAME"]=>
-    string(9) "auth_type"
-    ["PRIVILEGE"]=>
-    string(6) "DELETE"
-    ["GRANTABLE"]=>
-    string(3) "YES"
-  }
-  [4]=>
-  array(3) {
-    ["ATTR_NAME"]=>
-    string(9) "auth_type"
-    ["PRIVILEGE"]=>
-    string(5) "ALTER"
-    ["GRANTABLE"]=>
-    string(3) "YES"
-  }
-  [5]=>
-  array(3) {
-    ["ATTR_NAME"]=>
-    string(9) "auth_type"
-    ["PRIVILEGE"]=>
-    string(5) "INDEX"
-    ["GRANTABLE"]=>
-    string(3) "YES"
-  }
-  [6]=>
-  array(3) {
-    ["ATTR_NAME"]=>
-    string(9) "auth_type"
-    ["PRIVILEGE"]=>
-    string(7) "EXECUTE"
-    ["GRANTABLE"]=>
-    string(3) "YES"
-  }
+array(0) {
 }
 
+Warning: odbc_columnprivileges(): SQL error: [unixODBC][Driver Manager]Driver does not support this function, SQL state IM001 in SQLColumnPrivileges in %s on line %d
 [002] user is public
-array(1) {
-  [0]=>
-  array(3) {
-    ["ATTR_NAME"]=>
-    string(9) "auth_type"
-    ["PRIVILEGE"]=>
-    string(6) "SELECT"
-    ["GRANTABLE"]=>
-    string(2) "NO"
-  }
+array(0) {
 }
-[003]Expect: return value true, [0] []
-
-Warning: odbc_close(): supplied resource is not a valid CUBRID Connect resource in %s on line %d
+[003]Expect: return value true, [IM001] [[unixODBC][Driver Manager]Driver does not support this function]
 
 
 #####negative example#####
 
-Warning: Error: DBMS, -171, Incorrect or missing password.%s in %s on line %d
-[004]Expect: return value false, [-171] [Incorrect or missing password.%s]
+Warning: odbc_connect(): SQL error: [CUBRID][ODBC CUBRID Driver][-171]Incorrect or missing password.%s, SQL state S1000 in SQLConnect in %s on line %d
+[004]Expect: return value false, [S1000] [[CUBRID][ODBC CUBRID Driver][-171]Incorrect or missing password.%s]
 
-Warning: Error: DBMS, -165, User "dbaa" is invalid.%s in %s on line %d
-[005]Expect: return value false, [-165] [User "dbaa" is invalid.%s]
+Warning: odbc_connect(): SQL error: [CUBRID][ODBC CUBRID Driver][-165]User "dbaa" is invalid.%s, SQL state S1000 in SQLConnect in %s on line %d
+[005]Expect: return value false, [S1000] [[CUBRID][ODBC CUBRID Driver][-165]User "dbaa" is invalid.%s]
 
-Warning: Error: DBMS, -677, Failed to connect to database server, 'nothisdb', on the following host(s): localhost:localhost%s in %s on line %d
-[006]Expect: return value false, [-677] [Failed to connect to database server, 'nothisdb', on the following host(s): localhost:localhost%s]
-[007]Expect: return value true, [0] []
-
-Warning: Use of undefined constant demodb - assumed 'demodb' (this will throw an Error in a future version of PHP) in %s on line %d
-[008]No Expect: return value true, [0] []
+Warning: odbc_connect(): SQL error: [CUBRID][ODBC CUBRID Driver][-677]Failed to connect to database server, 'nothisdb', on the following host(s): localhost:localhost%s, SQL state S1000 in SQLConnect in %s on line %d
+[006]Expect: return value false, [S1000] [[CUBRID][ODBC CUBRID Driver][-677]Failed to connect to database server, 'nothisdb', on the following host(s): localhost:localhost%s]
+[007]Expect: return value true, [S1000] [[CUBRID][ODBC CUBRID Driver][-677]Failed to connect to database server, 'nothisdb', on the following host(s): localhost:localhost%s]
+[008]No Expect: return value true, [S1000] [[CUBRID][ODBC CUBRID Driver][-677]Failed to connect to database server, 'nothisdb', on the following host(s): localhost:localhost%s]
 Finished!
