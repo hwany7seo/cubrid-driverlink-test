@@ -10,28 +10,7 @@ require_once('skipifconnectfailure.inc');
 include_once("connect.inc");
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
-/**
- * Get column size map for a table via odbc_columns() (SQLColumns catalog function).
- * Returns: [ lowercase_column_name => COLUMN_SIZE, ... ]
- *
- * NOTE: odbc_field_len() / cubrid_field_len() use SQL_COLUMN_PRECISION (deprecated ODBC 2.x
- * attribute). For string/binary/date types this either wraps in a 16-bit short causing
- * overflow, or returns semantically wrong values (e.g. precision=0 for DATE).
- * odbc_columns() exposes COLUMN_SIZE from SQLColumns(), which is ODBC 3.x-compliant and
- * maps to SQL_DESC_LENGTH without the short overflow issue.
- */
-function get_column_size_map($conn, $table_name) {
-    $size_map = [];
-    $col_meta = odbc_columns($conn, null, null, $table_name, '%');
-    if ($col_meta) {
-        while (odbc_fetch_row($col_meta)) {
-            $col_name = strtolower(odbc_result($col_meta, 'COLUMN_NAME'));
-            $size_map[$col_name] = odbc_result($col_meta, 'COLUMN_SIZE');
-        }
-        odbc_free_result($col_meta);
-    }
-    return $size_map;
-}
+
 
 //Data type is numeric
 $delete_result1=odbc_exec($conn, "drop class if exists numeric_tb");
@@ -48,13 +27,11 @@ odbc_free_result($create_result1);
 $result1 = odbc_exec($conn, "SELECT * FROM numeric_tb;");
 $column_names1 = cubrid_column_names($result1);
 $column_types1 = cubrid_column_types($result1);
-$size_map1 = get_column_size_map($conn, 'numeric_tb');
 
 printf("#####Data type is numeric#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names1); $i < $size; $i++) {
-    $colkey = strtolower($column_names1[$i]);
-    $column_len1 = $size_map1[$colkey] ?? 'N/A';
+    $column_len1 = odbc_field_len($result1, $i + 1);
     printf("%-30s %-30s %-15s\n", $column_names1[$i], $column_types1[$i], $column_len1);
 }
 printf("\n\n");
@@ -74,13 +51,11 @@ odbc_free_result($create_result2);
 $result2 = odbc_exec($conn, "SELECT * FROM character_tb;");
 $column_names2 = cubrid_column_names($result2);
 $column_types2 = cubrid_column_types($result2);
-$size_map2 = get_column_size_map($conn, 'character_tb');
 
 printf("#####Data type is character strings#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names2); $i < $size; $i++) {
-    $colkey = strtolower($column_names2[$i]);
-    $column_len2 = $size_map2[$colkey] ?? 'N/A';
+    $column_len2 = odbc_field_len($result2, $i + 1);
     printf("%-30s %-30s %-15s\n", $column_names2[$i], $column_types2[$i], $column_len2);
 }
 printf("\n\n");
@@ -100,13 +75,11 @@ odbc_free_result($create_result);
 $result = odbc_exec($conn, "SELECT * FROM clob_tb;");
 $column_names = cubrid_column_names($result);
 $column_types = cubrid_column_types($result);
-$size_map = get_column_size_map($conn, 'clob_tb');
 
 printf("#####Data type is BLOB/CLOB#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names); $i < $size; $i++) {
-    $colkey = strtolower($column_names[$i]);
-    $column_len = $size_map[$colkey] ?? 'N/A';
+    $column_len = odbc_field_len($result, $i + 1);
     printf("%-30s %-30s %-15s\n", $column_names[$i], $column_types[$i], $column_len);
 }
 printf("\n\n");
@@ -148,13 +121,11 @@ odbc_free_result($create_result);
 $result = odbc_exec($conn, "SELECT * FROM collection_tb;");
 $column_names = cubrid_column_names($result);
 $column_types = cubrid_column_types($result);
-$size_map = get_column_size_map($conn, 'collection_tb');
 
 printf("#####Data type is collection#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names); $i < $size; $i++) {
-    $colkey = strtolower($column_names[$i]);
-    $column_len = $size_map[$colkey] ?? 'N/A';
+    $column_len = odbc_field_len($result, $i + 1);
     printf("%-30s %-30s %-15s\n", $column_names[$i], $column_types[$i], $column_len);
 }
 printf("\n\n");
@@ -174,13 +145,11 @@ odbc_free_result($create_result);
 $result = odbc_exec($conn, "SELECT * FROM date_tb;");
 $column_names = cubrid_column_names($result);
 $column_types = cubrid_column_types($result);
-$size_map = get_column_size_map($conn, 'date_tb');
 
 printf("#####Data type is Date/Time#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names); $i < $size; $i++) {
-    $colkey = strtolower($column_names[$i]);
-    $column_len = $size_map[$colkey] ?? 'N/A';
+    $column_len = odbc_field_len($result, $i + 1);
     printf("%-30s %-30s %-15s\n", $column_names[$i], $column_types[$i], $column_len);
 }
 printf("\n\n");
@@ -200,13 +169,11 @@ odbc_free_result($create_result);
 $result = odbc_exec($conn, "SELECT * FROM bit_tb;");
 $column_names = cubrid_column_names($result);
 $column_types = cubrid_column_types($result);
-$size_map = get_column_size_map($conn, 'bit_tb');
 
 printf("#####Data type is bit strings#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names); $i < $size; $i++) {
-    $colkey = strtolower($column_names[$i]);
-    $column_len = $size_map[$colkey] ?? 'N/A';
+    $column_len = odbc_field_len($result, $i + 1);
     printf("%-30s %-30s %-15s\n", $column_names[$i], $column_types[$i], $column_len);
 }
 printf("\n\n");
@@ -225,10 +192,10 @@ int_t                          INTEGER                        10
 bigint_t                       BIGINT                         19             
 decimal_t                      NUMERIC                        15             
 numeric_t                      NUMERIC                        38             
-float_t                        FLOAT                          15             
-real_t                         FLOAT                          15             
-monetary_t                     DOUBLE                         22             
-double_t                       DOUBLE                         22             
+float_t                        FLOAT                          7              
+real_t                         FLOAT                          7              
+monetary_t                     DOUBLE                         15             
+double_t                       DOUBLE                         15             
 
 
 #####Data type is character strings#####
@@ -236,46 +203,46 @@ Column Names                   Column Types                   Column Maxlen
 char_t                         CHAR                           5              
 varchar_t                      VARCHAR                        11             
 nchar_t                        CHAR                           20             
-ncharvarying_t                 VARCHAR                        536870911      
+ncharvarying_t                 VARCHAR                        1073741823     
 
 
 #####Data type is BLOB/CLOB#####
 Column Names                   Column Types                   Column Maxlen  
 id_t                           VARCHAR                        64             
-content                        CLOB                           0              
-image                          BLOB                           0              
+content                        CLOB                           1073741823     
+image                          BLOB                           1073741823     
 
 
 #####Data type is collection#####
 Column Names                   Column Types                   Column Maxlen  
-schar                          VARCHAR                        0              
-svarchar                       VARCHAR                        0              
-snchar                         VARCHAR                        0              
-snvchar                        VARCHAR                        0              
-sbit                           VARCHAR                        0              
-sbvit                          VARCHAR                        0              
-snumeric                       VARCHAR                        0              
-sinteger                       VARCHAR                        10             
-ssmallint                      VARCHAR                        5              
-smonetary                      VARCHAR                        22             
-sfloat                         VARCHAR                        15             
-sreal                          VARCHAR                        15             
-sdouble                        VARCHAR                        22             
-sdate                          VARCHAR                        10             
-stime                          VARCHAR                        12             
-stimestamp                     VARCHAR                        23             
+schar                          VARCHAR                        1073741823     
+svarchar                       VARCHAR                        1073741823     
+snchar                         VARCHAR                        1073741823     
+snvchar                        VARCHAR                        1073741823     
+sbit                           VARCHAR                        1073741823     
+sbvit                          VARCHAR                        1073741823     
+snumeric                       VARCHAR                        1073741823     
+sinteger                       VARCHAR                        1073741823     
+ssmallint                      VARCHAR                        1073741823     
+smonetary                      VARCHAR                        1073741823     
+sfloat                         VARCHAR                        1073741823     
+sreal                          VARCHAR                        1073741823     
+sdouble                        VARCHAR                        1073741823     
+sdate                          VARCHAR                        1073741823     
+stime                          VARCHAR                        1073741823     
+stimestamp                     VARCHAR                        1073741823     
 sset                           VARCHAR                        1073741823     
-smultiset                      VARCHAR                        0              
-slist                          VARCHAR                        0              
-ssequence                      VARCHAR                        0              
-multiset_t                     VARCHAR                        0              
-list_t                         VARCHAR                        0              
+smultiset                      VARCHAR                        1073741823     
+slist                          VARCHAR                        1073741823     
+ssequence                      VARCHAR                        1073741823     
+multiset_t                     VARCHAR                        1073741823     
+list_t                         VARCHAR                        1073741823     
 
 
 #####Data type is Date/Time#####
 Column Names                   Column Types                   Column Maxlen  
 date_t                         DATE                           10             
-time_t                         TIME                           12             
+time_t                         TIME                           11             
 timestamp_t                    TIMESTAMP                      23             
 datetime_t                     TIMESTAMP                      23             
 
@@ -283,9 +250,9 @@ datetime_t                     TIMESTAMP                      23
 #####Data type is bit strings#####
 Column Names                   Column Types                   Column Maxlen  
 bit_t                          BIT                            1              
-bit2_t                         BIT                            8              
-bitvarying_t                   BIT VARYING                    1073741823     
-bitvarying2_t                  BIT VARYING                    10             
+bit2_t                         BIT                            1              
+bitvarying_t                   BIT VARYING                    134217728      
+bitvarying2_t                  BIT VARYING                    2              
 
 
 Finished!

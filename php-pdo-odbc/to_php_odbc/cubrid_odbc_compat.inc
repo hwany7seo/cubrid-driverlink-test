@@ -117,7 +117,7 @@ if (!function_exists('cubrid_bind')) {
 		if ($i < 1) {
 			return null;
 		}
-		if ($i > 32) {
+		if ($i > 1024) {
 			return false;
 		}
 		$key = cubrid_stmt_key($stmt);
@@ -388,9 +388,13 @@ if (!function_exists('cubrid_set_autocommit')) {
 }
 
 if (!function_exists('cubrid_real_escape_string')) {
-	function cubrid_real_escape_string(string $str, $conn = null): string
+	function cubrid_real_escape_string(...$args)
 	{
-		return str_replace("'", "''", $str);
+		$n = count($args);
+		if ($n < 1 || $n > 2 || !is_string($args[0])) {
+			return false;
+		}
+		return str_replace("'", "''", $args[0]);
 	}
 }
 
@@ -539,22 +543,26 @@ if (!function_exists('cubrid_fetch_field')) {
 		if ($result === false || $result === null) {
 			return false;
 		}
-		$name = odbc_field_name($result, $field_offset_0 + 1);
-		if ($name === false) {
+		try {
+			$name = @odbc_field_name($result, $field_offset_0 + 1);
+			if ($name === false) {
+				return false;
+			}
+			$o = new stdClass();
+			$o->name = $name;
+			$o->table = '';
+			$o->def = '';
+			$o->max_length = (int) @odbc_field_len($result, $field_offset_0 + 1);
+			$o->not_null = 0;
+			$o->primary_key = 0;
+			$o->unique_key = 0;
+			$o->multiple_key = 0;
+			$t = @odbc_field_type($result, $field_offset_0 + 1);
+			$o->numeric = is_string($t) && stripos($t, 'int') !== false ? 1 : 0;
+			$o->blob = is_string($t) && stripos($t, 'blob') !== false ? 1 : 0;
+			return $o;
+		} catch (Throwable $e) {
 			return false;
 		}
-		$o = new stdClass();
-		$o->name = $name;
-		$o->table = '';
-		$o->def = '';
-		$o->max_length = (int) odbc_field_len($result, $field_offset_0 + 1);
-		$o->not_null = 0;
-		$o->primary_key = 0;
-		$o->unique_key = 0;
-		$o->multiple_key = 0;
-		$t = odbc_field_type($result, $field_offset_0 + 1);
-		$o->numeric = is_string($t) && stripos($t, 'int') !== false ? 1 : 0;
-		$o->blob = is_string($t) && stripos($t, 'blob') !== false ? 1 : 0;
-		return $o;
 	}
 }
