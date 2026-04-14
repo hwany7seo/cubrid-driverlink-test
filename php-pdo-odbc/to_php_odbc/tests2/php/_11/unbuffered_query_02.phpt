@@ -1,5 +1,5 @@
 --TEST--
-cubrid_unbuffered_query cubrid_free_result
+cubrid_unbuffered_query odbc_free_result
 --SKIPIF--
 <?php
 require_once('skipif.inc');

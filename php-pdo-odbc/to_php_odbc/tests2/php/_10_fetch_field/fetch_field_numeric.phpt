@@ -27,56 +27,56 @@ $result = odbc_exec($conn, "SELECT smallint_t,short_t,int_t,bigint_t,decimal_t,n
 var_dump(odbc_fetch_row($result) );
 
 //smallint
-cubrid_field_seek($result, 0);
+true;
 $field = cubrid_fetch_field($result);
 $type="smallint";
 $index=0;
 get_field_property($field,$type,$index,$result);
 
 //short
-cubrid_field_seek($result, 1);
+true;
 $field = cubrid_fetch_field($result);
 $type="short";
 $index=1;
 get_field_property($field,$type,$index,$result);
 
 //bigint
-cubrid_field_seek($result, 3);
+true;
 $field = cubrid_fetch_field($result);
 $type="bigint";
 $index=3;
 get_field_property($field,$type,$index,$result);
 
 //decimal
-cubrid_field_seek($result, 4);
+true;
 $field = cubrid_fetch_field($result);
 $type="decimal";
 $index=4;
 get_field_property($field,$type,$index,$result);
 
 //numeric
-cubrid_field_seek($result, 5);
+true;
 $field = cubrid_fetch_field($result);
 $type="numeric";
 $index=5;
 get_field_property($field,$type,$index,$result);
 
 //float
-cubrid_field_seek($result, 6);
+true;
 $field = cubrid_fetch_field($result);
 $type="float";
 $index=6;
 get_field_property($field,$type,$index,$result);
 
 //real
-cubrid_field_seek($result, 7);
+true;
 $field = cubrid_fetch_field($result);
 $type="real";
 $index=7;
 get_field_property($field,$type,$index,$result);
 
 //monetary
-cubrid_field_seek($result, 8);
+true;
 $field = cubrid_fetch_field($result);
 $type="monetary";
 $index=8;
@@ -97,7 +97,7 @@ function get_field_property($field,$type,$index,$result){
    printf("%s %s\n", "type:", $field->type);
    printf("%s %d\n", "unsigned:", $field->unsigned);
    printf("%s %d\n", "zerofill:", $field->zerofill);
-   printf("cubrid_field_len: %s\n",cubrid_field_len($result,$index));
+   printf("cubrid_field_len: %s\n",odbc_field_len($result, $index + 1));
 }
 
 odbc_free_result($result); 

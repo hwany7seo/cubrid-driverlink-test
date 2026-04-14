@@ -36,8 +36,8 @@ if (!$res = @odbc_exec($conn, "SELECT 'this is sql but with semicolon' AS valid 
 	printf("[005] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
 }
 
-var_dump(cubrid_fetch_assoc($res));
-cubrid_free_result($res);
+var_dump(odbc_fetch_array($res));
+odbc_free_result($res);
 
 odbc_close($conn);
 

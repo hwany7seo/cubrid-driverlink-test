@@ -23,7 +23,7 @@ var_dump(odbc_fetch_object($res));
 var_dump(odbc_fetch_object($res));
 var_dump(odbc_fetch_object($res));
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

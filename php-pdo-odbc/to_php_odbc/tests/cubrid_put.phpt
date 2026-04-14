@@ -47,7 +47,7 @@ $attr = cubrid_put($conn, $oid, array("a" => 2, "b" => array(7,8,9), "c" => arra
 $attr = cubrid_col_get($conn, $oid, "b");
 var_dump($attr);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

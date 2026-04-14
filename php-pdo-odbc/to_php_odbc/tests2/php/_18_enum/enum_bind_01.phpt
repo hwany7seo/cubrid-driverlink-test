@@ -43,7 +43,7 @@ printf("%-40s", $column_names1[$i]);
 print("\n");
 while (odbc_fetch_row($req)) {
 for ($i = 0; $i < $size; $i++) {
-   $__c = cubrid_odbc_result_cell($req, $i);
+   $__c = odbc_result($req, $i + 1);
    printf("%-40s", $__c !== false ? $__c : '');
 }
 print("\n");

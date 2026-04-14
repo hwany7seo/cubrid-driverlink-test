@@ -36,7 +36,7 @@ $row_size = 0;
 while (odbc_fetch_row($req_holdability)) {
     $row_size++;
 for ($i = 0; $i < $size; $i++) {
-   $__c = cubrid_odbc_result_cell($req_holdability, $i);
+   $__c = odbc_result($req_holdability, $i + 1);
    printf("%-30s", $__c !== false ? $__c : '');
 }
 print("\n");

@@ -26,7 +26,7 @@ var_dump(odbc_num_rows($del));
 var_dump(odbc_num_rows($del));
 var_dump(odbc_num_rows($del));
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

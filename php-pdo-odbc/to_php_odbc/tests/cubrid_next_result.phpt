@@ -1,5 +1,5 @@
 --TEST--
-cubrid_next_result
+odbc_next_result
 --SKIPIF--
 <?php
 require_once('skipif.inc');
@@ -13,7 +13,7 @@ include_once("connect.inc");
 $tmp = NULL;
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
 
-if (!is_null($tmp = @cubrid_next_result())) {
+if (!is_null($tmp = @odbc_next_result())) {
     printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
 }
 
@@ -28,16 +28,16 @@ $req = odbc_exec($res, CUBRID_EXEC_QUERY_ALL);
 get_result_info($res);
 print_field_info($res, 1);
 
-cubrid_next_result($res);
+odbc_next_result($res);
 
 get_result_info($res);
 print_field_info($res, 1);
 
-if (false !== ($tmp = @cubrid_next_result($res))) {
+if (false !== ($tmp = @odbc_next_result($res))) {
     printf("[003] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 }
 
-cubrid_free_result($res);
+odbc_free_result($res);
 odbc_close($conn);
 
 print "done!";
@@ -46,7 +46,7 @@ function print_field_info($req_handle, $offset = 0)
 {
     printf("\n------------ print_field_info --------------------\n");
 
-    cubrid_field_seek($req_handle, $offset);
+    true;
 
     $field = cubrid_fetch_field($req_handle, $offset);
     if (!$field) {
@@ -76,12 +76,12 @@ function get_result_info($req_handle)
 	return false;
     }
 
-    $col_num = cubrid_num_cols($req_handle);
+    $col_num = odbc_num_fields($req_handle);
     if ($col_num < 0) {
 	return false;
     }
 
-    $field_num = cubrid_num_fields($req_handle);
+    $field_num = odbc_num_fields($req_handle);
     if ($col_num < 0) {
 	return false;
     }
@@ -97,22 +97,22 @@ function get_result_info($req_handle)
 	return false;
     }
 
-    $column_last_name = cubrid_field_name($req_handle, $col_num - 1);
+    $column_last_name = odbc_field_name($req_handle, $col_num - 1 + 1);
     if ($column_last_name < 0) {
 	return false;
     }
 
-    $column_last_table = cubrid_field_table($req_handle, $col_num - 1);
+    $column_last_table = "";
     if ($column_last_table < 0) {
 	return false;
     }
 
-    $column_last_type = cubrid_field_type($req_handle, $col_num - 1);
+    $column_last_type = odbc_field_type($req_handle, $col_num - 1 + 1);
     if ($column_last_type < 0) {
 	return false;
     }
 
-    $column_last_len = cubrid_field_len($req_handle, $col_num - 1);
+    $column_last_len = odbc_field_len($req_handle, $col_num - 1 + 1);
     if (!$column_last_len) {
 	return false;
     }
@@ -130,7 +130,7 @@ function get_result_info($req_handle)
     printf("------------------------------------------------------------------------------\n");
     $size = count($column_name_list);
     for($i = 0; $i < $size; $i++) {
-	$column_len = cubrid_field_len($req_handle, $i);
+	$column_len = odbc_field_len($req_handle, $i + 1);
 	printf("%-30s %-30s %-15s\n", $column_name_list[$i], $column_type_list[$i], $column_len); 
     }
     printf("\n\n");

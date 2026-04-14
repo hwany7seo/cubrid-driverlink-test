@@ -84,7 +84,7 @@ if (false !== $tmp) {
     printf("[008] Expecting boolean/false at EOF, got %s/%s\n", gettype($tmp), $tmp);
 }
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 print 'done!';
 ?>
 --CLEAN--

@@ -29,7 +29,7 @@ if ($res == 1) {
     printf ("[003] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
 }
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

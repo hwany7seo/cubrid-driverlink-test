@@ -35,7 +35,7 @@ printf("%-30s", $column_names1[$i]);
 print("\n");
 if (odbc_fetch_row($req_holdability)) {
 for ($i = 0; $i < $size; $i++) {
-   $__c = cubrid_odbc_result_cell($req_holdability, $i);
+   $__c = odbc_result($req_holdability, $i + 1);
    printf("%-30s", $__c !== false ? $__c : '');
 }
 }
@@ -57,7 +57,7 @@ printf("%-30s", $column_names1[$i]);
 print("\n");
 if (odbc_fetch_row($req_holdability)) {
 for ($i = 0; $i < $size; $i++) {
-   $__c = cubrid_odbc_result_cell($req_holdability, $i);
+   $__c = odbc_result($req_holdability, $i + 1);
    printf("%-30s", $__c !== false ? $__c : '');
 }
 }
@@ -69,7 +69,7 @@ $row_size = 2;
 while (odbc_fetch_row($req_holdability)) {
     $row_size++;
 for ($i = 0; $i < $size; $i++) {
-   $__c = cubrid_odbc_result_cell($req_holdability, $i);
+   $__c = odbc_result($req_holdability, $i + 1);
    printf("%-30s", $__c !== false ? $__c : '');
 }
 odbc_commit($conn);
@@ -88,7 +88,7 @@ $row_size = 0;
 while (odbc_fetch_row($req_holdability)) {
     $row_size++;
 for ($i = 0; $i < $size; $i++) {
-   $__c = cubrid_odbc_result_cell($req_holdability, $i);
+   $__c = odbc_result($req_holdability, $i + 1);
    printf("%-30s", $__c !== false ? $__c : '');
 }
 odbc_commit($conn);

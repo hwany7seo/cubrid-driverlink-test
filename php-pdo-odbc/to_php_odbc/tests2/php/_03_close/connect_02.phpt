@@ -1,5 +1,5 @@
 --TEST-- 
-cubrid_connect $new_link = false cubrid_disconnect cubrid_close
+cubrid_connect $new_link = false odbc_close cubrid_close
 --SKIPIF--
 <?php
 require_once('skipif.inc');

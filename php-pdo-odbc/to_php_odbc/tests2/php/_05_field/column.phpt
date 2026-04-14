@@ -29,7 +29,7 @@ $column_types1 = cubrid_column_types($result1);
 printf("#####Data type is numeric#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names1); $i < $size; $i++) {
-    $column_len1 = cubrid_field_len($result1, $i);
+    $column_len1 = odbc_field_len($result1, $i + 1);
     printf("%-30s %-30s %-15s\n", $column_names1[$i], $column_types1[$i], $column_len1); 
 }
 printf("\n\n");
@@ -52,7 +52,7 @@ $column_types2 = cubrid_column_types($result2);
 printf("#####Data type is character strings#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names2); $i < $size; $i++) {
-    $column_len2 = cubrid_field_len($result2, $i);
+    $column_len2 = odbc_field_len($result2, $i + 1);
     printf("%-30s %-30s %-15s\n", $column_names2[$i], $column_types2[$i], $column_len2);
 }
 printf("\n\n");
@@ -75,7 +75,7 @@ $column_types = cubrid_column_types($result);
 printf("#####Data type is BLOB/CLOB#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names); $i < $size; $i++) {
-    $column_len = cubrid_field_len($result, $i);
+    $column_len = odbc_field_len($result, $i + 1);
     printf("%-30s %-30s %-15s\n", $column_names[$i], $column_types[$i], $column_len);
 }
 printf("\n\n");
@@ -120,7 +120,7 @@ $column_types = cubrid_column_types($result);
 printf("#####Data type is collection#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names); $i < $size; $i++) {
-    $column_len = cubrid_field_len($result, $i);
+    $column_len = odbc_field_len($result, $i + 1);
     printf("%-30s %-30s %-15s\n", $column_names[$i], $column_types[$i], $column_len);
 }
 printf("\n\n");
@@ -143,7 +143,7 @@ $column_types = cubrid_column_types($result);
 printf("#####Data type is Date/Time#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names); $i < $size; $i++) {
-    $column_len = cubrid_field_len($result, $i);
+    $column_len = odbc_field_len($result, $i + 1);
     printf("%-30s %-30s %-15s\n", $column_names[$i], $column_types[$i], $column_len);
 }
 printf("\n\n");
@@ -166,7 +166,7 @@ $column_types = cubrid_column_types($result);
 printf("#####Data type is bit strings#####\n");
 printf("%-30s %-30s %-15s\n", "Column Names", "Column Types", "Column Maxlen");
 for($i = 0, $size = count($column_names); $i < $size; $i++) {
-    $column_len = cubrid_field_len($result, $i);
+    $column_len = odbc_field_len($result, $i + 1);
     printf("%-30s %-30s %-15s\n", $column_names[$i], $column_types[$i], $column_len);
 }
 printf("\n\n");

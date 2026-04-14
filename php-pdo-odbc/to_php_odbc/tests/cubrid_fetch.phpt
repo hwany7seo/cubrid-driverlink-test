@@ -43,7 +43,7 @@ var_dump($row);
 $row = cubrid_fetch($req, CUBRID_OBJECT);
 var_dump($row);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

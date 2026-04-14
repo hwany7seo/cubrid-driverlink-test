@@ -48,7 +48,7 @@ cubrid_lob2_bind($req, 1, $lob_blob_3);
 
 odbc_exec($req);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print 'done!';
 ?>

@@ -17,7 +17,7 @@ $result=odbc_exec($conn,"select id as int_t, c10, BLOB_TO_BIT(c11) from blob_tb"
 $col_num = odbc_num_fields($result);
 
 for($i = 0; $i < $col_num; $i++) {
-   printf("%-30s %s\n", cubrid_field_name($result, $i), cubrid_field_flags($result, $i)); 
+   printf("%-30s %s\n", odbc_field_name($result, $i + 1), cubrid_field_flags($result, $i)); 
 }
 
 odbc_free_result($result);

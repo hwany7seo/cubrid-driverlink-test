@@ -52,7 +52,7 @@ if (($schema = cubrid_schema($conn, CUBRID_SCH_CROSS_REFERENCE, "event", "game")
 }
 var_dump($schema);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 /* =============================================== */
 /* Code for testing CUBRID_SCH_ATTR_WITH_SYNONYM   */
@@ -67,7 +67,7 @@ odbc_exec($conn,"CREATE TABLE u1.t1(col1 int, col2 varchar(10), col3 double);");
 odbc_exec($conn,"Grant SELECT ON u1.t1 TO public;");
 odbc_exec($conn,"CREATE synonym public.s1 for u1.t1;");
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 /* =============================================== */
 
 if (!$conn = odbc_connect($cubrid_odbc_dsn, "", "")) {
@@ -99,7 +99,7 @@ if (($schema = cubrid_schema($conn, CUBRID_SCH_ATTR_WITH_SYNONYM, "public.s%", "
 }
 var_dump($schema);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 if (!$conn = odbc_connect($cubrid_odbc_dsn, "", "")) {
     printf("[015] Cannot connect to db server using host=%s, port=%d, dbname=%s, user=%s, passwd=***\n",
@@ -112,7 +112,7 @@ if (($schema = cubrid_schema($conn, CUBRID_SCH_ATTR_WITH_SYNONYM, "s1", "col")) 
 }
 var_dump($schema);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 /* =============================================== */
 /* Code for testing CUBRID_SCH_ATTR_WITH_SYNONYM   */
@@ -125,7 +125,7 @@ odbc_exec($conn,"drop synonym if exists public.s1;");
 odbc_exec($conn,"drop table if EXISTS u1.t1;");
 odbc_exec($conn,"DROP USER u1;");
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 /* =============================================== */
 
 print "done!";

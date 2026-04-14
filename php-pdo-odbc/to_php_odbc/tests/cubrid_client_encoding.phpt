@@ -38,7 +38,7 @@ if ($charset === null || $charset === '') {
 
 printf("CUBRID current charset: %s\n", $charset);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print 'done!';
 ?>

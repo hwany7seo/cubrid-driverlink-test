@@ -73,7 +73,7 @@ var_dump($attr);
 $size = count($attr);
 var_dump($size);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print 'done!';
 ?>

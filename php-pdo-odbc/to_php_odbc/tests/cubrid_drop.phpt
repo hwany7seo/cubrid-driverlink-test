@@ -113,7 +113,7 @@ if ($shape === null) {
 }
 var_dump($shape);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print 'done!';
 ?>

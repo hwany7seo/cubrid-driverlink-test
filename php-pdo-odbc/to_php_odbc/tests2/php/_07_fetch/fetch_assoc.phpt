@@ -1,5 +1,5 @@
 --TEST--
-cubrid_fetch_assoc (ODBC: odbc_fetch_array + odbc_fetch_row 절대 행)
+odbc_fetch_array (ODBC: odbc_fetch_array + odbc_fetch_row 절대 행)
 --SKIPIF--
 <?php
 require_once('skipif.inc');

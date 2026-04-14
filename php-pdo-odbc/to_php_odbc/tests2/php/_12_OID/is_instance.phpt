@@ -32,7 +32,7 @@ if ($fq === null || $fq === '') {
 
 printf("Intance pointed by %s exists.\n", $fq);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print 'done!';
 ?>

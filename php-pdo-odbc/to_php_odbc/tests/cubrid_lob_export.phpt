@@ -57,7 +57,7 @@ if (filesize("lob_test.png") != filesize("./cubrid_logo.png")) {
 cubrid_lob_close($lobs);
 
 odbc_commit($cubrid_conn);
-cubrid_disconnect($cubrid_conn);
+odbc_close($cubrid_conn);
 
 print "done!";
 ?>

@@ -24,7 +24,7 @@ $result = odbc_exec($conn, "SELECT * FROM character_tb;");
 var_dump(odbc_fetch_row($result) );
 
 printf("#####Data type is character strings#####\n");
-cubrid_field_seek($result, 0);
+true;
 $field = cubrid_fetch_field($result);
 
 printf("\n---char Field Properties ---\n");
@@ -41,10 +41,10 @@ printf("%s %d\n", "blob:", $field->blob);
 printf("%s %s\n", "type:", $field->type);
 printf("%s %d\n", "unsigned:", $field->unsigned);
 printf("%s %d\n", "zerofill:", $field->zerofill);
-printf("cubrid_field_len: %s\n",cubrid_field_len($result,0));
+printf("cubrid_field_len: %s\n",odbc_field_len($result, 0 + 1));
 
 
-cubrid_field_seek($result, 1);
+true;
 $field = cubrid_fetch_field($result);
 printf("\n---varchar Field Properties ---\n");
 printf("%s %s\n", "name:", $field->name);
@@ -60,10 +60,10 @@ printf("%s %d\n", "blob:", $field->blob);
 printf("%s %s\n", "type:", $field->type);
 printf("%s %d\n", "unsigned:", $field->unsigned);
 printf("%s %d\n", "zerofill:", $field->zerofill);
-printf("cubrid_field_len: %s\n",cubrid_field_len($result,1));
+printf("cubrid_field_len: %s\n",odbc_field_len($result, 1 + 1));
 
 
-cubrid_field_seek($result, 2);
+true;
 $field = cubrid_fetch_field($result);
 printf("\n---nchar Field Properties ---\n");
 printf("%s %s\n", "name:", $field->name);
@@ -79,9 +79,9 @@ printf("%s %d\n", "blob:", $field->blob);
 printf("%s %s\n", "type:", $field->type);
 printf("%s %d\n", "unsigned:", $field->unsigned);
 printf("%s %d\n", "zerofill:", $field->zerofill);
-printf("cubrid_field_len: %s\n",cubrid_field_len($result,2));
+printf("cubrid_field_len: %s\n",odbc_field_len($result, 2 + 1));
 
-cubrid_field_seek($result, 3);
+true;
 $field = cubrid_fetch_field($result);
 printf("\n---nchar varying Field Properties ---\n");
 printf("%s %s\n", "name:", $field->name);
@@ -97,7 +97,7 @@ printf("%s %d\n", "blob:", $field->blob);
 printf("%s %s\n", "type:", $field->type);
 printf("%s %d\n", "unsigned:", $field->unsigned);
 printf("%s %d\n", "zerofill:", $field->zerofill);
-printf("cubrid_field_len: %s\n",cubrid_field_len($result,3));
+printf("cubrid_field_len: %s\n",odbc_field_len($result, 3 + 1));
 
 
 odbc_close($conn);

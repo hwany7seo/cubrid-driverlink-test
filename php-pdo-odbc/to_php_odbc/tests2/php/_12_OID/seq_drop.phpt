@@ -67,7 +67,7 @@ if ($attr === null) {
 }
 var_dump($attr);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print 'done!';
 ?>

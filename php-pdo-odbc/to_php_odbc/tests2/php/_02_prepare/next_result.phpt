@@ -1,5 +1,5 @@
 --TEST--
-cubrid_next_result and cubrid_execute
+odbc_next_result and cubrid_execute
 --SKIPIF--
 <?php
 require_once('skipif.inc');
@@ -26,14 +26,14 @@ if (false === $res) {
 }else{
    printf("[001] execute success.\n");
 }
-cubrid_next_result($res);
+odbc_next_result($res);
 get_result_info($res);
 
 //three sql statements
 $sql5="delete from prepare_tb where c3=1;insert into prepare_tb values('string3','char3',3,333.33),('string4','char4',4,444.444); select * from prepare_tb;";
 $res5=odbc_exec($conn,$sql5, CUBRID_EXEC_QUERY_ALL);
-cubrid_next_result($res5);
-cubrid_next_result($res5);
+odbc_next_result($res5);
+odbc_next_result($res5);
 while ($row = odbc_fetch_array($res5)) {
    print_r($row);
 }
@@ -48,11 +48,11 @@ function get_result_info($req)
     $column_name_list = cubrid_column_names($req);
     $column_type_list = cubrid_column_types($req);
 
-    $column_last_name = cubrid_field_name($req, $col_num - 1);
-    $column_last_table = cubrid_field_table($req, $col_num - 1);
+    $column_last_name = odbc_field_name($req, $col_num - 1 + 1);
+    $column_last_table = "";
 
-    $column_last_type = cubrid_field_type($req, $col_num - 1);
-    $column_last_len = cubrid_field_len($req, $col_num - 1);
+    $column_last_type = odbc_field_type($req, $col_num - 1 + 1);
+    $column_last_len = odbc_field_len($req, $col_num - 1 + 1);
 
     $column_1_flags = cubrid_field_flags($req, 1);
 
@@ -65,7 +65,7 @@ function get_result_info($req)
 
     $size = count($column_name_list);
     for($i = 0; $i < $size; $i++) {
-        $column_len = cubrid_field_len($req, $i);
+        $column_len = odbc_field_len($req, $i + 1);
         printf("%-30s %-30s %-15s\n", $column_name_list[$i], $column_type_list[$i], $column_len); 
     }
     printf("\n\n");
@@ -88,7 +88,7 @@ if (false === $res2) {
 }else{
    printf("[002] execute success.\n");
 }
-if (false === ($tmp=cubrid_next_result($res2))) {
+if (false === ($tmp=odbc_next_result($res2))) {
    printf("[002] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }else{
    printf("[002] next_result success.\n");
@@ -109,7 +109,7 @@ if (false === $res3) {
 }else{
    printf("[003] execute success.\n");
 }
-if (false === ($tmp=cubrid_next_result($res22222))) {
+if (false === ($tmp=odbc_next_result($res22222))) {
    printf("[003] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }elseif(is_null($tmp)){
     printf("%d--there is maybe some error\n",__LINE__);
@@ -127,7 +127,7 @@ if (false === $res4) {
 }else{
    printf("[004] execute success.\n");
 }
-if (false === ($tmp=cubrid_next_result($res4))) {
+if (false === ($tmp=odbc_next_result($res4))) {
    printf("[004] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 }elseif(is_null($tmp)){
     printf("%d--there is maybe some error\n", __LINE__);
@@ -209,7 +209,7 @@ Array
 
 Notice: Undefined variable: res22222 in %s on line %d
 
-Warning: cubrid_next_result() expects parameter 1 to be resource, null given in %s on line %d
+Warning: odbc_next_result() expects parameter 1 to be resource, null given in %s on line %d
 106--there is maybe some error
 
 Warning: Error: DBMS, -493, Syntax: In line 1, column 44 before ' this sql statement;'
@@ -217,6 +217,6 @@ Syntax error: unexpected 'no', expecting SELECT or VALUE or VALUES or '(' %s in 
 [004] [-493] Syntax: In line 1, column 44 before ' this sql statement;'
 Syntax error: unexpected 'no', expecting SELECT or VALUE or VALUES or '(' %s
 
-Warning: cubrid_next_result() expects parameter 1 to be resource, bool given in %s on line %d
+Warning: odbc_next_result() expects parameter 1 to be resource, bool given in %s on line %d
 124--there is maybe some error
 Finished!

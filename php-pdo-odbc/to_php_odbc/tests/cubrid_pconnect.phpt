@@ -27,7 +27,7 @@ if (!($pconn = cubrid_pconnect($host, $port, $db, $user, $passwd))) {
 }
 
 $req = odbc_exec($pconn, "SELECT * FROM code");
-$row = cubrid_fetch_assoc($req);
+$row = odbc_fetch_array($req);
 var_dump($row);
 
 odbc_close($pconn);
@@ -43,7 +43,7 @@ if (!($pconn = cubrid_pconnect_with_url($connect_url, $user, $passwd))) {
 }
 
 $req = odbc_exec($pconn, "SELECT * FROM code");
-$row = cubrid_fetch_assoc($req);
+$row = odbc_fetch_array($req);
 var_dump($row);
 
 odbc_close($pconn);

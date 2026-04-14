@@ -19,7 +19,7 @@ $result=odbc_exec($conn,"select c1,c2,c3,c4,c5,c6,c7,c8,c9,CLOB_TO_CHAR(c10) as 
 var_dump(odbc_fetch_row($result) );
 
 //string
-cubrid_field_seek($result, 0);
+true;
 $field = cubrid_fetch_field($result);
 $type="string";
 $index=0;
@@ -28,70 +28,70 @@ get_field_property($field,$type,$index,$result);
 //char
 $type="char";
 $index=1;
-cubrid_field_seek($result, 1);
+true;
 $field = cubrid_fetch_field($result);
 get_field_property($field,$type,$index,$result);
 
 //int
 $type="int";
 $index=2;
-cubrid_field_seek($result, 2);
+true;
 $field = cubrid_fetch_field($result);
 get_field_property($field,$type,$index,$result);
 
 //double
 $type="double";
 $index=3;
-cubrid_field_seek($result, 3);
+true;
 $field = cubrid_fetch_field($result);
 get_field_property($field,$type,$index,$result);
 
 //time
 $type="time";
 $index=4;
-cubrid_field_seek($result, 4);
+true;
 $field = cubrid_fetch_field($result);
 get_field_property($field,$type,$index,$result);
 
 //date
 $type="date";
 $index=5;
-cubrid_field_seek($result, 5);
+true;
 $field = cubrid_fetch_field($result);
 get_field_property($field,$type,$index,$result);
 
 //timestamp
 $type="timestamp";
 $index=6;
-cubrid_field_seek($result, 6);
+true;
 $field = cubrid_fetch_field($result);
 get_field_property($field,$type,$index,$result);
 
 //bit
 $type="bit";
 $index=7;
-cubrid_field_seek($result, 7);
+true;
 $field = cubrid_fetch_field($result);
 get_field_property($field,$type,$index,$result);
 
 //numeric
 $type="numeric";
 $index=8;
-cubrid_field_seek($result,8);
+true;
 $field = cubrid_fetch_field($result);
 get_field_property($field,$type,$index,$result);
 
 //clob
 $type="clob";
 $index=9;
-cubrid_field_seek($result, 9);
+true;
 $field = cubrid_fetch_field($result);
 get_field_property($field,$type,$index,$result);
 
 //blob
 $type="blob";
 $index=10;
-cubrid_field_seek($result, 10);
+true;
 $field = cubrid_fetch_field($result);
 get_field_property($field,$type,$index,$result);
 
@@ -110,7 +110,7 @@ function get_field_property($field,$type,$index,$result){
    printf("%s %s\n", "type:", $field->type);
    printf("%s %d\n", "unsigned:", $field->unsigned);
    printf("%s %d\n", "zerofill:", $field->zerofill);
-   printf("cubrid_field_len: %s\n",cubrid_field_len($result,$index));
+   printf("cubrid_field_len: %s\n",odbc_field_len($result, $index + 1));
 }
 
 odbc_free_result($result);

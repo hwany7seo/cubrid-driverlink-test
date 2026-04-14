@@ -23,7 +23,7 @@ cubrid_set_query_timeout($req, 1000);
 $timeout = cubrid_get_query_timeout($req);
 var_dump($timeout);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

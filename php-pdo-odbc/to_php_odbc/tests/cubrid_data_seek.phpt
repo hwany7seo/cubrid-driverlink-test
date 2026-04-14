@@ -39,7 +39,7 @@ var_dump($rows[0]);
 var_dump($rows[2]);
 var_dump($rows[4]);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print 'done!';
 ?>

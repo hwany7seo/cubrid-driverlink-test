@@ -39,7 +39,7 @@ $attr = cubrid_get($conn, $oid);
 var_dump($attr);
 
 odbc_free_result($req);
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

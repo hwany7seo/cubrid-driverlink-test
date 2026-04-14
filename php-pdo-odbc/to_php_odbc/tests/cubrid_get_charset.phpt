@@ -38,7 +38,7 @@ if ($charset === null || $charset === '') {
 
 var_dump($charset);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print 'done!';
 ?>

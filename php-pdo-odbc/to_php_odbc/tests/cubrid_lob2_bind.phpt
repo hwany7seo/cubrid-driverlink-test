@@ -44,7 +44,7 @@ if (false !== ($tmp = cubrid_lob2_bind($req, 2, 10, 'INT'))) {
     printf("[004] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
 }
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print 'done!';
 ?>

@@ -30,8 +30,8 @@ $column_types1 = cubrid_column_types($req);
 printf("%-40s %-20s %-20s %-40s\n", "column_name", "column_type", "column_len", "column_value");
 while (odbc_fetch_row($req)) {
 for ($i = 0, $size = count($column_names1); $i < $size; $i++) {
-     $column_len1 = cubrid_field_len($req, $i);
-	 $__c = cubrid_odbc_result_cell($req, $i);
+     $column_len1 = odbc_field_len($req, $i + 1);
+	 $__c = odbc_result($req, $i + 1);
     printf("%-40s %-20s %-20s %-40s\n", $column_names1[$i], $column_types1[$i], $column_len1, $__c !== false ? $__c : '');
 }
 }
@@ -46,8 +46,8 @@ $column_types1 = cubrid_column_types($req);
 printf("%-40s %-20s %-20s %-40s\n", "column_name", "column_type", "column_len", "column_value");
 while (odbc_fetch_row($req)) {
 for ($i = 0, $size = count($column_names1); $i < $size; $i++) {
-     $column_len1 = cubrid_field_len($req, $i);
-	 $__c = cubrid_odbc_result_cell($req, $i);
+     $column_len1 = odbc_field_len($req, $i + 1);
+	 $__c = odbc_result($req, $i + 1);
     printf("%-40s %-20s %-20s %-40s\n", $column_names1[$i], $column_types1[$i], $column_len1, $__c !== false ? $__c : '');
 }
 }
@@ -62,8 +62,8 @@ $column_types1 = cubrid_column_types($req);
 printf("%-40s %-20s %-20s %-40s\n", "column_name", "column_type", "column_len", "column_value");
 while (odbc_fetch_row($req)) {
 for ($i = 0, $size = count($column_names1); $i < $size; $i++) {
-     $column_len1 = cubrid_field_len($req, $i);
-	 $__c = cubrid_odbc_result_cell($req, $i);
+     $column_len1 = odbc_field_len($req, $i + 1);
+	 $__c = odbc_result($req, $i + 1);
     printf("%-40s %-20s %-20s %-40s\n", $column_names1[$i], $column_types1[$i], $column_len1, $__c !== false ? $__c : '');
 }
 }

@@ -41,7 +41,7 @@ $attr = cubrid_col_get($conn, $oid, "b");
 var_dump($attr);
 
 odbc_free_result($req);
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

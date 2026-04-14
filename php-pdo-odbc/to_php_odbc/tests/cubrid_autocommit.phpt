@@ -24,7 +24,7 @@ odbc_exec($conn, 'INSERT INTO autocommit_test(a) VALUES(1)');
 odbc_close($conn);
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
 $req = odbc_exec($conn, 'SELECT * FROM autocommit_test');
-$res = cubrid_fetch_assoc($req);
+$res = odbc_fetch_array($req);
 
 var_dump($res);
 
@@ -34,7 +34,7 @@ odbc_exec($conn, 'UPDATE autocommit_test SET a=2');
 odbc_close($conn);
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
 $req = odbc_exec($conn, 'SELECT * FROM autocommit_test');
-$res = cubrid_fetch_assoc($req);
+$res = odbc_fetch_array($req);
 
 var_dump($res);
 

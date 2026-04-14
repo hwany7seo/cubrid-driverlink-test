@@ -32,8 +32,8 @@ if ((0 === cubrid_errno($conn)) || ('' == cubrid_error($conn))) {
 if (!$res = cubrid_unbuffered_query("SELECT * FROM history ; ", $conn)) {
     printf("[006] [%d] %s\n", cubrid_errno($conn), cubrid_error($conn));
 }
-var_dump(cubrid_fetch_assoc($res));
-cubrid_free_result($res);
+var_dump(odbc_fetch_array($res));
+odbc_free_result($res);
 
 odbc_close($conn);
 

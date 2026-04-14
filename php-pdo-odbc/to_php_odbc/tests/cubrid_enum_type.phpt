@@ -1,5 +1,5 @@
 --TEST--
-cubrid_next_result
+odbc_next_result
 --SKIPIF--
 <?php
 require_once('skipif.inc');
@@ -32,7 +32,7 @@ odbc_execute($res, array("value_a"));
 
 $ret = get_result_info($res);
 
-cubrid_free_result($res);
+odbc_free_result($res);
 odbc_close($conn);
 
 print "done!";
@@ -41,7 +41,7 @@ function print_field_info($req_handle, $offset = 0)
 {
 	printf("\n------------ print_field_info --------------------\n");
 
-	cubrid_field_seek($req_handle, $offset);
+	true;
 
 	$field = cubrid_fetch_field($req_handle, $offset);
 	if (!$field) {
@@ -66,12 +66,12 @@ function get_result_info($req_handle)
 {
 	printf("\n------------ get_result_info --------------------\n");
 
-	$col_num = cubrid_num_cols($req_handle);
+	$col_num = odbc_num_fields($req_handle);
 	if ($col_num < 0) {
 		return false;
 	}
 
-	$field_num = cubrid_num_fields($req_handle);
+	$field_num = odbc_num_fields($req_handle);
 	assert($field_num == $col_num);
 
 	$column_name_list = cubrid_column_names($req_handle);
@@ -87,7 +87,7 @@ function get_result_info($req_handle)
 	$size = count($column_name_list);
 	$column_lens = [];
 	for ($i = 0; $i < $size; $i++) {
-		$column_lens[] = cubrid_field_len($req_handle, $i);
+		$column_lens[] = odbc_field_len($req_handle, $i + 1);
 	}
 
 	$row_num = odbc_num_rows($req_handle);

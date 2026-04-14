@@ -52,7 +52,7 @@ if (false !== ($tmp = cubrid_lob2_export($row[2], "test_cubrid_lob2_export"))) {
 
 @unlink("test_cubrid_lob2_export");
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print 'done!';
 

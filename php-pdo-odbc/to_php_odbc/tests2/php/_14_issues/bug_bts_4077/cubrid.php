@@ -393,10 +393,10 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      cubrid_field_seek ( $this->req, 0 );
+      true;
       $val = cubrid_fetch_field ( $this->req );
       $this->assertEquals ( 'column_integer', $val->name );
-      cubrid_field_seek ( $this->req, 4 );
+      true;
       $val = cubrid_fetch_field ( $this->req );
       $this->assertEquals ( 'column_varchar_92', $val->name );
       //Add more attributes to verifications
@@ -418,7 +418,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      cubrid_field_seek ();
+      true;
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage();
@@ -439,7 +439,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      cubrid_field_seek ( - 1, - 1 );
+      true;
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage()."\r\n";
@@ -460,25 +460,25 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $len = cubrid_field_len ( $this->req, 0 );
+      $len = odbc_field_len($this->req, 0  + 1);
       $this->assertEquals ( 10, $len );
-      $len = cubrid_field_len ( $this->req, 1 );
+      $len = odbc_field_len($this->req, 1  + 1);
       $this->assertEquals ( 5, $len );
-      $len = cubrid_field_len ( $this->req, 2 );
+      $len = odbc_field_len($this->req, 2  + 1);
       $this->assertEquals ( 11, $len );
-      $len = cubrid_field_len ( $this->req, 3 );
+      $len = odbc_field_len($this->req, 3  + 1);
       $this->assertEquals ( 9, $len );
-      $len = cubrid_field_len ( $this->req, 4 );
+      $len = odbc_field_len($this->req, 4  + 1);
       $this->assertEquals ( 92, $len );
-      $len = cubrid_field_len ( $this->req, 5 );
+      $len = odbc_field_len($this->req, 5  + 1);
       $this->assertEquals ( 10, $len );
-      $len = cubrid_field_len ( $this->req, 6 );
+      $len = odbc_field_len($this->req, 6  + 1);
       $this->assertEquals ( 4, $len );
-      $len = cubrid_field_len ( $this->req, 7 );
+      $len = odbc_field_len($this->req, 7  + 1);
       $this->assertEquals ( 8, $len );
-      $len = cubrid_field_len ( $this->req, 8 );
+      $len = odbc_field_len($this->req, 8  + 1);
       $this->assertEquals ( 23, $len );
-      $len = cubrid_field_len ( $this->req, 9 );
+      $len = odbc_field_len($this->req, 9  + 1);
       $this->assertEquals ( 1073741823, $len );
     } catch ( Exception $e ) {
       $this->log = __FUNCTION__;
@@ -519,7 +519,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $len = cubrid_field_len ( - 1, 0 );
+      $len = odbc_field_len(- 1, 0  + 1);
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage()."\r\n";
@@ -1010,7 +1010,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_field_name ( $this->req, 0 );
+      $val = odbc_field_name($this->req, 0  + 1);
       $this->assertEquals ( 'column_integer', $val );
     } catch ( Exception $e ) {
       $this->log = __FUNCTION__;
@@ -1030,7 +1030,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_field_name ( $this->req );
+      $val = odbc_field_name($this->req , 0 + 1);
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage();
@@ -1051,7 +1051,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_field_name ( $this->req, - 1 );
+      $val = odbc_field_name($this->req, - 1  + 1);
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage()."\r\n";
@@ -1072,7 +1072,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_field_table ( $this->req, 0 );
+      $val = "";
       $this->assertEquals ( 'test_table', $val );
     } catch ( Exception $e ) {
       $this->log = __FUNCTION__;
@@ -1092,7 +1092,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_field_table ( $this->req );
+      $val = "";
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage();
@@ -1113,7 +1113,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_field_table ( $this->req, - 1 );
+      $val = "";
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage()."\r\n";
@@ -1134,7 +1134,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_field_type ( $this->req, 0 );
+      $val = odbc_field_type($this->req, 0  + 1);
       $this->assertEquals ( 'INT', $val );
     } catch ( Exception $e ) {
       $this->log = __FUNCTION__;
@@ -1154,7 +1154,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_field_type ( $this->req );
+      $val = odbc_field_type($this->req , 0 + 1);
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage();
@@ -1175,7 +1175,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_field_type ( $this->req, - 100 );
+      $val = odbc_field_type($this->req, - 100  + 1);
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage()."\r\n";
@@ -1321,7 +1321,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_fetch_assoc ( $this->req );
+      $val = odbc_fetch_array ( $this->req );
       $this->assertType ( 'array', $val );
       $this->assertEquals ( 1, $val ["column_integer"] );
       $this->assertEquals ( 11, $val ["column_smallint"] );
@@ -1345,7 +1345,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_fetch_assoc ();
+      $val = odbc_fetch_array ();
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage();
@@ -1366,7 +1366,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_fetch_assoc ( - 1 );
+      $val = odbc_fetch_array ( - 1 );
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage()."\r\n";
@@ -1551,7 +1551,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_num_fields ( $this->req );
+      $val = odbc_num_fields ( $this->req );
       $this->assertType ( 'integer', $val );
       $this->assertEquals ( 10, $val );
     } catch ( Exception $e ) {
@@ -1572,7 +1572,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_num_fields ();
+      $val = odbc_num_fields ();
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage();
@@ -1593,7 +1593,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_num_fields ( - 1 );
+      $val = odbc_num_fields ( - 1 );
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage()."\r\n";
@@ -1614,7 +1614,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_free_result ( $this->req );
+      $val = odbc_free_result ( $this->req );
       $this->assertType ( 'boolean', $val );
       $this->assertEquals ( TRUE, $val );
     } catch ( Exception $e ) {
@@ -1635,7 +1635,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_free_result ();
+      $val = odbc_free_result ();
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage();
@@ -1656,7 +1656,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue ( $this->createTestTable (), "Failed to create the test table." );
       $this->sql = "SELECT * FROM test_table";
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $val = cubrid_free_result ( - 1 );
+      $val = odbc_free_result ( - 1 );
       $this->assertTrue ( FALSE, "Expected Exception not thrown." );
     } catch ( Exception $e ) {
       //echo $e->getMessage()."\r\n";
@@ -3516,7 +3516,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     cubrid_close_request ( $this->req );
     $res = cubrid_commit ( $this->con );
     $this->assertTrue ( $res );
-    cubrid_disconnect ( $this->con );
+    odbc_close ( $this->con );
     // must unset after close
     unset ( $this->req );
     unset ( $this->con );
@@ -3569,7 +3569,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       $this->sql = "create table test1 (id int)";
       cubrid_execute ( $this->con, $this->sql );
       
-      cubrid_disconnect ( $this->con );
+      odbc_close ( $this->con );
       // must unset con after disconnect
       unset ( $this->con );
       $this->con = cubrid_connect ( CubridTest::HOST, CubridTest::PORT, CubridTest::DBNAME, CubridTest::USERID, CubridTest::PASSWORD );
@@ -3594,7 +3594,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       echo "\r\nRunning: " . __FUNCTION__ . " = ";
     self::checkServer ();
     //cubrid_close_request($this->req);
-    cubrid_disconnect ( $this->con );
+    odbc_close ( $this->con );
     $this->req = null;
     $this->con = null;
     
@@ -3610,7 +3610,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
   //  public function testCubridConect1()
   //  {
   //    //cubrid_close_request($this->req);
-  //    cubrid_disconnect($this->con);
+  //    odbc_close($this->con);
   //    $this->req = null;
   //    $this->con = null;
   //    $this->con = cubrid_connect("10.34.63.58", CubridTest::PORT, CubridTest::DBNAME, CubridTest::USERID, CubridTest::PASSWORD);
@@ -3628,7 +3628,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     //cubrid_close_request($this->req);
     try {
-      cubrid_disconnect ( $this->con );
+      odbc_close ( $this->con );
       $this->req = null;
       $this->con = null;
       $this->con = cubrid_connect ( "192.168.0.44", CubridTest::PORT, CubridTest::DBNAME, CubridTest::USERID, CubridTest::PASSWORD );
@@ -3652,7 +3652,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     //cubrid_close_request($this->req);
     try {
-      cubrid_disconnect ( $this->con );
+      odbc_close ( $this->con );
       $this->req = null;
       $this->con = null;
       $this->con = cubrid_connect ( CubridTest::HOST, 100, CubridTest::DBNAME, CubridTest::USERID, CubridTest::PASSWORD );
@@ -3677,7 +3677,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     //cubrid_close_request($this->req);
     try {
-      cubrid_disconnect ( $this->con );
+      odbc_close ( $this->con );
       $this->req = null;
       $this->con = null;
       $this->con = cubrid_connect ( CubridTest::HOST, CubridTest::PORT, "demo", CubridTest::USERID, CubridTest::PASSWORD );
@@ -3701,7 +3701,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     //cubrid_close_request($this->req);
     try {
-      cubrid_disconnect ( $this->con );
+      odbc_close ( $this->con );
       $this->req = null;
       $this->con = null;
       $this->con = cubrid_connect ( CubridTest::HOST, CubridTest::PORT, CubridTest::DBNAME, "cj", CubridTest::PASSWORD );
@@ -3725,7 +3725,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     //cubrid_close_request($this->req);
     try {
-      cubrid_disconnect ( $this->con );
+      odbc_close ( $this->con );
       $this->req = null;
       $this->con = null;
       $this->con = cubrid_connect ( CubridTest::HOST, CubridTest::PORT, CubridTest::DBNAME, CubridTest::USERID, "gnuser" );
@@ -3745,7 +3745,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     if (OUTPUT_FUNCTION_NAME == true)
       echo "\r\nRunning: " . __FUNCTION__ . " = ";
     self::checkServer ();
-    cubrid_disconnect ( $this->con );
+    odbc_close ( $this->con );
     $this->req = null;
     $this->con = null;
     $this->con = cubrid_connect ( "test-db-server", CubridTest::PORT, CubridTest::DBNAME, CubridTest::USERID );
@@ -3761,7 +3761,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     if (OUTPUT_FUNCTION_NAME == true)
       echo "\r\nRunning: " . __FUNCTION__ . " = ";
     self::checkServer ();
-    cubrid_disconnect ( $this->con );
+    odbc_close ( $this->con );
     $this->req = null;
     $this->con = null;
     $this->con = cubrid_connect ( "test-db-server", CubridTest::PORT, CubridTest::DBNAME );
@@ -3780,7 +3780,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     //cubrid_close_request($this->req);
     try {
-      cubrid_disconnect ( $this->con );
+      odbc_close ( $this->con );
       $this->req = null;
       $this->con = null;
       $this->con = cubrid_connect ( CubridTest::HOST, CubridTest::PORT );
@@ -3947,7 +3947,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->sql = "insert into test1 values(3)";
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
-    $this->assertTrue ( cubrid_disconnect ( $this->con ) );
+    $this->assertTrue ( odbc_close ( $this->con ) );
     // must unset after disconnect
     $this->req = null;
     $this->con = null;
@@ -3965,11 +3965,11 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->sql = "insert into test1 values(3)";
     $this->req = cubrid_execute ( $this->con, $this->sql );
     
-    $this->assertTrue ( cubrid_disconnect ( $this->con ) );
+    $this->assertTrue ( odbc_close ( $this->con ) );
     
     // disconnect again
     try {
-      cubrid_disconnect ( $this->con );
+      odbc_close ( $this->con );
       $this->assertTrue ( FALSE );
     } catch ( Exception $e ) {
       //echo cubrid_error_code();
@@ -4006,7 +4006,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     // disconnect again
     try {
-      cubrid_disconnect ( $this->req );
+      odbc_close ( $this->req );
       $this->assertTrue ( FALSE );
     } catch ( Exception $e ) {
       //echo cubrid_error_code();
@@ -4016,7 +4016,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     }
     
     try {
-      cubrid_disconnect ( $this->con, $this->sql );
+      odbc_close ( $this->con, $this->sql );
       $this->assertTrue ( FALSE );
     } catch ( Exception $e ) {
       $this->assertTrue ( TRUE );
@@ -4359,7 +4359,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
       echo "\r\nRunning: " . __FUNCTION__ . " = ";
       //cubrid_close_request($this->req);
     try {
-      cubrid_disconnect ( $this->con );
+      odbc_close ( $this->con );
       $this->req = null;
       $this->con = null;
       $this->con = cubrid_connect ( "192.168.0.44", CubridTest::PORT, CubridTest::DBNAME, CubridTest::USERID, CubridTest::PASSWORD );
@@ -5057,7 +5057,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     }
     
     sleep ( 20 );
-    //cubrid_disconnect($this->con);
+    //odbc_close($this->con);
     //cubrid_close_request($this->req);
     $this->con = cubrid_connect ( CubridTest::HOST, CubridTest::PORT, CubridTest::DBNAME, CubridTest::USERID, CubridTest::PASSWORD );
     $this->sql = "create table test1 (id int primary key, name varchar(300))";
@@ -5356,7 +5356,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     $this->sql = "select * from test1";
     
     $this->req = cubrid_execute ( $this->con, $this->sql );
-    $cols_count = cubrid_num_cols ( $this->req );
+    $cols_count = odbc_num_fields ( $this->req );
     $this->assertEquals ( 3, $cols_count );
   }
   
@@ -5379,7 +5379,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     try {
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $cols_count = cubrid_num_cols ( $this->req );
+      $cols_count = odbc_num_fields ( $this->req );
       //    $this->assertEquals(2, $cols_count);
     } catch ( Exception $e ) {
       //echo cubrid_error_code();
@@ -5391,7 +5391,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     try {
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $cols_count = cubrid_num_cols ( $this->req );
+      $cols_count = odbc_num_fields ( $this->req );
       //$this->assertEquals(2, $cols_count);
     } catch ( Exception $e ) {
       //echo cubrid_error_code();
@@ -5403,7 +5403,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     try {
       $this->req = cubrid_execute ( $this->con, $this->sql );
-      $cols_count = cubrid_num_cols ( $this->req );
+      $cols_count = odbc_num_fields ( $this->req );
       //$this->assertEquals(2, $cols_count);
     } catch ( Exception $e ) {
       $this->assertTrue ( TRUE );
@@ -5430,7 +5430,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     
     // use wrong parameter
     try {
-      cubrid_num_cols ( $this->con );
+      odbc_num_fields ( $this->con );
     } catch ( Exception $e ) {
       //echo cubrid_error_code();
       $this->assertTrue ( TRUE );
@@ -7302,7 +7302,7 @@ class CubridTest extends PHPUnit_Framework_TestCase {
     }
     
     if ($this->con) {
-      cubrid_disconnect ( $this->con );
+      odbc_close ( $this->con );
     }
     
     if (VERBOSE_OUTPUT == true)

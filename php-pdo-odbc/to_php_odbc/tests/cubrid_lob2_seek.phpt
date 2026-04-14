@@ -77,7 +77,7 @@ cubrid_lob2_seek64($lob, "16", CUBRID_CURSOR_FIRST);
 cubrid_lob2_tell64($lob);
 cubrid_lob2_size64($lob);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

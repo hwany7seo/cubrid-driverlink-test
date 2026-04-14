@@ -225,16 +225,6 @@ if (!function_exists('cubrid_error')) {
 	}
 }
 
-if (!function_exists('cubrid_disconnect')) {
-	function cubrid_disconnect($conn)
-	{
-		if (isset($GLOBALS['__cubrid_odbc_last_conn']) && $GLOBALS['__cubrid_odbc_last_conn'] === $conn) {
-			unset($GLOBALS['__cubrid_odbc_last_conn']);
-		}
-		return odbc_close($conn);
-	}
-}
-
 if (!function_exists('cubrid_fetch')) {
 	/**
 	 * cubrid_fetch($result [, $mode]) — ODBC 포팅: 결과 핸들(odbc_exec 등)을 첫 인자로 필수.
@@ -292,34 +282,6 @@ if (!function_exists('cubrid_fetch')) {
 	}
 }
 
-if (!function_exists('cubrid_fetch_assoc')) {
-	function cubrid_fetch_assoc($result)
-	{
-		if ($result === false || $result === null) {
-			return false;
-		}
-		return odbc_fetch_array($result);
-	}
-}
-
-/**
- * odbc_fetch_row() 직후 현재 행의 컬럼 값(0 기반 인덱스).
- * PHP odbc_fetch_row 는 bool 만 반환하므로, 행 데이터는 odbc_result 으로 읽는다.
- */
-if (!function_exists('cubrid_odbc_result_cell')) {
-	function cubrid_odbc_result_cell($result, int $field_offset_0)
-	{
-		if ($result === false || $result === null) {
-			return false;
-		}
-		$n = odbc_num_fields($result);
-		if ($n === false || $field_offset_0 < 0 || $field_offset_0 >= (int) $n) {
-			return false;
-		}
-		return odbc_result($result, $field_offset_0 + 1);
-	}
-}
-
 if (!function_exists('cubrid_fetch_lengths')) {
 	function cubrid_fetch_lengths($result)
 	{
@@ -343,16 +305,6 @@ if (!function_exists('cubrid_fetch_lengths')) {
 			$lens[] = strlen((string) $v);
 		}
 		return $lens;
-	}
-}
-
-if (!function_exists('cubrid_free_result')) {
-	function cubrid_free_result($result)
-	{
-		if ($result === false || $result === null) {
-			return false;
-		}
-		return odbc_free_result($result);
 	}
 }
 
@@ -398,24 +350,6 @@ if (!function_exists('cubrid_real_escape_string')) {
 	}
 }
 
-if (!function_exists('cubrid_num_cols')) {
-	function cubrid_num_cols($result)
-	{
-		if ($result === false || $result === null) {
-			return -1;
-		}
-		$n = odbc_num_fields($result);
-		return $n !== false ? (int) $n : -1;
-	}
-}
-
-if (!function_exists('cubrid_num_fields')) {
-	function cubrid_num_fields($result)
-	{
-		return cubrid_num_cols($result);
-	}
-}
-
 if (!function_exists('cubrid_column_names')) {
 	function cubrid_column_names($result)
 	{
@@ -458,82 +392,6 @@ if (!function_exists('cubrid_column_types')) {
 			$types[] = ($v === false || $v === null) ? '' : (string) $v;
 		}
 		return $types;
-	}
-}
-
-if (!function_exists('cubrid_field_name')) {
-	function cubrid_field_name($result, int $field_offset_0)
-	{
-		if ($result === false || $result === null) {
-			return false;
-		}
-		$n = odbc_num_fields($result);
-		if ($n === false || $field_offset_0 < 0 || $field_offset_0 >= (int) $n) {
-			return false;
-		}
-		$name = odbc_field_name($result, $field_offset_0 + 1);
-		return $name !== false ? $name : false;
-	}
-}
-
-if (!function_exists('cubrid_field_table')) {
-	function cubrid_field_table($result, int $field_offset_0)
-	{
-		if ($result === false || $result === null) {
-			return false;
-		}
-		$n = odbc_num_fields($result);
-		if ($n === false || $field_offset_0 < 0 || $field_offset_0 >= (int) $n) {
-			return false;
-		}
-		/* PHP ODBC does not expose result-column table/catalog; keep empty string. */
-		return '';
-	}
-}
-
-if (!function_exists('cubrid_field_type')) {
-	function cubrid_field_type($result, int $field_offset_0)
-	{
-		if ($result === false || $result === null) {
-			return false;
-		}
-		$n = odbc_num_fields($result);
-		if ($n === false || $field_offset_0 < 0 || $field_offset_0 >= (int) $n) {
-			return false;
-		}
-		$t = odbc_field_type($result, $field_offset_0 + 1);
-		return $t !== false ? $t : false;
-	}
-}
-
-if (!function_exists('cubrid_next_result')) {
-	function cubrid_next_result($result)
-	{
-		if ($result === false || $result === null) {
-			return null;
-		}
-		return odbc_next_result($result);
-	}
-}
-
-if (!function_exists('cubrid_field_len')) {
-	function cubrid_field_len($result, int $field_offset_0)
-	{
-		if ($result === false || $result === null) {
-			return false;
-		}
-		$len = odbc_field_len($result, $field_offset_0 + 1);
-		if ($len === false || $len === null) {
-			return -1;
-		}
-		return (int) $len;
-	}
-}
-
-if (!function_exists('cubrid_field_seek')) {
-	function cubrid_field_seek($result, int $field_offset_0): bool
-	{
-		return $result !== false && $result !== null;
 	}
 }
 

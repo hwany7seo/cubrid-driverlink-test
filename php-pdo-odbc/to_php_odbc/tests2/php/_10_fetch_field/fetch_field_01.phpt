@@ -19,12 +19,12 @@ $result=odbc_exec($conn,"select * from field1_tb where c3 > 10");
 var_dump(odbc_fetch_row($result) );
 
 //fetch char first
-cubrid_field_seek($result, 1);
+true;
 $field = cubrid_fetch_field($result);
 var_dump($field);
 
 //index<0
-cubrid_field_seek($result, -1);
+true;
 $field1 = cubrid_fetch_field($result);
 printf("\n\n---index < 0 Field Properties ---\n");
 printf("%s %s\n", "name:", $field1->name);
@@ -32,7 +32,7 @@ printf("%s \"%s\"\n", "default value:", $field1->def);
 
 
 //index > range 
-cubrid_field_seek($result, 3);
+true;
 $field2 = cubrid_fetch_field($result);
 printf("\n\n---index > range Field Properties ---\n");
 printf("%s %s\n", "name:", $field2->name);

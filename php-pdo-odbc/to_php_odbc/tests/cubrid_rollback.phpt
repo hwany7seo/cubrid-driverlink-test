@@ -19,7 +19,7 @@ $conn = odbc_connect($cubrid_odbc_dsn, "", "");
 cubrid_set_autocommit($conn, CUBRID_AUTOCOMMIT_FALSE);
 
 $req = odbc_exec($conn, 'SELECT * FROM rollback_test');
-$res = cubrid_fetch_assoc($req);
+$res = odbc_fetch_array($req);
 
 var_dump($res);
 
@@ -30,7 +30,7 @@ odbc_rollback($conn);
 odbc_close($conn);
 $conn = odbc_connect($cubrid_odbc_dsn, "", "");
 $req = odbc_exec($conn, 'SELECT * FROM rollback_test');
-$res = cubrid_fetch_assoc($req);
+$res = odbc_fetch_array($req);
 
 var_dump($res);
 

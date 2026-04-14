@@ -47,7 +47,7 @@ while ($array = odbc_fetch_array($stmt2)) {
 }
 
 odbc_free_result($stmt2);
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

@@ -9,7 +9,7 @@ require_once('until.php');
 --FILE--
 <?php
 /**
- * cubrid_next_result / 한 번의 odbc_exec 에 다중 SQL(CUBRID_EXEC_QUERY_ALL) 은 CUBRID CCI 전용에 가깝고,
+ * odbc_next_result / 한 번의 odbc_exec 에 다중 SQL(CUBRID_EXEC_QUERY_ALL) 은 CUBRID CCI 전용에 가깝고,
  * 표준 ODBC+unixODBC 에서는 보장되지 않는다. 단일 결과 집합으로 fetch_lengths 동작만 검증한다.
  */
 include_once("connect.inc");
@@ -76,7 +76,7 @@ for ($i = 0; $i < 2; $i++) {
 printf("\n");
 
 odbc_free_result($req2);
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

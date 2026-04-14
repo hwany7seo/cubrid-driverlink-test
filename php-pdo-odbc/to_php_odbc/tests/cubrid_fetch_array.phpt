@@ -60,7 +60,7 @@ var_dump(array_values($byName['X']));
 
 var_dump($byName['W']);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

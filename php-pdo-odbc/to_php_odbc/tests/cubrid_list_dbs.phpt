@@ -28,7 +28,7 @@ while ($i < $cnt) {
     $i++;
 }
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

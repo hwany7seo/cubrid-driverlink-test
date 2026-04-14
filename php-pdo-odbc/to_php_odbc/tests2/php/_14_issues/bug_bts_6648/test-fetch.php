@@ -20,7 +20,7 @@ for ($i = 0; $i <1;$i++) {
                 cubrid_close_request ($req); 
             } 
 
-        cubrid_disconnect ($con); 
+        odbc_close ($con); 
     } else { 
         echo "failed cubrid_connect. \n"; 
         sleep (1); 

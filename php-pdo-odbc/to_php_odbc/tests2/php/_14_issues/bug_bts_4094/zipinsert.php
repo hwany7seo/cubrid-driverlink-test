@@ -46,7 +46,7 @@
             cubrid_error_code_facility (),
             cubrid_error_msg ());
     cubrid_rollback ($dh);
-    cubrid_disconnect ($dh);
+    odbc_close ($dh);
     exit (0);
   }
   cubrid_commit ($dh);
@@ -57,7 +57,7 @@
             cubrid_error_code_facility (),
             cubrid_error_msg ());
     cubrid_close_request ($result);
-    cubrid_disconnect ($dh);
+    odbc_close ($dh);
     exit (0);
   }
   cubrid_close_request ($result);
@@ -71,7 +71,7 @@
               cubrid_error_code_facility (),
               cubrid_error_msg ());
       cubrid_rollback ($dh);
-      cubrid_disconnect ($dh);
+      odbc_close ($dh);
       exit (0);
     }
     cubrid_close_request ($result);
@@ -94,7 +94,7 @@
               cubrid_error_code_facility (),
               cubrid_error_msg ());
       cubrid_rollback ($dh);
-      cubrid_disconnect ($dh);
+      odbc_close ($dh);
       exit (0);
     }
     cubrid_close_request ($result);
@@ -133,6 +133,6 @@
     cubrid_close_request ($result);
   }
   cubrid_commit ($dh);
-  cubrid_disconnect ($dh);
+  odbc_close ($dh);
   printf ("Done. %d record inserted, %d errors.\n", $inserted, $error_count);
 ?>

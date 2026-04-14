@@ -45,7 +45,7 @@ var_dump($attr);
 $data = array('a','b','d');
 $attr = cubrid_get($conn, $oid, $data);
 
-cubrid_disconnect($conn);
+odbc_close($conn);
 
 print "done!";
 ?>

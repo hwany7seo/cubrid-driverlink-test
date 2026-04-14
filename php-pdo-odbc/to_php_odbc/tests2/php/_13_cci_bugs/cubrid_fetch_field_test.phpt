@@ -15,7 +15,7 @@ $req = odbc_exec($conn, "SELECT event_code,athlete_code,nation_code,game_date FR
 
 var_dump(odbc_fetch_row($req));
 
-cubrid_field_seek($req, 1);
+true;
 $field = cubrid_fetch_field($req);
 
 printf("\n--- Field Properties ---\n");
@@ -32,7 +32,7 @@ printf("%-30s %d\n", "blob:", $field->blob);
 printf("%-30s %s\n", "type:", $field->type);
 printf("%-30s %d\n", "unsigned:", $field->unsigned);
 printf("%-30s %d\n", "zerofill:", $field->zerofill);
-printf("cubrid_field_len: %s\n",cubrid_field_len($req,1));
+printf("cubrid_field_len: %s\n",odbc_field_len($req, 1 + 1));
 
 odbc_free_result($req);
 

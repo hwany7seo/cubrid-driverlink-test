@@ -12,5 +12,5 @@ echo($pResult[0]);
 echo("<br/>");
 cubrid_close_request($result);
 cubrid_rollback($conn);
-cubrid_disconnect($conn);
+odbc_close($conn);
 ?>
