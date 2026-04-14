@@ -36,26 +36,31 @@ if (false == $unbuff) {
 
 
 printf("#####example for odbc_free_result()#####\n");
-if(FALSE == odbc_free_result($unbuff)){
+if (FALSE == odbc_free_result($unbuff)) {
    printf("[005] Expecting false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
-}else{
+} else {
    printf("[005] Cubrid_free_result success\n");
 }
 
-$query2=odbc_exec($conn, "select * from query_tb where id >=3");
-while ($row = odbc_fetch_array($query2)) {
+$query2 = odbc_exec($conn, "select * from query_tb where id >=3");
+while (($row = odbc_fetch_array($query2)) !== false) {
    var_dump($row);
 }
-if(FALSE == odbc_free_result($query2)){
+if (FALSE == odbc_free_result($query2)) {
    printf("[006]No expecting false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
-}else{
+} else {
    printf("[006] Cubrid_free_result success\n");
 }
 
-if(FALSE == odbc_free_result($query2)){
-   printf("[007] Expecting false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
-}else{
-   printf("[007] Cubrid_free_result success\n");
+/* ODBC(ext/odbc): second free on same result throws; native cubrid freed twice without exception */
+try {
+	if (FALSE === odbc_free_result($query2)) {
+		printf("[007] Expecting false, [%d] [%s]\n", odbc_error($conn), odbc_errormsg($conn));
+	} else {
+		printf("[007] Cubrid_free_result success\n");
+	}
+} catch (\Throwable $e) {
+	printf("[007] Expecting double-free reject (%s)\n", $e::class);
 }
 
 
@@ -67,13 +72,12 @@ print "Finished!\n";
 --EXPECTF--
 #####negative example#####
 [001] Expecting false, [0] []
-
 [002] Expecting false, [0] []
 
-Warning: Error: DBMS, -493, Syntax: In line 1, column 1 before ' IS NOT SQL'
-Syntax error: unexpected 'THIS', expecting SELECT or VALUE or VALUES or '(' %s in %s on line %d
-[003] Expecting false, [-493] [Syntax: In line 1, column 1 before ' IS NOT SQL'
-Syntax error: unexpected 'THIS', expecting SELECT or VALUE or VALUES or '(' %s]
+Warning: odbc_exec(): SQL error: [CUBRID][ODBC CUBRID Driver][-493]Syntax: In line 1, column 1 before ' IS NOT SQL'
+Syntax error: unexpected 'THIS', expecting SELECT or VALUE or VALUES or '(' [%s]., SQL state S1000 in SQLExecDirect in %s
+[003] Expecting false, [0] [[CUBRID][ODBC CUBRID Driver][-493]Syntax: In line 1, column 1 before ' IS NOT SQL'
+Syntax error: unexpected 'THIS', expecting SELECT or VALUE or VALUES or '(' [%s]
 bool(false)
 #####example for odbc_free_result()#####
 [005] Cubrid_free_result success
@@ -88,6 +92,5 @@ array(4) {
   string(7) "COMMENT"
 }
 [006] Cubrid_free_result success
-[007] Cubrid_free_result success
+[007] Expecting double-free reject (Error)
 Finished!
-

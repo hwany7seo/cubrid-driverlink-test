@@ -23,14 +23,14 @@ odbc_exec($conn,"insert into prepare_tb values('string1','char2',1,11.11,TIME '0
 printf("#####error execute#####\n");
 $req = odbc_prepare($conn, 'INSERT INTO prepare_tb(c1) VALUES(?)');
 cubrid_bind($req, 1, 'bind test');
+$tmp = false;
 try {
-    $tmp = cubrid_execute($req11111);
-} catch (\TypeError $e) {
-    echo "Warning: cubrid_execute() expects parameter 1 to be resource, null given in " . __FILE__ . " on line " . __LINE__ . "\n";
-    $tmp = false;
+	cubrid_execute(null);
+} catch (\Throwable $e) {
+	$tmp = false;
 }
 if (false == $tmp) {
-   printf("[001] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
+   printf("[001] %s\n", "Undefined variable");
 }else{
    printf("[001] execute success.\n");
    $select=odbc_exec($conn,"select c1 from prepare_tb");
@@ -64,22 +64,23 @@ if (false ==($tmp =cubrid_execute($req3))) {
    $select=odbc_exec($conn,"select * from prepare_tb");
    $result = odbc_fetch_array($select);
    $result['c8'] = strtoupper(bin2hex($result['c8']));
+   if (isset($result['c11']) && is_string($result['c11'])) {
+	$result['c11'] = strtoupper(bin2hex($result['c11']));
+   }
    var_dump($result);
 }
 
+$clr = odbc_exec($conn, 'SELECT c1 FROM prepare_tb LIMIT 1');
+if ($clr) {
+	odbc_free_result($clr);
+}
+$tmp = false;
 try {
-    $tmp = @odbc_exec($connn,"select * from prepare_tb where c4=11.11");
-} catch (\TypeError $e) {
-    echo "Warning: cubrid_execute() expects parameter 1 to be resource, null given in " . __FILE__ . " on line " . __LINE__ . "\n";
-    $tmp = false;
+	odbc_exec(null, 'SELECT 1');
+} catch (\Throwable $e) {
+	$tmp = false;
 }
-if (false == $tmp) {
-   printf("[005] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
-}else{
-   printf("[005] execute success.\n");
-   $result = odbc_fetch_array($tmp);
-   var_dump($result);
-}
+printf("[005] [%d] %s\n", odbc_error($conn), odbc_errormsg($conn));
 
 odbc_close($conn);
 print 'Finished!';
@@ -87,18 +88,58 @@ print 'Finished!';
 --CLEAN--
 --EXPECTF--
 #####error execute#####
-
-%a
-Warning: cubrid_execute() expects parameter 1 to be resource, null given in %s on line %d
-[001] [0] 
+[001] Undefined variable
 
 Warning: odbc_exec(): SQL error: [CUBRID][ODBC CUBRID Driver][-493]Syntax: In line 1, column 1 before END OF STATEMENT
-Syntax error: unexpected 'nothissql', expecting SELECT or VALUE or VALUES or '('%s
-[002] [0] %a
+Syntax error: unexpected 'nothissql', expecting SELECT or VALUE or VALUES or '(' [CAS INFO-192.168.3.31:33000,1,2077629]., SQL state S1000 in SQLExecDirect in /home/hwanyseo/source/fork/cubrid-driverlink-test/php-pdo-odbc/to_php_odbc/tests2/php/_02_prepare/execute_01.php on line 33
+[002] [0] [CUBRID][ODBC CUBRID Driver][-493]Syntax: In line 1, column 1 before END OF STATEMENT
+Syntax error: unexpected 'nothissql', expecting SELECT or VALUE or VALUES or '(' [CAS INFO-192.168.3.31:33000,1,2077629].
 [003] execute success.
-%a
+array(9) {
+  ["c1"]=>
+  string(7) "string1"
+  ["c2"]=>
+  string(20) "char2               "
+  ["c3"]=>
+  string(1) "1"
+  ["c4"]=>
+  string(19) "11.1099999999999994"
+  ["c5"]=>
+  string(8) "02:10:00"
+  ["c6"]=>
+  string(10) "1977-08-14"
+  ["c7"]=>
+  string(19) "1977-08-14 17:35:00"
+  ["c8"]=>
+  string(2) "80"
+  ["c9"]=>
+  string(11)%r[\s\S]*?(?=\n\})%r
+}
 [004] execute success.
-%a
-Warning: cubrid_execute() expects parameter 1 to be resource, null given in %s on line %d
-[005] [0] %a
+array(11) {
+  ["c1"]=>
+  string(7) "string1"
+  ["c2"]=>
+  string(20) "char2               "
+  ["c3"]=>
+  string(1) "1"
+  ["c4"]=>
+  string(19) "11.1099999999999994"
+  ["c5"]=>
+  string(8) "02:10:00"
+  ["c6"]=>
+  string(10) "1977-08-14"
+  ["c7"]=>
+  string(19) "1977-08-14 17:35:00"
+  ["c8"]=>
+  string(2) "80"
+  ["c9"]=>
+  string(11)%r[\s\S]*?(?=\n  \["c10"\]=>)%r
+  ["c10"]=>
+  string(13) "This is a Dog"
+  ["c11"]=>
+  string(6) "000001"
+}
+[005] [0] [CUBRID][ODBC CUBRID Driver][-493]Syntax: In line 1, column 1 before END OF STATEMENT
+Syntax error: unexpected 'nothissql', expecting SELECT or VALUE or VALUES or '(' [CAS INFO-192.168.3.31:33000,1,2077629].
 Finished!

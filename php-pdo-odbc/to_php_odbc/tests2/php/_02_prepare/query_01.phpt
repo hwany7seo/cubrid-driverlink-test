@@ -30,7 +30,7 @@ while ($row = odbc_fetch_array($query1)) {
 odbc_free_result($query1);
 
 $query2=odbc_exec($conn, "select * from query_tb ");
-while($result2=odbc_fetch_array($query2,CUBRID_NUM)){
+while ($result2 = cubrid_fetch($query2, CUBRID_NUM)) {
    var_dump($result2);
 }
 odbc_free_result($query2);
@@ -43,7 +43,7 @@ odbc_exec($conn, "create reverse unique index reverse_unique_index on query_tb2(
 odbc_exec($conn, "create reverse index reverse_index on query_tb2(address)");
 odbc_exec($conn, "create unique index unique_index on query_tb2(email)");
 $query3=odbc_exec($conn, "show index in query_tb2;");
-while($result3=odbc_fetch_array($query3,CUBRID_ASSOC)){
+while ($result3 = cubrid_fetch($query3, CUBRID_ASSOC)) {
    print_r($result3);
 }
 odbc_free_result($query3);

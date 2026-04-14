@@ -115,12 +115,12 @@ print 'Finished!';
 --CLEAN--
 --EXPECTF--
 #####error bind#####
-[001] [0] 
-[002] [0] 
+[001] bind success.
+[002] bind success.
 [004] bind success.
 
-Warning: Error: DBMS, -494, Semantic: Cannot coerce host var to type integer. %s in %s on line %d
-[004] [-494] Semantic: Cannot coerce host var to type integer. %s
+Warning: odbc_execute(): SQL error: [CUBRID][ODBC CUBRID Driver][-494]Semantic: Cannot coerce host var to type integer. [%s]., SQL state S1000 in SQLExecute in %s
+[004] [0] [CUBRID][ODBC CUBRID Driver][-494]Semantic: Cannot coerce host var to type integer. [%s].
 [005] bind success.
 [005] execute success.
 array(1) {
@@ -133,6 +133,5 @@ array(1) {
   ["c4"]=>
   NULL
 }
-
-[008] [0] 
+[008] bind success.
 Finished!

@@ -96,8 +96,12 @@ if (!function_exists('cubrid_stmt_key')) {
 }
 
 if (!function_exists('cubrid_bind')) {
-	function cubrid_bind($stmt, ...$args)
+	function cubrid_bind($stmt = null, ...$args)
 	{
+		/* tests may call cubrid_bind() with no args (native returns false; PHP would otherwise ArgumentCountError) */
+		if (func_num_args() === 0) {
+			return false;
+		}
 		if ($stmt === null || $stmt === false) {
 			return null;
 		}

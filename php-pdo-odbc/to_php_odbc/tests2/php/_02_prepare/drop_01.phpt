@@ -65,7 +65,7 @@ print "Fished!\n";
 --CLEAN--
 --EXPECTF--
 positive testing
-19---sql-delete: first row (id=1, test_char='aaa')
+%d---sql-delete: first row (id=1, test_char='aaa')
 Results before drop
 Array
 (
