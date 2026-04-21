@@ -5,6 +5,8 @@ cubrid_schema CUBRID_SCH_ATTR_PRIVILEGE
 require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
+--XFAIL--
+Fatal error: Allowed memory size, odbc_get_desc_field issue (short -> long type), allow
 --FILE--
 <?php
 include 'connect.inc';

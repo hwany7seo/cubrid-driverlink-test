@@ -4,6 +4,7 @@ cubrid_seq_put (ODBC: UPDATE 로 LIST 요소 치환과 동일 효과)
 <?php
 require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
+die("skip PHP ODBC(ext/odbc): CUBRID PHP Extension-Only OID API — Not supported by PHP ODBC");
 ?>
 --FILE--
 <?php

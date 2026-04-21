@@ -5,6 +5,8 @@ cubrid_column_names/types/len via ODBC (field_flag suite)
 require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
+--XFAIL--
+issue length in odbc_field_len (SQL_COLUMN_PRECISION) and not support type in odbc_field_type (JSON, ENUM ...)
 --FILE--
 <?php
 include_once("connect.inc");

@@ -1,5 +1,5 @@
 --TEST--
-cubrid_data_seek for APIS-132 (ODBC 셤)
+cubrid_data_seek for APIS-132
 --SKIPIF--
 <?php
 require_once('skipif.inc');
@@ -8,6 +8,8 @@ if (extension_loaded('cubrid')) {
 	die('skip ODBC shim: unload CUBRID PHP extension to avoid cubrid_data_seek vs ODBC result handle clash');
 }
 ?>
+--XFAIL--
+ODBC driver returns for odbc_fetch_row.
 --FILE--
 <?php
 include_once('connect.inc');

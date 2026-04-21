@@ -18,7 +18,7 @@ if (!($req = odbc_exec($conn, 'SELECT * FROM code'))) {
 	printf('[004] [%s] %s\n', odbc_error($conn), odbc_errormsg($conn));
 }
 
-while ($res = odbc_fetch_array($req, CUBRID_NUM)) {
+for ($row = 1; ($res = odbc_fetch_array($req, $row)) !== false; $row++) {
 	var_dump($res);
 }
 

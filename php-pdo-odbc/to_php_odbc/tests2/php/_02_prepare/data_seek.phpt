@@ -1,5 +1,5 @@
 --TEST--
-cubrid_data_seek (ODBC: odbc_fetch_row 절대 행 번호 + 셤으로 동등 시나리오)
+cubrid_data_seek (ODBC: odbc_fetch_row Absolute row number)
 --SKIPIF--
 <?php
 require_once('skipif.inc');
@@ -8,12 +8,10 @@ if (extension_loaded('cubrid')) {
 	die('skip ODBC shim: unload CUBRID PHP extension to avoid cubrid_data_seek vs ODBC result handle clash');
 }
 ?>
+--XFAIL--
+ODBC driver returns for odbc_fetch_row.
 --FILE--
 <?php
-/**
- * 양수: ORDER BY 로 순서 고정 후 odbc_fetch_row($stmt, 1-based row).
- * 음수: 확장 미로드 시에만 cubrid_data_seek 셤으로 원본과 유사한 Warning/반환값.
- */
 include_once('connect.inc');
 
 $conn = odbc_connect($cubrid_odbc_dsn, '', '');

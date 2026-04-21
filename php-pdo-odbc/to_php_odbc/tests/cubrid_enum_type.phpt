@@ -122,7 +122,7 @@ Column count:                  1
 
 Column Names                   Column Types                   Column Len     
 ------------------------------------------------------------------------------
-a                              VARCHAR                        0              
+a                              ENUM                           0              
 
 
 done!

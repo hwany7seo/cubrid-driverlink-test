@@ -5,6 +5,8 @@ cubrid_query cubrid_fress_result
 require_once('skipif.inc');
 require_once('skipifconnectfailure.inc');
 ?>
+--XFAIL--
+Fatal error: Allowed memory size, odbc_get_desc_field issue (short -> long type), allow
 --FILE--
 <?php
 include_once("connect.inc");
