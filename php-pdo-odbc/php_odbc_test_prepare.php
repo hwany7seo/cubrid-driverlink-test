@@ -5,7 +5,7 @@ ini_set('implicit_flush', true);
 
 $insert_count = 5;
 // $dsn = "CUBRID Driver";
-$dsn = "CUBRID Driver";
+$dsn = "CUBRID_Unicode";
 $user = "dba";
 $password = "";
 

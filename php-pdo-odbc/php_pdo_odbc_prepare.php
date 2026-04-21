@@ -1,6 +1,6 @@
 <?php
 // $dsn = 'odbc:Driver={CUBRID_Unicode};db_name=demodb;server=test-db-server;port=33000';
-$dsn = 'odbc:CUBRID Driver';
+$dsn = 'odbc:CUBRID_Unicode';
 $username = 'dba';
 $password = '';
 $insert_count = 5;
