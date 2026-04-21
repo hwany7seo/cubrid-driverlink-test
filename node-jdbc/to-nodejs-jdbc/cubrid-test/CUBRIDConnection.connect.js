@@ -9,7 +9,7 @@ describe('CUBRIDConnection', function() {
         describe('to a non-existing database', function() {
             it('should fail to connect to a non-existing database', async function() {
                 const badConfig = JSON.parse(JSON.stringify(testSetup.defaultConfig));
-                badConfig.url = 'jdbc:cubrid:localhost:33000:non_existing_db:public::?charSet=utf-8';
+                badConfig.url = 'jdbc:cubrid:test-db-server:33000:non_existing_db:public::?charSet=utf-8';
                 
                 const client = new CUBRIDAsyncWrapper(badConfig);
                 try {

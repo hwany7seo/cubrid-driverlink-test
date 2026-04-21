@@ -468,34 +468,6 @@ def test_select_calculate(cubrid_db_cursor):
     assert row[0] == 12
 
 
-def test_trigger(cubrid_db_cursor):
-    cur, _ = cubrid_db_cursor
-
-    hi = f"{TABLE_PREFIX}hi"
-    tt1 = f"{TABLE_PREFIX}tt1"
-
-    try:
-        _drop_table(cubrid_db_cursor, hi)
-        _drop_table(cubrid_db_cursor, tt1)
-        _create_table(cubrid_db_cursor, "hi", "a int , b string")
-        _create_table(cubrid_db_cursor, "tt1", "a int , b string")
-
-        cur.execute(f"create trigger tt1_insert after insert on {tt1} execute "
-            f"insert into {hi}(a, b) values( obj.a ,to_char(obj.a))")
-
-        cur.execute(f"insert into {tt1}(a,b) values(1, 'test')")
-        cur.execute(f"select * from {hi}")
-        rows = cur.fetchall()
-        assert [tuple(r) for r in rows] == [(1, '1')]
-
-        cur.execute(f"select * from {tt1}")
-        rows = cur.fetchall()
-        assert [tuple(r) for r in rows] == [(1, 'test')]
-    finally:
-        _drop_table(cubrid_db_cursor, hi)
-        _drop_table(cubrid_db_cursor, tt1)
-
-
 def test_view_select(cubrid_db_cursor, exc_view_v, exc_view_table):
     cur, _ = cubrid_db_cursor
     vtb = exc_view_table
@@ -527,3 +499,32 @@ def test_view_update(cubrid_db_cursor, exc_view_b):
     with pytest.raises(pyodbc.Error) as ei:
         cur.execute(f"UPDATE {exc_view_b} SET phone=NULL")
     assert_pyodbc_exc_str(ei, PYODBC_ERR_HY000_GENERIC)
+
+
+def test_trigger(cubrid_db_cursor):
+    cur, _ = cubrid_db_cursor
+
+    hi = f"{TABLE_PREFIX}hi"
+    tt1 = f"{TABLE_PREFIX}tt1"
+
+    try:
+        _drop_table(cubrid_db_cursor, hi)
+        _drop_table(cubrid_db_cursor, tt1)
+        _create_table(cubrid_db_cursor, "hi", "a int , b string")
+        _create_table(cubrid_db_cursor, "tt1", "a int , b string")
+
+        cur.execute(f"create trigger tt1_insert after insert on {tt1} execute "
+            f"insert into {hi}(a, b) values( obj.a ,to_char(obj.a))")
+
+        cur.execute(f"insert into {tt1}(a,b) values(1, 'test')")
+        cur.execute(f"select * from {hi}")
+        rows = cur.fetchall()
+        assert [tuple(r) for r in rows] == [(1, '1')]
+
+        cur.execute(f"select * from {tt1}")
+        rows = cur.fetchall()
+        assert [tuple(r) for r in rows] == [(1, 'test')]
+    finally:
+        cur.execute(f"drop trigger tt1_insert")
+        _drop_table(cubrid_db_cursor, hi)
+        _drop_table(cubrid_db_cursor, tt1)

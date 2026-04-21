@@ -10,7 +10,7 @@ npm install (최초 실행)
 - linux
 ```
 test_linux.sh (기본 테스트)
-./to-nodejs-jdbc/unit-test-pueteam.sh (CUBRID Unit-test 변환 실행)
+./to-nodejs-jdbc/unit-test-pueteam.sh (CUBRID Unit-test 변환 테스트 실행)
 ```
 
 - Windows

@@ -19,4 +19,5 @@ run_tests.bat 실행 (기본 테스트)
 ./test_odbc_linux.sh (cubrid-python unitest를 pyodbc로 변환 테스트)
 ```
 
-
+테스트 결과
+- 특이사항 없음

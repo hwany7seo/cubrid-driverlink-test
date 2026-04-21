@@ -22,19 +22,21 @@ gem install ruby-odbc-0.999992.gem
 ```
 
 테스트 방법
-- run_tests.bat 실행 (필수 lib 설치 및 실행)
-
+- Windows
+  - run_tests.bat 실행 (필수 lib 설치 및 실행)
 예제는 DBI를 사용하여 ruby-odbc와 DBI(with DBD:ODBC)를 사용하는 방식 두가지로
 작성되어 있습니다.
 
+- LINUX
+  - ruby 설치
+    ```
+    $ curl -sSL https://get.rvm.io | bash -s stable
+    $ sudo rvm requirements run
+    $ sudo rvm install ruby-3.3.7
+    ```
+  - test_linux.sh - 기본 테스트
+  - test_odbc_linux.sh - ruby unit-test를 변환한 테스트
 
 
-LINUX
-- 테스트 방법
--- ruby 설치
-'''
-$ curl -sSL https://get.rvm.io | bash -s stable
-$ sudo rvm requirements run
-$ sudo rvm install ruby-3.3.7
-
-- 
+테스트 결과
+- 특이 사항 없음

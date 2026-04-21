@@ -32,11 +32,13 @@ sudo ln -sf annobin.so /opt/rh/gcc-toolset-9/root/usr/lib/gcc/x86_64-redhat-linu
 
 #### 테스트 실행
 ```
-$> sh test_linux.sh
+$> sh test_linux.sh - sample test
+$> cd to-odbc
+$> sh test_to_odbc.sh - perl UnitTest 변환 검증 테스트
 ```
 
-## 결과
+## 테스트 결과
 ### 미지원
 - last_insert_id (ODBC 미지원)
-### 확인 필요
-- bind_enum_apis-341.t에서 열거형 bind_param시 INDEX를 지원 관련.
+### 변환 된 테스트 케이스의 알려진 이슈
+- ENUM, Decimal, NUMERIC, BIT/BINARY/ BLOB 등 결과 값의 바이너리 데이터 문제로 (Ox00)NUL이 삽입되는 문제입니다. MySQL와 비교후 동일한 방식으로 결과 처리 예정.

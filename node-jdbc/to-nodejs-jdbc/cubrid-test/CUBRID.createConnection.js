@@ -9,7 +9,7 @@ describe('CUBRID', function () {
     it('should succeed to create and close several client connections', function (done) {
       // testSetup.config has 'url' property, but here we need decomposed config
       // Let's use hardcoded defaults or parse from testSetup.config.url
-      // default config: localhost, 33000, dba, ''
+      // default config: test-db-server, 33000, dba, ''
       
       const config = {
           hosts: ['test-db-server'],
