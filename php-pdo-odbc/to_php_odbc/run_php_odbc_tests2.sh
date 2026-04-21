@@ -20,11 +20,11 @@ _php_resolve() {
 }
 PHP_CMD="${PHP_BIN:-php}"
 PHP_RESOLVED="$(_php_resolve "$PHP_CMD")" || {
-	echo "ERROR: PHP 실행 파일을 찾을 수 없습니다: $PHP_CMD (dnf: sudo dnf install -y php-cli)" >&2
+	echo "ERROR: PHP executable not found: $PHP_CMD (dnf: sudo dnf install -y php-cli)" >&2
 	exit 1
 }
 EXEC_PHP="$(_php_resolve "${TEST_PHP_EXECUTABLE:-$PHP_RESOLVED}")" || {
-	echo "ERROR: TEST_PHP_EXECUTABLE를 해석할 수 없습니다: ${TEST_PHP_EXECUTABLE:-}" >&2
+	echo "ERROR: TEST_PHP_EXECUTABLE not found: ${TEST_PHP_EXECUTABLE:-}" >&2
 	exit 1
 }
 export TEST_PHP_EXECUTABLE="$EXEC_PHP"

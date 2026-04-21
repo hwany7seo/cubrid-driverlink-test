@@ -1,5 +1,5 @@
 본 테스트는 PHP(https://github.com/php/php-src/) 내부 Module을 통해 cubrid ODBC를 호출하는 형태로 사용됨.
-PHP의 내부 Module은 ODBC, PDO는 PDO-ODBC를 사용합니다.
+PHP의 내부 Module은 ODBC(ext/odbc), PDO는 PDO-ODBC(ext/pdo_odbc)를 사용합니다.
 
 본 테스트는 아래와 같은 환경에서 테스트 됨
 - PHP 8.4.19 (https://www.php.net/)
@@ -35,46 +35,7 @@ sudo dnf install -y php-cli php-pdo php-odbc unixODBC
 - Linux
 1. unixODBC 설치
 2. odbc 관리자 설정 (~/.odbc.ini and cat ~/.odbcinst.ini)
-```
-[hwanyseo@hwanyseo-3-31 ~]$ cat ~/.odbc.ini 
-[CUBRID_ANCI]
-Driver = CUBRID_ODBC_ANCI
-Description = CUBRID ODBC ANCI
-DB_NAME = demodb
-UID = dba
-PWD =
-SERVER = test-db-server
-PORT = 33000
-FETCH_SIZE = 1
-AUTOCOMMIT = false
-OMIT_SCHEMA = no
-CHARSET = utf8
 
-[CUBRID_Unicode]
-Driver = CUBRID_ODBC_Unicode
-Description = CUBRID ODBC Unicode
-DB_NAME = demodb
-UID = dba
-PWD =
-SERVER = test-db-server
-PORT = 33000
-FETCH_SIZE = 1
-AUTOCOMMIT = false
-OMIT_SCHEMA = no
-CHARSET = utf8
-```
-
-```
-[hwanyseo@hwanyseo-3-31 ~]$ cat ~/.odbcinst.ini 
-[CUBRID_ODBC_ANCI]
-Description = CUBRID Linux ODBC Driver
-Driver = /home/hwanyseo/cubrid-odbc/lib/libcubrid-odbc.so
-FileUsage = 1
-[CUBRID_ODBC_Unicode]
-Description = CUBRID Linux ODBC Unicode Driver
-Driver = /home/hwanyseo/cubrid-odbc/lib/libcubrid-odbcw.so
-IANAAppCodePage = 1
-```
 - 기본 테스트
   - ./test_linux.sh (basic test - php & pdo)
 - 테스트 케이스 변환 검증

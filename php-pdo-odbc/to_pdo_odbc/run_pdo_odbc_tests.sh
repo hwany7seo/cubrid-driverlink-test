@@ -27,7 +27,6 @@ EXEC_PHP="$(_php_resolve "${TEST_PHP_EXECUTABLE:-$PHP_RESOLVED}")" || {
 export TEST_PHP_EXECUTABLE="$EXEC_PHP"
 export TEST_PHP_SRCDIR="${TEST_PHP_SRCDIR:-$ROOT}"
 
-# 비대화형(파이프/CI)에서는 QA 메일 프롬프트 방지
 if [[ -z "${NO_INTERACTION:-}" ]] && [[ ! -t 0 ]]; then
 	export NO_INTERACTION=1
 fi
