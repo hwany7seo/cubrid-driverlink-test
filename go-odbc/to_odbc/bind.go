@@ -26,22 +26,19 @@ func main() {
 
 	// Test 1: Bind all EXCEPT SET (using literals for SET)
 	fmt.Println("Test 1: Binding all columns except SET...")
-	// Note: For BIT, we try passing string "1". For BLOB/CLOB we use CHAR_TO_... wrapper with parameter? No, wrapper takes argument. 
-	// Standard ODBC might struggle with function calls around parameters like CHAR_TO_BLOB(?). 
-	// Let's try binding simple types first: INT, NUMERIC, FLOAT, DATE, TIME, TIMESTAMP, BIGINT, DATETIME.
-	// We will skip BIT, SET, BLOB, CLOB for now to see if basic types work.
-	
-	query1 := "INSERT INTO tbl_bind_test (id, a_bit, b_vbit, c_num, d_float, e_double, f_date, g_time, g_timest, h_set, i_bigint, j_datetm, k_blob, l_clob) VALUES (?, B'1', B'1', ?, ?, ?, ?, ?, ?, NULL, ?, ?, NULL, NULL)"
-	_, err = db.Exec(query1, 
-		1,              // id
-		1.1,            // c_num
-		1.1,            // d_float
-		1.1,            // e_double
-		"2026-01-01",   // f_date
-		"12:00:00",     // g_time
+	query1 := "INSERT INTO tbl_bind_test (id, a_bit, b_vbit, c_num, d_float, e_double, f_date, g_time, g_timest, h_set, i_bigint, j_datetm, k_blob, l_clob) VALUES (?, B'1', B'1', ?, ?, ?, ?, ?, ?, {1,2,3}, ?, ?, ?, ?)"
+	_, err = db.Exec(query1,
+		1,                     // id
+		1.1,                   // c_num
+		1.1,                   // d_float
+		1.1,                   // e_double
+		"2026-01-01",          // f_date
+		"12:00:00",            // g_time
 		"2026-01-01 12:00:00", // g_timest
-		100,            // i_bigint
+		100,                   // i_bigint
 		"2026-01-01 12:00:00", // j_datetm
+		"bind-blob",           // k_blob
+		"bind-clob",           // l_clob
 	)
 	if err != nil {
 		fmt.Printf("Test 1 (Basic types) failed: %v\n", err)
@@ -49,22 +46,19 @@ func main() {
 		fmt.Println("Test 1 (Basic types) passed.")
 	}
 
-	// Test 2: Test BIT binding
 	fmt.Println("Test 2: Testing BIT binding...")
 	query2 := "INSERT INTO tbl_bind_test (id, a_bit, b_vbit, h_set, k_blob, l_clob) VALUES (2, ?, ?, NULL, NULL, NULL)"
-	// Try passing "1" as string
-	_, err = db.Exec(query2, "1", "1")
+	_, err = db.Exec(query2, []byte{0x80}, []byte{0x80}) // B'1', B'1'
 	if err != nil {
-		fmt.Printf("Test 2 (BIT string binding) failed: %v\n", err)
-		// Try passing 1 as int
-		_, err = db.Exec(query2, 1, 1)
+		fmt.Printf("Test 2 (BIT []byte B'1', B'1') failed: %v\n", err)
+		_, err = db.Exec(query2, []byte{0x80}, []byte{0x00}) // B'1', B'0'
 		if err != nil {
-			fmt.Printf("Test 2 (BIT int binding) failed: %v\n", err)
+			fmt.Printf("Test 2 (BIT []byte B'1', B'0') failed: %v\n", err)
 		} else {
-			fmt.Println("Test 2 (BIT int binding) passed.")
+			fmt.Println("Test 2 (BIT []byte B'1', B'0') passed.")
 		}
 	} else {
-		fmt.Println("Test 2 (BIT string binding) passed.")
+		fmt.Println("Test 2 (BIT []byte B'1', B'1') passed.")
 	}
 
 	// Test 3: Test SET binding
