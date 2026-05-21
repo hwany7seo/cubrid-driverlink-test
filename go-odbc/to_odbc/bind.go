@@ -70,7 +70,23 @@ func main() {
 	} else {
 		fmt.Println("Test 3 (SET binding) passed.")
 	}
-	
+
+	// Test 4: BLOB/CLOB parameter binding
+	fmt.Println("Test 4: Testing BLOB/CLOB binding...")
+	query4 := "INSERT INTO tbl_bind_test (id, k_blob, l_clob) VALUES (4, ?, ?)"
+	_, err = db.Exec(query4, "bind-blob-via-string", "bind-clob-via-string")
+	if err != nil {
+		fmt.Printf("Test 4 (BLOB/CLOB string binding) failed: %v\n", err)
+	} else {
+		fmt.Println("Test 4 (BLOB/CLOB string binding) passed.")
+	}
+	_, err = db.Exec(query4, []byte("bind-blob-via-bytes"), "bind-clob-via-string")
+	if err != nil {
+		fmt.Printf("Test 4 (BLOB []byte binding) failed: %v\n", err)
+	} else {
+		fmt.Println("Test 4 (BLOB []byte binding) passed.")
+	}
+
 	db.Exec("DROP TABLE tbl_bind_test")
 }
 

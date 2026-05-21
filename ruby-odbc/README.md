@@ -1,5 +1,5 @@
 WINDOWS
-본 테스트는 [Ruby ODBC](https://github.com/larskanis/ruby-odbc) 인터페이스를 통해 cubrid jdbc를 호출하는 형태로 사용됨.
+본 테스트는 [Ruby ODBC](https://github.com/larskanis/ruby-odbc) 인터페이스를 통해 cubrid odbc를 호출하는 형태로 사용됨.
 
 본 테스트는 아래와 같은 환경에서 테스트 됨
 - ruby 3.3.7-1 (https://www.ruby-lang.org/ko/downloads/)
@@ -7,7 +7,8 @@ WINDOWS
 
 
 ruby-odbc 설치 관련
-Windows의 Unicode 관련 타입(SQLWCHAR)과 일반 C 문자열(char*) 사이의 불일치로 컴파일 오류가 발생해 코드 수정 필요
+Windows에서 테스트 할때는 Unicode 관련 타입(SQLWCHAR)과 일반 C 문자열(char*) 사이의 불일치로 컴파일 오류가 발생해 코드 수정 필요
+Linux는 불필요.
 ```
 gem unpack ruby-odbc
 
