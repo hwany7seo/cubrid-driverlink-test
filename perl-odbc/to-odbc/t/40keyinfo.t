@@ -20,7 +20,7 @@ if ($@) {
     plan skip_all => "ERROR: $DBI::errstr. Can't continue test";
 }
 
-plan tests => 30;
+plan tests => 22;
 
 #
 # test primary_key_info ()
@@ -41,29 +41,20 @@ ok($sth, "Got primary key info");
 my $key_info= $sth->fetchall_arrayref({});
 
 if (@$key_info >= 2) {
-    # TABLE_NAME may be UTF-16LE-ish (NUL between chars); strip before compare.
-    # Use \Q...\E so "." in dba.test_cubrid is literal, not regex "any char".
-    like($key_info->[0]->{TABLE_NAME}, qr/\Q$table\E/i, "Table name check 1");
-    like($key_info->[0]->{COLUMN_NAME}, qr/^a$/i, "Column a");
+    is($key_info->[0]->{TABLE_NAME}, $table, "Table name check 1");
+    is($key_info->[0]->{COLUMN_NAME}, 'a', "Column a");
     is($key_info->[0]->{KEY_SEQ}, 1);
-    
-    # PK Name might be auto-generated differently
-    # is($key_info->[0]->{PK_NAME}, "pk_test_cubrid_a_b");
 
-    like($key_info->[1]->{TABLE_NAME}, qr/\Q$table\E/i, "Table name check 2");
-    like($key_info->[1]->{COLUMN_NAME}, qr/^b$/i, "Column b");
+    is($key_info->[1]->{TABLE_NAME}, $table, "Table name check 2");
+    is($key_info->[1]->{COLUMN_NAME}, 'b', "Column b");
     is($key_info->[1]->{KEY_SEQ}, 2);
 } else {
     fail("Not enough key info rows");
 }
 
 # primary_key method returns list of column names
-my @pks = $dbh->primary_key(undef, undef, $table);
-# sort them to be safe if order is not guaranteed (though PK usually ordered by SEQ)
-# is_deeply([ $dbh->primary_key(undef, undef, $table) ], [ 'a', 'b' ], "Check primary_key results");
-# Adjust for potential case differences
-@pks = map { lc $_ } @pks;
-is_deeply([ @pks ], [ 'a', 'b' ], "Check primary_key results");
+is_deeply([ $dbh->primary_key(undef, undef, $table) ], [ 'a', 'b' ],
+    "Check primary_key results");
 
 
 ok($dbh->do("DROP TABLE $table"), "Dropped table");
@@ -81,20 +72,13 @@ ok($dbh->do(qq{CREATE TABLE child(id INT, parent_id INT,
 
 # ODBC foreign_key_info args: pk_catalog, pk_schema, pk_table, fk_catalog, fk_schema, fk_table
 $sth = $dbh->foreign_key_info(undef, undef, 'parent', undef, undef, 'child');
-if ($sth) {
-    my ($info) = $sth->fetchall_arrayref({});
-    if (@$info) {
-        like($info->[0]->{PKTABLE_NAME}, qr/parent/i);
-        like($info->[0]->{PKCOLUMN_NAME}, qr/^id$/i);
-        like($info->[0]->{FKTABLE_NAME}, qr/child/i);
-        like($info->[0]->{FKCOLUMN_NAME}, qr/^parent_id$/i);
-    } else {
-        # fail("No FK info returned");
-        pass("No FK info returned (Driver might not support it fully or needs exact casing)");
-    }
-} else {
-    pass("foreign_key_info not supported or failed");
-}
+ok($sth, "Got foreign key info");
+my ($info) = $sth->fetchall_arrayref({});
+ok(@$info, "Foreign key info returned");
+is($info->[0]->{PKTABLE_NAME}, 'parent');
+is($info->[0]->{PKCOLUMN_NAME}, 'id');
+is($info->[0]->{FKTABLE_NAME}, 'child');
+is($info->[0]->{FKCOLUMN_NAME}, 'parent_id');
 
 # Test other permutations if supported
 # ...

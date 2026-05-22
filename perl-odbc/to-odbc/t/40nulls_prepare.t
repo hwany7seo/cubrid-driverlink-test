@@ -70,14 +70,7 @@ ok($sth_insert->execute(), "Executing the 2nd insert");
 
 # verify
 ok($sth_lookup->execute(42), "Query for record of id = 42");
-# Expecting 102 (int-like string) or '102'. Empty string '' or undef?
-# The insert bound ''. Some ODBC stacks return NUL-padded VARCHAR.
-my $row42 = $sth_lookup->fetchrow_arrayref();
-for my $i (0 .. $#$row42) {
-  next unless defined $row42->[$i] && !ref $row42->[$i];
-  $row42->[$i] =~ s/\0+//g;
-}
-is_deeply($row42, [42, '102', '', '10004']);
+is_deeply($sth_lookup->fetchrow_arrayref(), [42, '102', '', '10004']);
 
 ok($sth_lookup->execute(43), "Query for record of id = 43");
 is_deeply($sth_lookup->fetchrow_arrayref(), [43, '2002', '20003', '200004']);

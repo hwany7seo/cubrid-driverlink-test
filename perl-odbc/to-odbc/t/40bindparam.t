@@ -82,9 +82,6 @@ cmp_ok $name, 'eq', 'Andreas Koenig', '$name set to Andreas Koenig';
 
 $ref = $sth->fetch;
 is $id, 5, 'id set to 5';
-# Some ODBC stacks NUL-pad VARCHAR; treat as empty
-$name = '' unless defined $name;
-$name =~ s/\0+//g;
 cmp_ok $name, 'eq', '', 'name empty (VARCHAR default)';
 
 $ref = $sth->fetch;

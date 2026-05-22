@@ -62,11 +62,51 @@ done
 echo Running ODBC test 
 rm -f "$RESULT_FILE"
 cd t
+
+FAILED_TESTS=()
+TOTAL=0
+PASSED=0
+
 for test_file in *.t; do
+    TOTAL=$((TOTAL + 1))
     echo "Running $test_file..."
     echo "-------------- $test_file -------------- $test_file" >> "$RESULT_FILE"
-    perl "$test_file" >> "$RESULT_FILE" 2>&1
+
+    TEST_OUT=$(mktemp)
+    perl "$test_file" > "$TEST_OUT" 2>&1
+    TEST_EXIT=$?
+    cat "$TEST_OUT" >> "$RESULT_FILE"
+
+    if [ "$TEST_EXIT" -ne 0 ] || grep -aqE '^not ok|Looks like you failed|Dubious|Failed test' "$TEST_OUT"; then
+        FAILED_TESTS+=("$test_file")
+        echo "  => FAILED (exit=$TEST_EXIT)"
+        grep -aE '^not ok|Looks like you failed|#   Failed test' "$TEST_OUT" || true
+    else
+        PASSED=$((PASSED + 1))
+        echo "  => passed"
+    fi
+
+    rm -f "$TEST_OUT"
     echo "-------------------------------------"
 done
+
 echo
-echo All tests completed.
+echo "========== Test Summary =========="
+echo "Total:  $TOTAL"
+echo "Passed: $PASSED"
+echo "Failed: ${#FAILED_TESTS[@]}"
+
+if [ "${#FAILED_TESTS[@]}" -gt 0 ]; then
+    echo
+    echo "Failed test list:"
+    for f in "${FAILED_TESTS[@]}"; do
+        echo "  - $f"
+    done
+    echo
+    echo "See details in: $RESULT_FILE"
+    echo "All tests completed with failures."
+    exit 1
+fi
+
+echo "All tests passed."
+exit 0
