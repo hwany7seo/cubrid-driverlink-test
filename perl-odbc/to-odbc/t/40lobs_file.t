@@ -13,7 +13,6 @@ require 'lib.pl';
 
 my $volume;
 my $script_directory;
-# get the full path of the hotcopy_script.
 my $abs_path = File::Spec->rel2abs($0);
 ($volume, $script_directory, undef) = File::Spec->splitpath($abs_path);
 
@@ -27,8 +26,7 @@ if ($@) {
     plan skip_all => "ERROR: $DBI::errstr. Can't continue test";
 }
 else {
-    # Adjusted tests count
-    plan tests => 15;
+    plan tests => 19;
 }
 
 ok $dbh->do("DROP TABLE IF EXISTS $table"), "Drop table if exists $table";
@@ -41,21 +39,10 @@ EOT
 
 ok ($dbh->do($create));
 
-my ($sth, $query);
-
-# Insert a row into the test table .......
-$query = "INSERT INTO $table VALUES(1, ?)";
-ok ($sth = $dbh->prepare($query));
-
-# cubrid_lob_import is CUBRID specific. 
-# For ODBC, we should read file and bind it as binary.
-# Or just skip this part if it relies on driver specific method.
-# Let's try to simulate basic BLOB insert via parameter.
+my ($sth, $query, $row, $null_row, $bind_ok, $null_bind_ok);
 
 my $test_png_file = File::Spec->catfile($volume, $script_directory, "cubrid_logo.png");
-# Check if file exists, if not use a dummy
 if (! -e $test_png_file) {
-    # try looking in parent dir or ../cubrid-perl/t
     $test_png_file = File::Spec->catfile($volume, $script_directory, "../cubrid-perl/t/cubrid_logo.png");
 }
 
@@ -68,36 +55,49 @@ if (-e $test_png_file) {
     close $fh;
 }
 
-# Workaround: HY021 with SQL_BLOB — use LONGVARBINARY (ODBC common for byte LOB input).
-ok ($sth->bind_param(1, $blob_data, DBI::SQL_LONGVARBINARY), "bind blob data");
-ok ($sth->execute);
+$query = "INSERT INTO $table VALUES(1, ?)";
+ok ($sth = $dbh->prepare($query));
+$bind_ok = $sth->bind_param(1, $blob_data, DBI::SQL_BLOB);
+ok ($bind_ok, "bind_param SQL_BLOB")
+    or diag("bind_param SQL_BLOB: " . ($sth->errstr // $dbh->errstr // ''));
 
-# Insert a NULL row into the test table ......
+SKIP: {
+    skip "SQL_BLOB bind failed (HY021 regression)", 1 unless $bind_ok;
+    ok ($sth->execute, "execute after SQL_BLOB bind");
+}
+
 $query = "INSERT INTO $table VALUES(2, ?)";
 ok ($sth = $dbh->prepare($query));
-# $sth->cubrid_lob_import(1, NULL, DBI::SQL_BLOB);
-ok ($sth->bind_param(1, undef));
-ok ($sth->execute);
+$null_bind_ok = $sth->bind_param(1, undef, DBI::SQL_BLOB);
+ok ($null_bind_ok, "bind_param NULL SQL_BLOB")
+    or diag("bind_param NULL SQL_BLOB: " . ($sth->errstr // $dbh->errstr // ''));
 
+SKIP: {
+    skip "NULL SQL_BLOB bind failed (HY021 regression)", 1 unless $null_bind_ok;
+    ok ($sth->execute, "execute NULL SQL_BLOB bind");
+}
 ok ($sth->finish);
 
-# Now, try SELECT'ing the first row out.
-ok ($sth = $dbh->prepare("SELECT * FROM $table WHERE id = 1"), "prepare to select picture");
-ok ($sth->execute, "executing...");
+SKIP: {
+    skip "BLOB insert failed (HY021 regression)", 4 unless $bind_ok;
 
-# cubrid_lob_get/export are CUBRID specific.
-# LongReadLen/LongTruncOk must be set before prepare for some ODBC drivers
-my $row = $sth->fetchrow_arrayref;
-# ok ($sth->cubrid_lob_get(2), 'get lob object');
-# ok ($sth->cubrid_lob_export(1, "out"), 'export lob object');
+    ok ($sth = $dbh->prepare("SELECT * FROM $table WHERE id = 1"), "prepare to select picture");
+    ok ($sth->execute, "executing...");
+    $row = $sth->fetchrow_arrayref;
+    ok ($row && defined($row->[1]), "Got blob data");
+    is ($row->[1], $blob_data, "BLOB content match");
+}
 
-ok ($row && $row->[1], "Got blob data");
+SKIP: {
+    skip "NULL BLOB insert failed (HY021 regression)", 3 unless $null_bind_ok;
 
-# Now try SELECT'ing the second row out: NULL
-# ...
+    ok ($sth = $dbh->prepare("SELECT * FROM $table WHERE id = 2"), "prepare to select NULL blob");
+    ok ($sth->execute, "executing NULL row...");
+    $null_row = $sth->fetchrow_arrayref;
+    ok ($null_row && !defined($null_row->[1]), "NULL blob row");
+}
 
-# Cleanup
-ok ($sth->finish);
+ok ($sth->finish) if $sth;
 
 ok $dbh->do("DROP TABLE $table"), "Drop table $table";
 

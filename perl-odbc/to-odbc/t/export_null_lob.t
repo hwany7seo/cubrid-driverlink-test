@@ -20,7 +20,7 @@ if ($@) {
     plan skip_all => "ERROR: $DBI::errstr. Can't continue test";
 }
 else {
-    plan tests => 10;
+    plan tests => 11;
 }
 
 ok $dbh->do("DROP TABLE IF EXISTS $table"), "Drop table if exists $table";
@@ -33,23 +33,30 @@ EOT
 
 ok ($dbh->do($create));
 
-my ($sth, $query);
+my ($sth, $query, $row, $bind_ok);
 
-# Insert a row with NULL blob
-# Workaround: CUBRID ODBC often returns HY021 on bind_param(..., SQL_BLOB); plain NULL works.
 $query = "INSERT INTO $table VALUES(1, ?)";
 ok ($sth = $dbh->prepare($query));
-ok ($sth->bind_param(1, undef));
-ok ($sth->execute);
-ok ($sth->finish);
+$bind_ok = $sth->bind_param(1, undef, DBI::SQL_BLOB);
+ok ($bind_ok, "bind_param NULL SQL_BLOB")
+    or diag("bind_param NULL SQL_BLOB: " . ($sth->errstr // $dbh->errstr // ''));
 
-# Select it back
-ok ($sth = $dbh->prepare("SELECT picture FROM $table WHERE id = 1"));
-ok ($sth->execute);
+SKIP: {
+    skip "NULL SQL_BLOB bind failed (HY021 regression)", 2 unless $bind_ok;
+    ok ($sth->execute, "execute NULL SQL_BLOB bind");
+    ok ($sth->finish);
+}
 
-my $row = $sth->fetchrow_arrayref;
-ok !defined($row->[0]), "Blob should be NULL";
+SKIP: {
+    skip "NULL SQL_BLOB bind failed (HY021 regression)", 3 unless $bind_ok;
 
-$sth->finish if $sth;
+    ok ($sth = $dbh->prepare("SELECT picture FROM $table WHERE id = 1"));
+    ok ($sth->execute);
+    $row = $sth->fetchrow_arrayref;
+    ok ($row && !defined($row->[0]), "Blob should be NULL");
+    $sth->finish if $sth;
+}
+
+ok $dbh->do("DROP TABLE IF EXISTS $table"), "Drop table $table";
 
 ok $dbh->disconnect;

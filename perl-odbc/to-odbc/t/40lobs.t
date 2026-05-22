@@ -12,13 +12,14 @@ require 'lib.pl';
 my $dbh;
 
 eval {$dbh = DBI->connect($test_dsn, $test_user, $test_passwd,
-        { RaiseError => 1, AutoCommit => 1})};
+        { RaiseError => 0, AutoCommit => 1,
+          LongReadLen => 10000, LongTruncOk => 1 })};
 
 if ($@) {
     plan skip_all => "ERROR: $DBI::errstr. Can't continue test";
 }
 else {
-    plan tests => 15;
+    plan tests => 16;
 }
 
 ok $dbh->do("DROP TABLE IF EXISTS $table"), "Drop table if exists $table";
@@ -31,40 +32,29 @@ EOT
 
 ok ($dbh->do($create));
 
-#   Insert a row into the test table.......
-my ($sth, $query);
+my ($sth, $query, $row);
 $query = "INSERT INTO $table VALUES(1, ?)";
 ok ($sth = $dbh->prepare($query));
-# Workaround: SQL_CLOB bind hits HY021 on CUBRID ODBC; LONGVARCHAR is accepted for text LOB.
-ok ($sth->bind_param(1, "Hello world!", DBI::SQL_LONGVARCHAR));
-ok ($sth->execute);
-ok ($sth->finish);
 
-#   Now, try SELECT'ing the row out.
-ok ($sth = $dbh->prepare("SELECT * FROM $table WHERE id = 1"));
+my $bind_ok = $sth->bind_param(1, "Hello world!", DBI::SQL_CLOB);
+ok ($bind_ok, "bind_param SQL_CLOB")
+    or diag("bind_param SQL_CLOB: " . ($sth->errstr // $dbh->errstr // ''));
 
-ok ($sth->execute);
+SKIP: {
+    skip "SQL_CLOB bind failed (HY021 regression)", 9 unless $bind_ok;
 
-# blob_read might not be supported or needed with ODBC
-# ODBC usually returns LOBs as stream or long string depending on LongReadLen
-$dbh->{LongReadLen} = 10000;
-$dbh->{LongTruncOk} = 1;
+    ok ($sth->execute, "execute after SQL_CLOB bind");
+    ok ($sth->finish);
 
-# $sth->blob_read(0,0,0); # Not standard DBI or might be driver specific.
-# CUBRID driver had it. ODBC driver likely just fetches it.
-
-ok ($row = $sth->fetchrow_arrayref);
-
-ok defined($row), "row returned defined";
-
-is @$row, 2, "records from $table returned 2";
-
-is $$row[0], 1, 'id set to 1';
-
-# Verify content if possible
-# is $$row[1], "Hello world!", "Content match";
-
-ok ($sth->finish);
+    ok ($sth = $dbh->prepare("SELECT * FROM $table WHERE id = 1"));
+    ok ($sth->execute);
+    ok ($row = $sth->fetchrow_arrayref);
+    ok defined($row), "row returned defined";
+    is @$row, 2, "records from $table returned 2";
+    is $$row[0], 1, 'id set to 1';
+    is $$row[1], "Hello world!", "CLOB content match";
+    ok ($sth->finish);
+}
 
 ok $dbh->do("DROP TABLE $table"), "Drop table $table";
 
