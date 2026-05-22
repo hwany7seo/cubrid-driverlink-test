@@ -79,14 +79,16 @@ class ExecuteViewTest(unittest.TestCase):
                 self.cursor.execute(alterSql)
                 result_up = self.cursor.rowcount
                 print ("alterSql",result_up)
-                #self.assertEqual(result_up, 1)
+                # ODBC: DDL rowcount is 0 (native CUBRIDdb execute() returned 1).
+                self.assertEqual(result_up, 0)
                 select_up = "select * from b_view"
                 self.cursor.execute(select_up)
                 self.row_up=self.cursor.fetchall()
                 for self.value in self.row_up:
                    print (self.value[0],self.value[1])
-                #result_up1=self.row_up[1]
-                #self.assertEqual(result_up1, 'b2')
+                self.assertEqual(len(self.row_up), 5)
+                self.assertEqual(self.row_up[1][0], 2)
+                self.assertEqual(self.row_up[1][1], '222-2222')
 
         def test_update(self):
                 print("view update!")

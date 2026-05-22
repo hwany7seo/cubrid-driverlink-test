@@ -49,8 +49,7 @@ https://github.com/pueteam/nodejs-jdbc
 
 ## PyODBC (tests, tests2, test3) - https://github.com/mkleehammer/pyodbc
 - Tests2에서 error 코드 테스트가 많으나 pyodbc에서 보내는 error외에 
-ODBC에서 보내는 코드에 대해서 오류 메세지가 미흡함 확인 후 수정필요
-- execute_view and execute_issue
+ODBC에서 보내는 코드에 대해서 오류 메세지가 미흡함 확인 후 수정필요 (execute_issue, execute_view in test2)
 - cur.setinputsizes([(SQL_BLOB, len(img_data), 0)])
 - Blob, Clob 관련 오류 (테스트 버전 수정 확인 후 반영 예정)
 
