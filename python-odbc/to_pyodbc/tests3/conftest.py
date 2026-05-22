@@ -44,6 +44,7 @@ def cubrid_db_connection():
     conn = pyodbc.connect(conStr)
     yield conn
     try:
+        conn.autocommit = True
         conn.close()
     except pyodbc.ProgrammingError:
         pass
@@ -77,15 +78,21 @@ def assert_pyodbc_exc_str(exc_info, expected: str):
 
 
 def _create_table(cdb_cur, name_suffix, columns_sql):
-    cur, _ = cdb_cur
+    cur, con = cdb_cur
     table_name = f'{TABLE_PREFIX}{name_suffix}'
+    prev_autocommit = con.autocommit
+    con.autocommit = True
     cur.execute(f'drop table if exists {table_name}')
     cur.execute(f'create table {table_name} ({columns_sql})')
+    con.autocommit = prev_autocommit
     return table_name
 
 def _drop_table(cdb_cur, table_name):
-    cur, _ = cdb_cur
+    cur, con = cdb_cur
+    prev_autocommit = con.autocommit
+    con.autocommit = True
     cur.execute(f'drop table if exists {table_name}')
+    con.autocommit = prev_autocommit
 
 
 @pytest.fixture
@@ -258,15 +265,21 @@ VIEW_PREFIX = 'dbapi20testview_'
 
 
 def _create_view(cdb_cur, name_suffix, view_sql):
-    cur, _ = cdb_cur
+    cur, con = cdb_cur
     view_name = f'{TABLE_PREFIX}{name_suffix}'
+    prev_autocommit = con.autocommit
+    con.autocommit = True
     cur.execute(f'drop view if exists {view_name}')
     cur.execute(f'create view {view_name} AS {view_sql}')
+    con.autocommit = prev_autocommit
     return view_name
 
 def _drop_view(cdb_cur, view_name):
-    cur, _ = cdb_cur
+    cur, con = cdb_cur
+    prev_autocommit = con.autocommit
+    con.autocommit = True
     cur.execute(f'drop view if exists {view_name}')
+    con.autocommit = prev_autocommit
 
 
 @pytest.fixture

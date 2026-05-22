@@ -375,12 +375,49 @@ class DatabaseTest(unittest.TestCase):
             con.close()
 
     def test_lob_file(self):
-        """pyodbc with cubrid-odbc is not support: Connection.lob(), Cursor.bind_lob(), fetch_lob() are CUBRID-specific."""
-        pass
+        """BLOB round-trip via pyodbc.Binary (native con.lob() is not available)."""
+        import os
+        logo = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cubrid_logo.png')
+        if os.path.isfile(logo):
+            with open(logo, 'rb') as fh:
+                raw = fh.read()
+        else:
+            raw = b'dummy blob data for regression test'
+
+        con = self._connect()
+        cur = con.cursor()
+        try:
+            cur.execute('drop table if exists testpyodbc')
+            cur.execute('create table testpyodbc (picture blob)')
+            param = pyodbc.Binary(raw) if hasattr(pyodbc, 'Binary') else raw
+            cur.execute('insert into testpyodbc values (?)', (param,))
+            cur.execute('select picture from testpyodbc')
+            row = cur.fetchone()
+            self.assertIsNotNone(row)
+            self.assertEqual(row[0], raw)
+        finally:
+            cur.close()
+            con.close()
 
     def test_lob_string(self):
-        """pyodbc with cubrid-odbc is not support: Connection.lob(), Cursor.bind_lob(), fetch_lob() are CUBRID-specific."""
-        pass
+        """Regression: direct CLOB SELECT must work without CAST to VARCHAR."""
+        text = 'hello world'
+        con = self._connect()
+        cur = con.cursor()
+        try:
+            cur.execute('drop table if exists testpyodbc')
+            cur.execute('create table testpyodbc (content clob)')
+            cur.execute('insert into testpyodbc values (?)', (text,))
+            cur.execute('select content from testpyodbc')
+            row = cur.fetchone()
+            self.assertIsNotNone(row)
+            got = row[0]
+            if isinstance(got, bytes):
+                got = got.decode('utf-8')
+            self.assertEqual(str(got).rstrip(), text)
+        finally:
+            cur.close()
+            con.close()
 
     def test_result_info(self):
         """pyodbc with cubrid-odbc is not support: Cursor.result_info() is CUBRID-specific."""

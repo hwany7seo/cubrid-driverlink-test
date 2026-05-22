@@ -639,59 +639,49 @@ def _are_files_identical(file1_path, file2_path, chunk_size=4096):
 
 
 def test_lob_file(cubrid_cursor):
-    cur, con = cubrid_cursor
-    _require_conn_api(con, 'lob')
-
+    cur, _ = cubrid_cursor
     base_dir = os.path.dirname(__file__)
     fp1 = os.path.join(base_dir, 'cubrid_logo.png')
-    fp2 = os.path.join(base_dir, 'lob_out.png')
+    if os.path.isfile(fp1):
+        with open(fp1, 'rb') as fh:
+            raw = fh.read()
+    else:
+        raw = b'dummy blob data for regression test'
 
     try:
         cur.execute('drop table if exists testpyodbc')
-
         cur.execute('create table testpyodbc (picture blob)')
-
-        cur.prepare('insert into testpyodbc values (?)')
-        lob = con.lob()
-        lob.imports(fp1)
-        cur.bind_lob(1, lob)
-        cur.execute()
-        lob.close()
-
-        cur.execute('select * from testpyodbc')
-        lob_fetch = con.lob()
-        cur.fetch_lob(1, lob_fetch)
-        lob_fetch.export(fp2)
-        lob_fetch.close()
-
-        assert _are_files_identical(fp1, fp2)
+        param = pyodbc.Binary(raw) if hasattr(pyodbc, 'Binary') else raw
+        cur.execute('insert into testpyodbc values (?)', (param,))
+        cur.execute('select picture from testpyodbc')
+        row = cur.fetchone()
+        assert row is not None
+        got = row[0]
+        if isinstance(got, memoryview):
+            got = got.tobytes()
+        elif isinstance(got, bytearray):
+            got = bytes(got)
+        assert got == raw
     finally:
         _cleanup_table(cur)
 
-        if os.path.exists(fp2):
-            os.remove(fp2)
-
 
 def test_lob_string(cubrid_cursor):
-    cur, con = cubrid_cursor
-    _require_conn_api(con, 'lob')
+    """Regression: direct CLOB SELECT must work without CAST to VARCHAR."""
+    cur, _ = cubrid_cursor
+    text = 'hello world'
 
     try:
+        cur.execute('drop table if exists testpyodbc')
         cur.execute('create table testpyodbc (content clob)')
-
-        cur.prepare('insert into testpyodbc values (?)')
-        lob = con.lob()
-        lob.write('hello world', 'C')
-        cur.bind_lob(1, lob)
-        cur.execute()
-        lob.close()
-
-        cur.execute('select * from testpyodbc')
-        lob_fetch = con.lob()
-        cur.fetch_lob(1, lob_fetch)
-        assert lob_fetch.read() == 'hello world', 'lob.read() get incorrect result'
-        assert lob_fetch.seek(0, pyodbc.SEEK_SET) == 0
-        lob_fetch.close()
+        cur.execute('insert into testpyodbc values (?)', (text,))
+        cur.execute('select content from testpyodbc')
+        row = cur.fetchone()
+        assert row is not None
+        got = row[0]
+        if isinstance(got, bytes):
+            got = got.decode('utf-8')
+        assert str(got).rstrip() == text
     finally:
         _cleanup_table(cur)
 

@@ -21,7 +21,6 @@ def test_fetchone_error_before_select(cubrid_db_cursor):
     assert_pyodbc_exc_str(ei, PYODBC_ERR_NO_QUERY_RESULTS)
 
 
-@pytest.mark.xfail(reason="CCI does not return error when fetchone cannot return rows")
 def test_fetchone_error_no_rows(cubrid_db_cursor, booze_table):
     cur, _ = cubrid_db_cursor
 

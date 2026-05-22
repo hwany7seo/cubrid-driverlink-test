@@ -14,7 +14,6 @@ from conftest import (
 import pyodbc
 
 
-@pytest.mark.xfail(reason="CCI does not return error when fetchall cannot return rows")
 def test_fetchall_error_no_rows(cubrid_db_cursor, booze_table):
     cur, _ = cubrid_db_cursor
 

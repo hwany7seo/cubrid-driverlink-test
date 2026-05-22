@@ -1,5 +1,6 @@
 # -*- encoding:utf-8 -*-
 
+import ast
 import unittest
 import pyodbc
 import time
@@ -8,6 +9,26 @@ import decimal
 import datetime
 from xml.dom import minidom
 from conftest import _get_connect_args
+
+
+def _set_elements_from_fetch(result):
+    """Normalize a CUBRID SET column value from pyodbc to a set of strings."""
+    if isinstance(result, (set, list, tuple)):
+        return set(str(x) for x in result)
+    if isinstance(result, str):
+        try:
+            parsed = ast.literal_eval(result)
+            if isinstance(parsed, (set, list, tuple)):
+                return set(str(x) for x in parsed)
+        except (ValueError, SyntaxError):
+            pass
+        s = result.strip().strip('{}')
+        if not s:
+            return set()
+        parts = [p.strip().strip('"\'') for p in s.split(',')]
+        return set(parts)
+    return set(str(x) for x in result)
+
 
 class DBAPI20Test(unittest.TestCase):
     driver = pyodbc
@@ -356,137 +377,97 @@ class DBAPI20Test(unittest.TestCase):
             con.close()
 
     def test_set_type_binding(self):
-        if not hasattr(self.driver, 'FIELD_TYPE'):
-            self.skipTest('set_type binding is not supported by this DB-API driver')
         con = self._connect()
         try:
             cur = con.cursor()
             self.executeDDL4(cur)
             self.executeDDL5(cur)
 
-            # Scenario: set_type not provided (type inference)
-            # String set
-            cur.execute("insert into %sset_table values (?,?)" % self.table_prefix,
-                        (3, ('e', 'f')))
+            cur.execute(
+                "insert into %sset_table values (?,{?,?})" % self.table_prefix,
+                (3, 'e', 'f'))
             cur.execute("select s from %sset_table where id=3" % self.table_prefix)
             res = cur.fetchone()[0]
-            self.assertEqual(set(res), {'e', 'f'})
+            self.assertEqual(_set_elements_from_fetch(res), {'e', 'f'})
 
-            # Integer set
-            cur.execute("insert into %sset_table_int values (?,?)" % self.table_prefix,
-                        (1, (10, 20)))
+            cur.execute(
+                "insert into %sset_table_int values (?,{?,?})" % self.table_prefix,
+                (1, '10', '20'))
             cur.execute("select s from %sset_table_int where id=1" % self.table_prefix)
             res = cur.fetchone()[0]
-            self.assertEqual(set(res), {'10', '20'})
+            self.assertEqual(_set_elements_from_fetch(res), {'10', '20'})
         finally:
             con.close()
 
     def test_set_type_binding_set_type(self):
-        if not hasattr(self.driver, 'FIELD_TYPE'):
-            self.skipTest('set_type binding is not supported by this DB-API driver')
         con = self._connect()
         try:
             cur = con.cursor()
             self.executeDDL4(cur)
 
-            # Scenario: set_type provided correctly
-            # Using a single type for all set parameters
-            cur.execute("insert into %sset_table values (?,?)" % self.table_prefix,
-                        (1, ('a', 'b')), set_type=self.driver.FIELD_TYPE.VARCHAR)
+            cur.execute(
+                "insert into %sset_table values (?,{?,?})" % self.table_prefix,
+                (1, 'a', 'b'))
             cur.execute("select s from %sset_table where id=1" % self.table_prefix)
             res = cur.fetchone()[0]
-            self.assertEqual(set(res), {'a', 'b'})
+            self.assertEqual(_set_elements_from_fetch(res), {'a', 'b'})
 
-            # Using a list of types
-            cur.execute("insert into %sset_table values (?,?)" % self.table_prefix,
-                        (2, ('c', 'd')), set_type=[None, self.driver.FIELD_TYPE.VARCHAR])
+            cur.execute(
+                "insert into %sset_table values (?,{?,?})" % self.table_prefix,
+                (2, 'c', 'd'))
             cur.execute("select s from %sset_table where id=2" % self.table_prefix)
             res = cur.fetchone()[0]
-            self.assertEqual(set(res), {'c', 'd'})
+            self.assertEqual(_set_elements_from_fetch(res), {'c', 'd'})
         finally:
             con.close()
 
     def test_set_type_binding_set_type_fail(self):
-        if not hasattr(self.driver, 'FIELD_TYPE'):
-            self.skipTest('set_type binding is not supported by this DB-API driver')
         con = self._connect()
         try:
             cur = con.cursor()
             self.executeDDL4(cur)
             self.executeDDL5(cur)
 
-            # Scenario: Incorrect usage
-            # Case A: set_type list is too short, should fall back to inference
-            cur.execute("insert into %sset_table values (?,?)" % self.table_prefix,
-                        (4, ('g', 'h')), set_type=[self.driver.FIELD_TYPE.INT])
+            cur.execute(
+                "insert into %sset_table values (?,{?,?})" % self.table_prefix,
+                (4, 'g', 'h'))
             cur.execute("select s from %sset_table where id=4" % self.table_prefix)
             res = cur.fetchone()[0]
-            self.assertEqual(set(res), {'g', 'h'})
+            self.assertEqual(_set_elements_from_fetch(res), {'g', 'h'})
 
-            # Case B: Type mismatch between set_type and data (should raise DatabaseError)
-            with self.assertRaises(self.driver.DatabaseError):
-                cur.execute("insert into %sset_table_int values (?,?)" % self.table_prefix,
-                            (2, ('x', 'y')), set_type=self.driver.FIELD_TYPE.INT)
-
-            # Case C: Mixed types in set data without set_type (should raise TypeError)
-            with self.assertRaises(TypeError):
-                cur.execute("insert into %sset_table values (?,?)" % self.table_prefix,
-                            (5, (1, 'z')))
+            with self.assertRaises(self.driver.Error):
+                cur.execute(
+                    "insert into %sset_table_int values (?,{?,?})" % self.table_prefix,
+                    (2, 'x', 'y'))
         finally:
             con.close()
 
         # APIS-348
     def test_autocommit(self):
         con = self._connect()
-        saved_autocommit = None
         try:
             cur = con.cursor()
+            saved_autocommit = con.autocommit
+            con.autocommit = True
             self.executeDDL1(cur)
-
-            if hasattr(con, 'get_autocommit'):
-                self.assertEqual(con.get_autocommit(), True, "autocommit is on by default")
-                con.set_autocommit(False)
-                self.assertEqual(con.get_autocommit(), False, "autocommit is off")
-            else:
-                saved_autocommit = con.autocommit
-                con.autocommit = False
-                self.assertFalse(con.autocommit)
+            con.autocommit = False
+            self.assertFalse(con.autocommit)
 
             cur.execute("insert into %sbooze values ('Hello')" % (self.table_prefix))
             con.rollback()
+            cur.execute("select * from %sbooze" % self.table_prefix)
+            rows = cur.fetchall()
+            self.assertEqual(len(rows), 0)
+
             con.autocommit = True
-            con2 = None
-            try:
-                con2 = pyodbc.connect(self.conStr)
-                c2 = con2.cursor()
-                c2.execute("select count(*) from %sbooze" % self.table_prefix)
-                n = int(c2.fetchone()[0])
-            except pyodbc.Error:
-                self.skipTest(
-                    'CUBRID ODBC: cannot query table after rollback on another connection')
-            finally:
-                if con2 is not None:
-                    con2.close()
-
-            self.assertEqual(n, 0, "0 lines affected")
-
-            if hasattr(con, 'set_autocommit'):
-                con.set_autocommit(True)
-                self.assertEqual(con.get_autocommit(), True, "autocommit is on")
-            else:
-                con.autocommit = True
-                self.assertTrue(con.autocommit)
+            self.assertTrue(con.autocommit)
 
             cur.execute("insert into %sbooze values ('Hello')" % (self.table_prefix))
-            cur_sel = con.cursor()
-            cur_sel.execute("select * from %sbooze" % self.table_prefix)
-            rows = cur_sel.fetchall()
-            cur_sel.close()
-
+            cur.execute("select * from %sbooze" % self.table_prefix)
+            rows = cur.fetchall()
             self.assertEqual(len(rows), 1, "1 lines affected")
 
-            if saved_autocommit is not None:
-                con.autocommit = saved_autocommit
+            con.autocommit = saved_autocommit
         finally:
             con.close()
 

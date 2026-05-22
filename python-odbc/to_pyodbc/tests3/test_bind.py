@@ -114,3 +114,39 @@ def test_bind_binary(cubrid_db_cursor):
 
     inserted = _test_binding(cubrid_db_cursor[0], 'xbit BIT VARYING(256)', samples_bytes)
     assert inserted == samples_bytes
+
+
+def test_bind_clob_direct_select(cubrid_db_cursor):
+    """Regression: CLOB must be readable via direct SELECT (no CAST workaround)."""
+    cur, _ = cubrid_db_cursor
+    table_name = f'{TABLE_PREFIX}clob_direct'
+    text = 'hello clob regression'
+    cur.execute(f'drop table if exists {table_name}')
+    try:
+        cur.execute(f'create table {table_name} (content clob)')
+        cur.execute(f'insert into {table_name} values (?)', (text,))
+        cur.execute(f'select content from {table_name}')
+        row = cur.fetchone()
+        got = row[0]
+        if isinstance(got, bytes):
+            got = got.decode('utf-8')
+        assert str(got).rstrip() == text
+    finally:
+        cur.execute(f'drop table if exists {table_name}')
+
+
+def test_bind_set_scalar_param(cubrid_db_cursor):
+    """Regression: SET bind via single ? parameter (native driver style)."""
+    cur, _ = cubrid_db_cursor
+    table_name = f'{TABLE_PREFIX}set_scalar'
+    cur.execute(f'drop table if exists {table_name}')
+    try:
+        cur.execute(f'create table {table_name} (id int, s set(varchar))')
+        cur.execute(f'insert into {table_name} values (1, ?)', ('{a,b}',))
+        cur.execute(f'select s from {table_name} where id=1')
+        row = cur.fetchone()
+        assert row is not None
+        assert 'a' in str(row[0])
+        assert 'b' in str(row[0])
+    finally:
+        cur.execute(f'drop table if exists {table_name}')

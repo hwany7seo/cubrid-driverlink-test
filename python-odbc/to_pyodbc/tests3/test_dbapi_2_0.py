@@ -257,39 +257,25 @@ def test_executemany(cubrid_db_cursor, booze_table):
 def test_autocommit(cubrid_db_cursor, booze_table):
     cur, con = cubrid_db_cursor
 
-    # PEP 249 does not require a default; pyodbc often defaults to False
-    prev = con.autocommit
-
     con.autocommit = False
     assert con.autocommit is False, "autocommit must be set to off"
 
     cur.execute(f"insert into {booze_table} values ('Hello')")
     con.rollback()
-    con.autocommit = True
-    # Same connection may not accept SELECT immediately after rollback on CUBRID ODBC
-    con2 = None
-    try:
-        con2 = pyodbc.connect(_get_connect_args())
-        c2 = con2.cursor()
-        c2.execute(f"select count(*) from {booze_table}")
-        n = int(c2.fetchone()[0])
-    except pyodbc.Error:
-        pytest.skip('CUBRID ODBC: cannot query table after rollback on another connection')
-    finally:
-        if con2 is not None:
-            con2.close()
+    cur.execute(f"select * from {booze_table}")
+    rows = cur.fetchall()
 
-    assert n == 0
+    assert len(rows) == 0
+
+    con.autocommit = True
 
     cur.execute(f"insert into {booze_table} values ('Hello')")
-    cur_sel = con.cursor()
-    cur_sel.execute(f"select * from {booze_table}")
-    rows = cur_sel.fetchall()
-    cur_sel.close()
+    cur.execute(f"select * from {booze_table}")
+    rows = cur.fetchall()
 
     assert len(rows) == 1
 
-    con.autocommit = prev
+    con.autocommit = True
 
 
 def test_datatype(cubrid_db_cursor, datatype_table):

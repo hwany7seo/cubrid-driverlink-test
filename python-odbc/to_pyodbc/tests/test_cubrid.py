@@ -377,8 +377,8 @@ class DatabaseTest(unittest.TestCase):
             cur.execute('insert into testpyodbc values (?)', (text,))
             self.assertTrue(cur.rowcount in (-1, 1))
             con.commit()
-            # Direct CLOB select can confuse pyodbc UTF-16 decoding on CUBRID ODBC.
-            cur.execute('select cast(content as varchar(32768)) from testpyodbc')
+            # Regression: CUBRID ODBC must return CLOB via direct SELECT (no CAST workaround).
+            cur.execute('select content from testpyodbc')
             row = cur.fetchone()
             self.assertIsNotNone(row)
             got = row[0]
